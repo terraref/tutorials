@@ -3,7 +3,7 @@
 
 ### Schema Overview
 
-![http://onlinelibrary.wiley.com/store/10.1111/gcbb.12420/asset/image_n/gcbb12420-fig-0001.png]
+![](https://raw.githubusercontent.com/ebimodeling/betydb_manuscript/master/figures/gcbb12420-fig-0001.png)
 
 ### Define Join
 
