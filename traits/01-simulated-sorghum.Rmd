@@ -5,7 +5,9 @@ date: "February 1, 2015"
 output: html_document
 ---
 
-# A simulated dataset
+
+
+# Background: The design of a simulated dataset
 
 To explore the potential of phenotyping data, we have simulated the type of data that might be observed by daily scans by drone or robot. 
 
@@ -51,6 +53,13 @@ These are approximate locations used to query the meteorological and soil data u
 | south | 37.0 | -88.5 |
 
 Each site has four replicate fields: A, B, C, D. This simulated dataset assumes each field within a site has similar, but different meteorology (e.g., as if they were all in the same county). 
+
+```{r query-sites}
+sites <- bety_query(table = 'sites', name = 'Season+2')
+# plot polygons, how? leaflet? something simple?
+```
+
+> Your Turn: How would you add these points to a map?
 
 ## Meteorology
 
@@ -107,26 +116,9 @@ This dataset includes what a sensor might observe, daily for five years during t
 |          |NDVI                            |normalized_difference_vegetation_index                                               |ratio             | commonly used vegetation index |
 |            | Height                               |   canopy_height | m                        | |
 
-# How to obtain data and give feedback:
 
-Please provide feedback. Please provide feedback by leaving a comment below, commenting on the issue in our [GitHub repository](https://github.com/terraref/reference-data/issues/20), emailing me, [dlebauer@illinois.edu](mailto:dlebauer@illinois.edu), or visiting the [TerraRef Reference Data chatroom](https://gitter.im/terraref/reference-data).
+# Quick start
 
-* If you do something cool, please send comments and figures! 
-* I also can provide similar data at hourly or higher frequency as well as other processes and environmental drivers, 
-Data are located on Box: https://uofi.box.com/sorghum-simulation
-
-## Data on BETYdb
-
-These data have been uploaded to a [test instance of our database, BETYdb.](http://terraref.ncsa.illinois.edu/bety-test/search?search=sorghum) and can be accessed in the following ways:
-
-1. web interface: search + download
- * go to http://terraref.ncsa.illinois.edu/bety-test and search for "Sorghum" in the search box
- * click "Download Results"
-2. API: 
-  * basic search: http://terraref.ncsa.illinois.edu/bety-test/search?search=sorghum
-  * Draft API Documentation: https://terraref.ncsa.illinois.edu/bety-test/api/docs
-3. SQL Dump: https://terraref.ncsa.illinois.edu/bety-test/dump/bety.tar.gz
-4. Other Methods: https://pecan.gitbooks.io/betydb-data-access/content/introduction.html
 
 For simplicity, and because I neither have a model nor the data to simulate _Sorghum_, I have started with some phenotypes and simulations of plant growth based on a model that simulates the growth of biomass crops including Miscanthus, Switchgrass, Sugarcane, and coppice Willow.
 
@@ -206,7 +198,7 @@ ggpairs(p,
 
 ```
 
-### Time serise
+### Time series
 
 
 ```{r}
@@ -232,3 +224,24 @@ ggplot() +
   facet_wrap(~year, nrow = 1) 
         
 ```
+
+# How to obtain data and give feedback:
+
+Please provide feedback by leaving a comment below, commenting on the issue in our [GitHub repository](https://github.com/terraref/reference-data/issues/20), emailing me, [dlebauer@illinois.edu](mailto:dlebauer@illinois.edu), or visiting the [TerraRef Reference Data chatroom](https://gitter.im/terraref/reference-data).
+
+* If you do something cool, please send comments and figures! 
+* I also can provide similar data at hourly or higher frequency as well as other processes and environmental drivers, 
+Data are located on Box: https://uofi.box.com/sorghum-simulation
+
+## Data on BETYdb
+
+These data have been uploaded to a [test instance of our database, BETYdb.](http://terraref.ncsa.illinois.edu/bety-test/search?search=sorghum) and can be accessed in the following ways:
+
+1. web interface: search + download
+ * go to http://terraref.ncsa.illinois.edu/bety-test and search for "Sorghum" in the search box
+ * click "Download Results"
+2. API: 
+  * basic search: http://terraref.ncsa.illinois.edu/bety-test/search?search=sorghum
+  * Draft API Documentation: https://terraref.ncsa.illinois.edu/bety-test/api/docs
+3. SQL Dump: https://terraref.ncsa.illinois.edu/bety-test/dump/bety.tar.gz
+4. Other Methods: https://pecan.gitbooks.io/betydb-data-access/content/introduction.html
