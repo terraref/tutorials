@@ -1,0 +1,63 @@
+
+## Joining database tables  
+
+### Schema Overview
+
+![http://onlinelibrary.wiley.com/store/10.1111/gcbb.12420/asset/image_n/gcbb12420-fig-0001.png]
+
+### Define Join
+
+```{r}
+bety <- src_postgres(host = d$host, user = d$user, password = d$password, dbname = d$dbname)
+
+## query and join tables
+species <- tbl(bety, 'species') %>% 
+  dplyr::select(id, scientificname, genus) %>% 
+  dplyr::rename(specie_id = id)
+
+sites <- tbl(bety, sql(
+  paste("select id as site_id, st_y(st_centroid(sites.geometry)) AS lat,",
+        "st_x(st_centroid(sites.geometry)) AS lon,",
+        " sitename, city, country from sites"))
+  )
+
+citations <- tbl(bety, 'citations') %>%
+  select(citation_id = id, author, year, title)
+
+yields <- tbl(bety, 'yields') %>%
+  select(id, date, mean, n, statname, stat, site_id, specie_id, treatment_id, citation_id, cultivar_id) %>% 
+  left_join(species, by = 'specie_id') %>%
+  left_join(sites, by = 'site_id') %>% 
+  left_join(citations, by = 'citation_id')
+
+managements_treatments <- tbl(bety, 'managements_treatments') %>%
+  select(treatment_id, management_id)
+
+treatments <- tbl(bety, 'treatments') %>% 
+  dplyr::mutate(treatment_id = id) %>% 
+  dplyr::select(treatment_id, name, definition, control)
+
+managements <- tbl(bety, 'managements') %>%
+  filter(mgmttype %in% c('fertilizer_N', 'fertilizer_N_rate', 'planting', 'irrigation')) %>%
+  dplyr::mutate(management_id = id) %>%
+  dplyr::select(management_id, date, mgmttype, level, units) %>%
+  left_join(managements_treatments, by = 'management_id') %>%
+  left_join(treatments, by = 'treatment_id') 
+
+planting <- managements %>% filter(mgmttype == "planting") %>%
+  select(treatment_id, planting_date = date)
+
+grass_yields <- yields %>% 
+  filter(genus %in% c('Miscanthus', 'Panicum')) %>%
+  left_join(planting, by = 'treatment_id') %>% 
+  collect %>% 
+  mutate(age = year(date)- year(planting_date),
+         nrate = ifelse(is.na(nrate), 0, nrate),
+         SE = ifelse(statname == "SE", stat, ifelse(statname == 'SD', stat / sqrt(n), NA)),
+         continent = ifelse(lon < -30, 'united_states', ifelse(lon < 75, 'europe', 'asia'))) %>% 
+  filter(!duplicated(.))
+
+ggplot(data = grass_yields, aes(lon,lat)) + 
+  geom_point(aes(color = genus, size = mean), 
+             alpha = 0.1)
+```
