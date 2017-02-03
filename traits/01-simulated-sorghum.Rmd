@@ -62,7 +62,7 @@ These are approximate locations used to query the meteorological and soil data u
 Each site has four replicate fields: A, B, C, D. This simulated dataset assumes each field within a site has similar, but different meteorology (e.g., as if they were all in the same county). 
 
 ```{r query-sites}
-sites <- bety_query(table = 'sites', name = 'Season+2')
+sites <- betydb_query(table = 'sites', name = 'Season+2')
 # plot polygons, how? leaflet? something simple?
 ```
 
