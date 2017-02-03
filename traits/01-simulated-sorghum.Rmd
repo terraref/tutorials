@@ -5,7 +5,14 @@ date: "February 1, 2015"
 output: html_document
 ---
 
+```{r setup}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+library(ggplot2)
+library(ggthemes)
+library(GGally)
+theme_set(theme_bw())
 
+```
 
 # Background: The design of a simulated dataset
 
@@ -140,20 +147,42 @@ In make-believe land we take a bunch of data generated above and start to rename
    * for within site E effects, use a few points within 1/4 degree lat/lon 
    * for across site E effects, use southern, central, and northern Illinois.
 
-### Simulated Phenotypes
+### Accessing the TERRA Simulated Data Database
 
 
 ```{r}
-# query search table with phenotypes %in% SLA, leafN, 
-#p <- phenotypes %>% dplyr::select(Vcmax, c2n_leaf, cuticular_cond, SLA, quantum_efficiency,
-#                                  leaf_respiration_rate_m2, stomatal_slope.BB, growth_respiration_coefficient,
-#                                  Jmax, chi_leaf, extinction_coefficient_diffuse) %>% setDT
-# make some scatter plots 
 
-library(ggplot2)
-library(ggthemes)
-library(GGally)
-theme_set(theme_tufte())
+library(traits)
+
+terraref_test_url <- "https://terraref.ncsa.illinois.edu/bety-test/"
+## note that this key accesses public data. In part 2 you will use your own key to access the actual data
+
+public_key <- 9999999999999999999999999999999999999999
+
+traits <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
+
+
+SLA <- betydb_search(query = "SLA", betyurl = terraref_test_url, key = public_key)
+%>% 
+  filter(scientificname == 'Sorghum bicolor')
+
+```
+
+
+Now we have queried all of the Specific Leaf Area records, we can see that these data are summarized at the level of genotype. 
+
+
+```{r sla-fig, fig.height=2, fig.width=6}
+ggplot(SLA) + 
+  geom_histogram(aes(mean), binwidth = 1)
+```
+
+## Your turn: query the list of available traits from the variables table
+
+```{r query-traits}
+
+
+traits <- betydb_search("SLA Vcmax",  betyurl = terraref_test_url, key = public_key)
 
 p <- phenotypes %>% dplyr::select(Vcmax, c2n_leaf, cuticular_cond, SLA, quantum_efficiency,
                                   leaf_respiration_rate_m2, stomatal_slope.BB, growth_respiration_coefficient,

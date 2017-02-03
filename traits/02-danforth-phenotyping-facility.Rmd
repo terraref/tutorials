@@ -6,7 +6,7 @@ output: md_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(jsonlite)
 library(dplyr)
 library(ggplot2)
@@ -22,19 +22,70 @@ BETYdb stores trait data and agronomic metadata. An introduction to the API is i
 Also see the full documentation for accessing data from BETYdb. 
 
 
+### Setting up an API key and establishing a connection
+
+An API key is like a password. It allows you to access data, and should be kept private. Therefore, we are not going to put it in code that we share. One way to do this is to place it in a simple text file. 
+
+* click file --> new --> text file
+* copy the api key that was sent when you registered into the file
+* file --> save save as '/home/rstudio/.betykey'
+
+For the purposes of the tutorial, you can assign it to the `mykey` variable in the console window.
+
 ```{r traits}
+
 terraref_betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
-mykey = readLines(con = file('~/.betykey'))
-site <- betydb_site(id = 6000000866, betyurl = terraref_betyurl, key = mykey)
+mykey <- readLines('~/.betykey', warn = FALSE)
 
 sorghum_all <- betydb_search(query = 'Sorghum', 
                          betyurl = terraref_betyurl, 
                          key = mykey) 
-#save(sorghum_all, file = '~/terraref/documentation/tutorials/data/sorghum_all.RData')
-#load('~/terraref/documentation/tutorials/data/sorghum_all.RData')
 
-sorghum <- sorghum_all %>% 
-  select(author, date, scientificname, cultivar, entity, trait, mean, units, city, sitename)
+```
+
+### Query data from the Danforth Phenotyping Facility
+
+First we will use the generic search to query the output from the Lemnatec indoor phenotyping system at the Danforth Center in St. Louis, MO.
+
+```{r query-danforth}
+
+danforth_sorghum <- betydb_query(scientificname = 'Sorghum bicolor', 
+                                 sitename = 'Danforth Plant Science Center Bellweather Phenotyping Facility',
+                                 betyurl = terraref_betyurl, 
+                                 key = mykey)
+
+```
+
+To get the equivalent query via the web interface, you can construct the following URL: 
+
+```{r api-query-in-browser, eval=FALSE}
+search_url <- paste0('https://terraref.ncsa.illinois.edu/bety/api/beta/search?',
+                     'scientificname=Sorghum+bicolor',
+                     '&sitename=Danforth+Plant+Science+Center+Bellweather+Phenotyping+Facility',
+                     '&key=',mykey,'&limit=none')
+
+## open in browser (may need to grant permission)
+browseURL(search_url)
+
+
+```
+
+
+Note that this returns a lot of columns. Lets take a look at what they mean
+
+```{r all-columns}
+
+colnames(sorghum_all)
+
+```
+
+Which ones do we want?
+
+
+
+```{r}
+sorghum <- danforth_sorghum %>% 
+  select(date = raw_date, scientificname, cultivar, entity, trait, mean, units)
 
 head(sorghum)
 
@@ -43,25 +94,31 @@ head(sorghum)
 ### Summary of Available Data
 
 ```{r phenotype_counts, fig.width=8, fig.height=4}
-
+theme_set(theme_few())
+sorghum <- sorghum %>% mutate(label = paste0(trait, ' (', units, ')'))
 ggplot(data = sorghum) + 
   geom_histogram(aes(x = mean), bins = 100) + 
-  facet_wrap(~trait, scales = 'free')
+  facet_wrap(~label, scales = 'free') 
 
 
 ```
 
 
-### Danfoth Phenotyping Facility 
+### Growth rate over time
+
 ```{r danforth-phenotypes, fig.width=8, fig.height=4}
-danforth <- sorghum %>% 
-  filter(author == 'Fahlgren, Noah') %>% 
-  mutate(date = lubridate::ymd(date))
-  
 
-ggplot(data = danforth, aes(x = date, y = mean, color = cultivar)) +
-  #geom_line(aes(y = mean, group = entity), alpha = 0.1) +
-  geom_smooth() +
-  geom_point(alpha = 0.1, size = 0.5) +
-  facet_wrap(~trait, scales = 'free')
+ggplot(data = sorghum, aes(x = date, y = mean, color = cultivar)) +
+ # geom_line(aes(group = entity), size = 0.1) +
+  geom_smooth(aes(group = cultivar)) +
+  geom_point(alpha = 0.4, size = 0.1) +
+  facet_wrap(~label, scales = 'free')
 ```
+
+### Your turn
+
+1. Compute phenotypes for each cultivar
+2. An 'entity' is a replicate. 
+   * How many entities are there? 
+   * How many entities per cultivar? 
+   * Did they all make it through the entire growing season?
