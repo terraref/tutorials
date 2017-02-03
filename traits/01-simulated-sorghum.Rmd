@@ -157,14 +157,13 @@ library(traits)
 terraref_test_url <- "https://terraref.ncsa.illinois.edu/bety-test/"
 ## note that this key accesses public data. In part 2 you will use your own key to access the actual data
 
-public_key <- 9999999999999999999999999999999999999999
+public_key <- "9999999999999999999999999999999999999999"
 
 traits <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
 
 
-SLA <- betydb_search(query = "SLA", betyurl = terraref_test_url, key = public_key)
-%>% 
-  filter(scientificname == 'Sorghum bicolor')
+SLA <- (betydb_search(query = "SLA", betyurl = terraref_test_url, key = public_key)
+  %>% filter(scientificname == 'Sorghum bicolor'))
 
 ```
 
