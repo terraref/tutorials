@@ -8,54 +8,94 @@
 ### Define Join
 
 ```{r}
-bety <- src_postgres(host = d$host, user = d$user, password = d$password, dbname = d$dbname)
+
+library(dplyr)
+library(tidyr)
+library(traits)
+year = lubridate::year
+
+# TODO: Maybe just leave this as a list in user environment and pass it explicitly
+# Need to update traits pkg so this works
+options(bety_auth = list(
+  url="https://terraref.ncsa.illinois.edu/bety/",
+  key="9999999999999999999999999999999999999999",
+  api_version="beta"))
 
 ## query and join tables
-species <- tbl(bety, 'species') %>% 
-  dplyr::select(id, scientificname, genus) %>% 
-  dplyr::rename(specie_id = id)
+species <- (betydb_query(table="species", limit="none")
+  %>% select(specie_id = id, scientificname, genus))
 
-sites <- tbl(bety, sql(
-  paste("select id as site_id, st_y(st_centroid(sites.geometry)) AS lat,",
-        "st_x(st_centroid(sites.geometry)) AS lon,",
-        " sitename, city, country from sites"))
-  )
+# Regex is to convert geometry column to lat/long --
+# starts out as e.g. "POINT(40.11, -88.22, 223)"
+sites <- (betydb_query(table="sites")
+  %>% extract(
+    col = geometry,
+    into = c("lat", "lon", "ele"),
+    regex = "POINT \\(([-.\\d]+) ([-.\\d]+) ([-.\\d]+)\\)",
+    convert=TRUE)
+  %>% select(site_id = id, lat, lon, ele, sitename, city, country))
 
-citations <- tbl(bety, 'citations') %>%
-  select(citation_id = id, author, year, title)
 
-yields <- tbl(bety, 'yields') %>%
-  select(id, date, mean, n, statname, stat, site_id, specie_id, treatment_id, citation_id, cultivar_id) %>% 
-  left_join(species, by = 'specie_id') %>%
-  left_join(sites, by = 'site_id') %>% 
-  left_join(citations, by = 'citation_id')
+citations <- (betydb_query(table="citations")
+  %>% select(citation_id = id, author, year, title))
 
-managements_treatments <- tbl(bety, 'managements_treatments') %>%
-  select(treatment_id, management_id)
+# Fails because terraref BETY's yields table is empty
+# Succeeds if betyurl="https://www.betydb.org/" (with a valid key...)
+yields = (betydb_query(table="yields")
+  %>% select(
+    id, date, mean,
+    n, statname, stat,
+    site_id, specie_id, treatment_id,
+    citation_id, cultivar_id)
+  %>% left_join(species, by = 'specie_id')
+  %>% left_join(sites, by = 'site_id')
+    %>% left_join(citations, by = 'citation_id'))
 
-treatments <- tbl(bety, 'treatments') %>% 
-  dplyr::mutate(treatment_id = id) %>% 
-  dplyr::select(treatment_id, name, definition, control)
+```
 
-managements <- tbl(bety, 'managements') %>%
-  filter(mgmttype %in% c('fertilizer_N', 'fertilizer_N_rate', 'planting', 'irrigation')) %>%
-  dplyr::mutate(management_id = id) %>%
-  dplyr::select(management_id, date, mgmttype, level, units) %>%
-  left_join(managements_treatments, by = 'management_id') %>%
-  left_join(treatments, by = 'treatment_id') 
+Let's do the manual equivalent of a cross-table join. BETY actually does contain a `managements_treatments` view that would make this faster and easier, but it is not (yet) exposed via API, so let's use it as an example of how to create your own join.
 
-planting <- managements %>% filter(mgmttype == "planting") %>%
-  select(treatment_id, planting_date = date)
+The key idea here is that each treatment is associated with some (possibly many) managements, but the treatments table only reports the number of associated managements. To see the management IDs themselves, we need to query an individual treatment ID. So, we retrieve one table, then iterate over each row extracting the foreign keys for the other table. This requires an API call for every treatment, so beware that it is likely to be slow!
 
-grass_yields <- yields %>% 
-  filter(genus %in% c('Miscanthus', 'Panicum')) %>%
-  left_join(planting, by = 'treatment_id') %>% 
-  collect %>% 
-  mutate(age = year(date)- year(planting_date),
-         nrate = ifelse(is.na(nrate), 0, nrate),
-         SE = ifelse(statname == "SE", stat, ifelse(statname == 'SD', stat / sqrt(n), NA)),
-         continent = ifelse(lon < -30, 'united_states', ifelse(lon < 75, 'europe', 'asia'))) %>% 
-  filter(!duplicated(.))
+```r
+treatments <- (betydb_query(table = 'treatments')
+  %>% select(treatment_id = id , name, definition, control))
+
+get_mgid <- function(trtid){
+  betydb_item(id=trtid, table="treatments")$managements$management.id
+}
+
+managements_treatments <- (treatments 
+  %>% group_by(treatment_id)
+  %>% do(management_id = get_mgid(.$treatment_id))
+  %>% unnest())
+
+managements <- (betydb_query(table = 'managements')
+  %>% filter(mgmttype %in% c('fertilizer_N', 'fertilizer_N_rate', 'planting', 'irrigation'))
+  %>% select(management_id = id, date, mgmttype, level, units)
+  %>% left_join(managements_treatments, by = 'management_id')
+  %>% left_join(treatments, by = 'treatment_id'))
+
+planting <- (managements
+  %>% filter(mgmttype == "planting")
+  %>% select(treatment_id, planting_date = date, nrate = level))
+
+grass_yields <- (yields
+  %>% filter(genus %in% c('Miscanthus', 'Panicum'))
+  %>% left_join(planting, by = 'treatment_id')
+  %>% collect
+  %>% replace_na(replace=list(nrate = 0))
+  %>% mutate(
+    age = year(date) - year(planting_date),
+    SE = case_when(
+      .$statname == "SE" ~ .$stat,
+      .$statname == 'SD' ~ .$stat / sqrt(.$n),
+      TRUE ~ NA_real_),
+    continent = case_when(
+      .$lon < -30 ~ "united_states",
+      .$lon < 75 ~ "europe",
+      TRUE ~ "asia"))
+    %>% filter(!duplicated(.)))
 
 ggplot(data = grass_yields, aes(lon,lat)) + 
   geom_point(aes(color = genus, size = mean), 
