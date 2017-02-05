@@ -1,11 +1,25 @@
 
-## Joining database tables  
+
+
+
+## How the database is structured
+
+
 
 ### Schema Overview
 
 ![](https://raw.githubusercontent.com/ebimodeling/betydb_manuscript/master/figures/gcbb12420-fig-0001.png)
 
+### Query Cultivar information
+
+```{r}
+
+```
+
 ### Define Join
+
+
+### Example Joins:
 
 ```{r}
 bety <- src_postgres(host = d$host, user = d$user, password = d$password, dbname = d$dbname)
