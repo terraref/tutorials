@@ -1,0 +1,16 @@
+
+## Sign up
+
+## Download from web interface
+
+
+
+## API Summary
+
+API key sent in the mail
+
+Save it to textfile (take from traits/02- file
+
+### Basic construction of an API query
+
+Move this from exiting documentation.
