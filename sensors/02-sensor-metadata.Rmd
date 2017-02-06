@@ -1,0 +1,54 @@
+---
+title: "Accessing Sensor Metadata"
+subtitle: "Response Curves and other Metadata"
+author: "David LeBauer, Craig Willis"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(jsonlite)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+
+
+```
+
+# Introduction
+
+This tutorial will demonstrate how to access sensor metadata from within R. All of the sensor metadata is public, and can be queried via the API using the url `https://terraref.ncsa.illinois.edu/clowder/api/datasets/<id>/metadata.jsonld`.
+
+For further information about sensor metadata see the [Sensor Data Standards](/sensor-data-standards.md) section.
+
+## Avaialble Sensor metadata
+
+```{r}
+sensor_datasets <- jsonlite::fromJSON("data/sensor_metadata_datasets.json")
+knitr::kable(sensor_datasets[,c(2,3,1)])
+```
+
+### Looking at Skye NDVI meta-data
+
+```{r}
+
+ndvi_metadata <- jsonlite::fromJSON("https://terraref.ncsa.illinois.edu/clowder/api/datasets/581787524f0ce77b6655b2c7/metadata.jsonld")
+
+knitr::kable(t(ndvi_metadata$content[-21]), col.names = '')
+
+```
+#### RSR curve 
+
+```{r rsr-curve}
+ndvi_up_rsr <- cbind(direction = 'up',
+                     bind_rows(lapply(ndvi_metadata$content$rsr$up, unlist)))
+ndvi_down_rsr <- cbind(direction = 'down', 
+                    bind_rows(lapply(ndvi_metadata$content$rsr$down, unlist)))
+ndvi_rsr <- rbind(ndvi_up_rsr, ndvi_down_rsr) 
+ggplot(data = ndvi_rsr, aes(x = wavelength, linetype = direction), alpha = 0.4) +
+  geom_line(aes(y = ch1), color = 'green') + 
+  geom_line(aes(y = ch4), color = 'red') +
+  ylab('relative response')
+```
+
