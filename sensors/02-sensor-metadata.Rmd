@@ -24,6 +24,13 @@ For further information about sensor metadata see the [Sensor Data Standards](/s
 
 ## Avaialble Sensor metadata
 
+
+### Example: RSR curves for PAR, PSII and NDVI
+
+* par: https://terraref.ncsa.illinois.edu/clowder/api/datasets/5873a8ce4f0cad7d8131ad86/metadata.jsonld
+* pri: https://terraref.ncsa.illinois.edu/clowder/api/datasets/5873a9174f0cad7d8131b09a/metadata.jsonld
+* ndvi: https://terraref.ncsa.illinois.edu/clowder/api/datasets/5873a8f64f0cad7d8131af54/metadata.jsonld
+
 ```{r}
 sensor_datasets <- jsonlite::fromJSON("data/sensor_metadata_datasets.json")
 knitr::kable(sensor_datasets[,c(2,3,1)])
