@@ -5,6 +5,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+
+api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+output_dir <- "~/Downloads/rdata/"
 ```
 
 ## The Maricopa Weather Station
@@ -19,26 +22,34 @@ Geodashboard:
 
 
 ```{r query-clowder}
-api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+library(jsonlite)
+library(magrittr)
+library(dplyr)
+library(RCurl)
+
+# Get Spaces from Clowder - without authentication, result will be Sample Data
 spaces <- fromJSON(paste0(api_url, '/spaces'))
+print(spaces %>% select(id, name))
 
-print(spaces)
-
+# Get list of (at most 20) Datasets within that Space from Clowder
 datasets <- fromJSON(paste0(api_url, '/spaces/', spaces$id, '/datasets'))
+print(datasets %>% select(id, name))
 
-print(datasets)
-
+# Get list of Files within any EnvironmentLogger datasets and filter .nc files
 files <- fromJSON(paste0(api_url, '/datasets/', datasets$id[grepl("EnvironmentLogger", datasets$name)], '/files'))
-
-ncfiles <- files %>% filter(grepl('environmentlogger.nc', filename))
-
+ncfiles <- files[grepl('environmentlogger.nc', files$filename), ]
 print(ncfiles %>% select(id, filename))
 
+# Download all files from Clowder
+sources <- paste0(api_url, '/files/', ncfiles$id)
+outputs <- paste0(output_dir, ncfiles$filename)
 
-## probably where a package like httr comes in?
-download.file(paste0(api_url, '/files/', ncfiles$id[1]), destfile = ncfiles$filename[1])
-
-httr::GET(url = "https://terraref.ncsa.illinois.edu/clowder/api/files/587fd3b44f0cd67174e81b26")
+for (i in 1:length(sources)) {
+  print(paste0("Downloading ", sources[i], " to ", outputs[i]))
+  #f <- CFILE(outputs[i], mode = "wb")
+  #curlPerform(url = sources[i], writedata = f@ref)
+  #RCurl::close(f)
+}
 ```
 
 ### Using the netCDF 1/s data
@@ -50,21 +61,28 @@ library(ncdf4)
 library(ncdf.tools)
 library(lubridate)
 
-ncfile <- 'data/2016-10-28_environmentlogger.nc'
-oct28 <- nc_open(ncfile)
+time <- list()
+vals <- list()
 
-metdata <- list()
-for(var in c(names(oct28$dim), names(oct28$var))){
-  metdata[[var]] <- ncvar_get(oct28, var)
+for (i in 1:length(outputs)) {
+  print(paste0("Scanning ", outputs[i]))
+  ncfile <- nc_open(outputs[i])
+  curr_time <- list()
+
+  metdata <- list()
+  for(var in c(names(ncfile$dim), names(ncfile$var))){
+    metdata[[var]] <- ncvar_get(ncfile, var)
+  }
+  lapply(metdata, dim)
+  
+  days <- ncvar_get(ncfile, varid = "time")
+  curr_time <- as.numeric(ymd("1970-01-01") + seconds(days * 24 * 60 * 60))
+  
+  time <- c(time, curr_time)
+  vals <- c(vals, metdata$`par_sensor/Sensor_Photosynthetically_Active_Radiation`)
 }
-lapply(metdata, function(x) print(paste(class(x), dim(x))))
-lapply(metdata, dim)
 
-days <- ncvar_get(oct28, varid = "time")
-oct28$dim$time$units
-time <- ymd("1970-01-01") + seconds(days * 24 * 60 * 60)
-
-plot(time, metdata$`par_sensor/Sensor_Photosynthetically_Active_Radiation`, type = 'l')
+plot(time, vals, type = 'p')
 
 ```
 
