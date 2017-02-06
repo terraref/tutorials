@@ -1,0 +1,157 @@
+---
+title: "01-meteorological-data.Rmd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+```
+
+## The Maricopa Weather Station
+
+Locating the weather station via the geodashboard:
+
+TODO: screenshots / tutorials
+
+### Meteorological data formats
+
+### Dimensions:
+
+|CF standard-name | units |
+|:------------------------------------------|:------|
+| time | days since 1700-01-01 00:00:00 UTC|
+| longitude | degrees_east|
+| latitude |degrees_north|
+
+### Variable names and units
+
+| CF standard-name                          | units | bety         | isimip       | cruncep | narr  | ameriflux |
+|:------------------------------------------|:------|:-------------|:-------------|:--------|:------|:----------|
+| **air_temperature**                       | K     | airT         | tasAdjust    | tair    | air   | TA (C)    |
+| air_temperature_max                       | K     |              | tasmaxAdjust | NA      | tmax  |           |
+| air_temperature_min                       | K     |              | tasminAdjust | NA      | tmin  |           |
+| **air_pressure**                          | Pa    | air_pressure |              |         |       | PRESS (KPa) |
+| mole_fraction_of_carbon_dioxide_in_air    | mol/mol |            |              |         |       | CO2       |
+| moisture_content_of_soil_layer            | kg m-2 |             |              |         |       |           |
+| soil_temperature                          | K     | soilT        |              |         |       | TS1 *(NOT DONE)* |
+| relative_humidity                         | % | relative_humidity | rhurs       | NA      | rhum  | RH        |
+| **specific_humidity**                     | 1 | specific_humidity | NA          | qair    | shum  | CALC(RH)  |
+| water_vapor_saturation_deficit            | Pa    | VPD          |              |         |       | VPD *(NOT DONE)*     |
+| **surface_downwelling_longwave_flux_in_air** | W m-2 | same      | rldsAdjust   | lwdown  | dlwrf | Rgl       |
+| **surface_downwelling_shortwave_flux_in_air**| W m-2 |solar_radiation|rsdsAdjust| swdown  | dswrf | Rg        |
+| surface_downwelling_photosynthetic_photon_flux_in_air | mol m-2 s-1 | PAR |     |         |       | PAR *(NOT DONE)*          |
+| **precipitation_flux**                    |  kg m-2 s-1 | cccc   | prAdjust     | rain    | acpc  | PREC (mm/s)          |
+|                                           | degrees | wind_direction |          |         |       | WD        |
+| wind_speed                                | m/s   | Wspd         |              |         |       | WS        |
+| **eastward_wind**                         | m/s   | eastward_wind |             |         |       | CALC(WS+WD) |
+| **northward_wind**                        | m/s   | northward_wind |            |         |       | CALC(WS+WD) |
+
+* preferred variables indicated in bold
+* variable names are from [MsTMIP](http://nacp.ornl.gov/MsTMIP_variables.shtml).
+* standard_name is CF-convention standard names
+* units can be converted by udunits, so these can vary (e.g. the time denominator may change with time frequency of inputs)
+* soil moisture for the full column, rather than a layer, is soil_moisture_content
+
+For example, in the [MsTMIP-CRUNCEP](https://www.betydb.org/inputs/280) data, the variable `rain` should be `precipitation_rate`.
+We want to standardize the units as well as part of the `met2CF.<product>` step. I believe we want to use the CF "canonical" units but retain the MsTMIP units any time CF is ambiguous about the units.
+
+The key is to process each type of met data (site, reanalysis, forecast, climate scenario, etc) to the exact same standard. This way every operation after that (extract, gap fill, downscale, convert to a model, etc) will always have the exact same inputs. This will make everything else much simpler to code and allow us to avoid a lot of unnecessary data checking, tests, etc being repeated in every downstream function.
+
+### The Geostreams Database
+
+
+!(schema)[https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg]
+
+Here is the json representation of a single five-minute observation:
+
+```
+[
+   {
+      "geometry":{
+         "type":"Point",
+         "coordinates":[
+            33.0745666667,
+            -111.9750833333,
+            0
+         ]
+      },
+      "start_time":"2016-08-30T00:06:24-07:00",
+      "type":"Feature",
+      "end_time":"2016-08-30T00:10:00-07:00",
+      "properties":{
+         "precipitation_rate":0.0,
+         "wind_speed":1.6207870370370374,
+         "surface_downwelling_shortwave_flux_in_air":0.0,
+         "northward_wind":0.07488770951583902,
+         "relative_humidity":26.18560185185185,
+         "air_temperature":300.17606481481516,
+         "eastward_wind":1.571286062845733,
+         "surface_downwelling_photosynthetic_photon_flux_in_air":0.0
+      }
+   },
+```
+
+
+### Querying weather sensor data stream
+
+The data represent 5 minute summaries aggregated from 1/s observations.
+
+```{r met-geostream}
+library(dplyr)
+library(ggplot2)
+library(jsonlite)
+
+url = ""
+mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=300', flatten = FALSE)
+
+mac_weather <- mac_weather.list$properties %>% 
+  mutate(time = lubridate::ymd_hms(mac_weather.list$end_time))
+  
+
+```
+
+## Weather Summary
+
+You can also embed plots, for example:
+
+```{r weather}
+theme_set(ggthemes::theme_few())
+ggplot(data = mac_weather) +
+  geom_line(aes(x = time, y = wind_speed), size = 0.1)
+
+
+ggplot(data = mac_weather) +
+  geom_line(aes(x = time, y = precipitation_rate), size = 0.1)
+```
+
+Your turn! Try the following:
+
+* Convert temperature in K to C
+  * what other unit conversions would be useful?
+* plot two metrics of solar radiation flux. 
+  * What is the difference between these?
+
+Here is one way you might convert the given units into ones appropriate for the scale that you are working on:
+
+```{r}
+# from https://raw.githubusercontent.com/PecanProject/pecan/master/models/biocro/R/met2model.BIOCRO.R
+library(convertr)
+library(lubridate)
+met <- mac_weather %>% 
+  transmute(date = time,
+            par = surface_downwelling_photosynthetic_photon_flux_in_air, 
+            temperature = convert(air_temperature, "K", "degC"),
+            rh = relative_humidity, 
+            ws = wind_speed,
+            precip = convert(precipitation_rate, "1/s", "1/min") * 5 )
+
+## your turn: summarize by day
+
+ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-12-01"))) +
+  geom_line(aes(date, precip))
+
+ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-10-01"))) +
+  geom_point(aes(date, precip))
+```
+
+Your 
