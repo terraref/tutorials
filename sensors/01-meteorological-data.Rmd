@@ -36,8 +36,9 @@ print(ncfiles %>% select(id, filename))
 
 
 ## probably where a package like httr comes in?
-download.file(paste0(api_url, '/datasets/', ncfiles$id[1], '/files'), destfile = ncfiles$filename[1])
+download.file(paste0(api_url, '/files/', ncfiles$id[1]), destfile = ncfiles$filename[1])
 
+httr::GET(url = "https://terraref.ncsa.illinois.edu/clowder/api/files/587fd3b44f0cd67174e81b26")
 ```
 
 ### Using the netCDF 1/s data
