@@ -46,9 +46,9 @@ outputs <- paste0(output_dir, ncfiles$filename)
 
 for (i in 1:length(sources)) {
   print(paste0("Downloading ", sources[i], " to ", outputs[i]))
-  #f <- CFILE(outputs[i], mode = "wb")
-  #curlPerform(url = sources[i], writedata = f@ref)
-  #RCurl::close(f)
+  f <- CFILE(outputs[i], mode = "wb")
+  curlPerform(url = sources[i], writedata = f@ref)
+  RCurl::close(f)
 }
 ```
 
