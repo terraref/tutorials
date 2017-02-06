@@ -56,17 +56,16 @@ danforth_sorghum <- betydb_query(scientificname = 'Sorghum bicolor',
 
 ```
 
-To get the equivalent query via the web interface, you can construct the following URL: 
+To get the equivalent query via the web interface, you can construct the following URL. Once you learn how to write a query using the url API, you can use this to  
 
 ```{r api-query-in-browser, eval=FALSE}
-search_url <- paste0('https://terraref.ncsa.illinois.edu/bety/api/beta/search?',
+search_url <- paste0(terraref_betyurl, '/api/beta/search?',
                      'scientificname=Sorghum+bicolor',
                      '&sitename=Danforth+Plant+Science+Center+Bellweather+Phenotyping+Facility',
                      '&key=',mykey,'&limit=none')
 
 ## open in browser (may need to grant permission)
 browseURL(search_url)
-
 
 ```
 
@@ -79,7 +78,7 @@ colnames(sorghum_all)
 
 ```
 
-Which ones do we want?
+Which columns do we want?
 
 
 
