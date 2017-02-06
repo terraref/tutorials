@@ -1,0 +1,70 @@
+---
+title: "Laser Scanner Point Clouds"
+author: "David LeBauer"
+date: "`r Sys.Date()`"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = TRUE)
+```
+
+
+Based on documentation for the `readLiDAR` package
+
+```{r}
+library(rLiDAR) 
+library(ggplot2)
+library(dplyr)
+library(rgl)
+theme_set(theme_bw())
+# Importing LAS file:
+
+lasfile <- "~/terraref/documentation/tutorials/data/51458297-0d25-416a-91a5-a2f0ae1a1083__Top-heading-east_0.las"
+
+LAS <- readLAS(lasfile) %>% 
+  as_data_frame %>% 
+  mutate(Z = (Z - min(Z)))
+
+LAS_sample <- LAS %>% 
+  filter(Z>200) %>% 
+  sample_frac(size = 0.01)
+
+xyz <- LAS_sample[,1:3]
+# Getting LiDAR clusters
+set.seed(1)
+clLAS <- kmeans(xyz, 32)
+# Set the points id
+id <- as.factor(clLAS$cluster)
+
+xyzid <- cbind(xyz, id)
+
+library(rgl)
+open3d()
+volumeList <- chullLiDAR3D(xyzid = xyzid, plotit = TRUE, col = 'forestgreen', alpha = 0.6)
+
+plot3d(xyzid[,1:3], add=TRUE)
+
+summary(volumeList) # summary
+
+xyid <- xyzid[,c("X", "Y", "id")]
+chullTrees <- chullLiDAR2D(xyid = xyid)
+
+ # Plotting the LiDAR convex hull
+library(sp)
+plot.new()
+plot(SpatialPoints(xyid[,1:2]),cex=0.5,col=xyid[,3])
+plot(chullTrees$chullPolygon, border = "green")
+# Get the ground-projected area of LiDAR convex hull
+
+chullList <- chullTrees$chullPolygon
+summary(chullList) # summary
+
+ggplot(data = LAS_sample ) + 
+  geom_histogram(aes(Z), bins = 300) + coord_flip()
+
+ggplot(data = LAS_sample) + 
+  geom_hex(aes(X, Y), bins = 50)
+
+
+```
