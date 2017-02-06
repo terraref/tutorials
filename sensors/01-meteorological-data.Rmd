@@ -40,6 +40,33 @@ download.file(paste0(api_url, '/datasets/', ncfiles$id[1], '/files'), destfile =
 
 ```
 
+### Using the netCDF 1/s data
+
+One use case getting the solar spectrum associated with a particular hyperspectral image.
+
+```{r}
+library(ncdf4)
+library(ncdf.tools)
+library(lubridate)
+
+ncfile <- 'data/2016-10-28_environmentlogger.nc'
+oct28 <- nc_open(ncfile)
+
+metdata <- list()
+for(var in c(names(oct28$dim), names(oct28$var))){
+  metdata[[var]] <- ncvar_get(oct28, var)
+}
+lapply(metdata, function(x) print(paste(class(x), dim(x))))
+lapply(metdata, dim)
+
+days <- ncvar_get(oct28, varid = "time")
+oct28$dim$time$units
+time <- ymd("1970-01-01") + seconds(days * 24 * 60 * 60)
+
+plot(time, metdata$`par_sensor/Sensor_Photosynthetically_Active_Radiation`, type = 'l')
+
+```
+
 ### Meteorological data formats
 
 ### Dimensions:
