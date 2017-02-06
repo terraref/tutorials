@@ -13,6 +13,33 @@ Locating the weather station via the geodashboard:
 
 TODO: screenshots / tutorials
 
+Geodashboard:
+
+[Sample raw meteorological (1/s) data on Clowder](https://terraref.ncsa.illinois.edu/clowder/files/588ba5474f0c06726acfcace?dataset=587fc7444f0cd67174e7a92d&space=57e42cd44f0cff4b58dd3eea)
+
+
+```{r query-clowder}
+api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+spaces <- fromJSON(paste0(api_url, '/spaces'))
+
+print(spaces)
+
+datasets <- fromJSON(paste0(api_url, '/spaces/', spaces$id, '/datasets'))
+
+print(datasets)
+
+files <- fromJSON(paste0(api_url, '/datasets/', datasets$id[grepl("EnvironmentLogger", datasets$name)], '/files'))
+
+ncfiles <- files %>% filter(grepl('environmentlogger.nc', filename))
+
+print(ncfiles %>% select(id, filename))
+
+
+## probably where a package like httr comes in?
+download.file(paste0(api_url, '/datasets/', ncfiles$id[1], '/files'), destfile = ncfiles$filename[1])
+
+```
+
 ### Meteorological data formats
 
 ### Dimensions:
