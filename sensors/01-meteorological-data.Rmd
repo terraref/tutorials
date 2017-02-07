@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
 output_dir <- "~/data/downloads/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+
 ```
 
 ## The Maricopa Weather Station
@@ -84,6 +85,25 @@ for (i in 1:length(outputs)) {
 }
 
 plot(time, vals, type = 'p')
+=======
+api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+spaces <- fromJSON(paste0(api_url, '/spaces'))
+
+print(spaces)
+
+datasets <- fromJSON(paste0(api_url, '/spaces/', spaces$id, '/datasets'))
+
+print(datasets)
+
+files <- fromJSON(paste0(api_url, '/datasets/', datasets$id[grepl("EnvironmentLogger", datasets$name)], '/files'))
+
+ncfiles <- files %>% filter(grepl('environmentlogger.nc', filename))
+
+print(ncfiles %>% select(id, filename))
+
+
+## probably where a package like httr comes in?
+download.file(paste0(api_url, '/datasets/', ncfiles$id[1], '/files'), destfile = ncfiles$filename[1])
 
 ```
 
@@ -227,5 +247,3 @@ ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-12-01")
 ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-10-01"))) +
   geom_point(aes(date, precip))
 ```
-
-Your 
