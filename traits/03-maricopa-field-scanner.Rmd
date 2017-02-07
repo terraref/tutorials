@@ -1,13 +1,78 @@
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+theme_set(theme_bw())
+library(traits)
+library(rgeos)
+library(sp) # for implicitly called rbind.SpatialPolygons method
+library(leaflet)
+
+
+betyurl="https://terraref.ncsa.illinois.edu/bety/"
+betykey="9999999999999999999999999999999999999999"
+```
+
 
 ## Plots
 
 
 query sites for season 2
+
+```r
+sites = betydb_query(
+	table="sites",
+	city="Maricopa", sitename="~Season 2",
+	limit="none",
+	betyurl=betyurl, key=betykey, api_version="beta")
+```
+
 plot polygons on a map
 
+```r
+site_bounds = (sites
+	%>% rowwise()
+	%>% do(boundaries = readWKT(text = .$geometry, id = .$id)))
+
+site_bounds = do.call("rbind", site_bounds$boundaries)
+
+leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
+ 
+```
 
 ## Cultivars
+
+```r
+cultivars = (
+	betydb_query(
+		table = "cultivars", limit = "none",
+		betyurl=betyurl, key=betykey, api_version="beta")
+	%>% rename(cultivar_id = id)
+
+cultivars_traits = (cultivars
+	%>% group_by(cultivar_id)
+	%>% do(trait_id = betydb_record(
+			id = .$cultivar_id, table = "cultivars",
+			betyurl = betyurl, key = betykey, api_version = "beta"
+			)$traits$trait.id)
+	%>% unnest())
+
+sites_traits = (sites
+	%>% group_by(id)
+	%>% do(trait_id = betydb_record(
+			id = .$id, table = "sites",
+			betyurl = betyurl, key = betykey, api_version = "beta"
+			)$traits$trait.id)
+	%>% unnest())
+
+sites = (sites 
+	%>% left_join(sites_traits, by="id")
+	%>% left_join(cultivars_traits, by="trait_id")
+	%>% left_join(cultivars, by="cultivar_id")
+
+```
 
 ## Managements
 
