@@ -90,6 +90,7 @@ species <- (betydb_query(table="species", limit="none")
 # Regex is to convert geometry column to lat/long --
 # starts out as e.g. "POINT(40.11, -88.22, 223)"
 
+# the cool thing will be to get all of the sites where name = "~Season+2+plot" and plot the polygons on a map. is it possible to do this + keep the polygon geometries? Most of the sites in terraref are polygons ...
 
 sites <- betydb_query(table="sites") %>% 
   extract(
