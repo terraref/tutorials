@@ -1,4 +1,9 @@
-
+---
+title: "Phenotype Analysis"
+author: "David LeBauer, Craig Willis"
+date: "`r Sys.Date()`"
+output: md_document
+---
 
 ## Joining database tables  
 
@@ -6,7 +11,62 @@
 
 ![](https://raw.githubusercontent.com/ebimodeling/betydb_manuscript/master/figures/gcbb12420-fig-0001.png)
 
-### Define Join
+An interactive schema can be found at [terraref.ncsa.illinois.edu/schemas](https::terraref.ncsa.illinois.edu/schemas)
+
+
+### Tables
+
+#### Traits
+
+Here are some key tables and fields that we will look at:
+
+
+| Column       | References    | Comments                                                                                        |
+|--------------|---------------|-------------------------------------------------------------------------------------------------|
+| id           |               |                                                                                                 |
+| site_id      | sites.id      | Site at which measurement was taken.                                                            |
+| specie_id    | species.id    | Species on which measurement was taken.                                                         |
+| citation_id  | citations.id  | Citation in which data was originally reported.                                                 |
+| cultivar_id  | cultivars.id  | Cultivar information, if any.                                                                   |
+| treatment_id | treatments.id | Experimental treatment identification. Required, can indicate observational study.              |
+| date         |               | Date on which measurement was made.                                                             |
+| time         |               | Time at which measurement was taken. Sometimes necessary, e.g. for photosynthesis measurements. |
+| mean         |               | Mean value of trait.                       
+
+
+
+#### Treatments
+
+
+
+| Column       | References    | Comments                                                                                        |
+|--------------|---------------|----------|
+| id           |               ||
+| name      | sites.id      | Name of treatment, should be easy to associate with treatment name in original study..|
+| definition    | species.id    | 	Description of treatment, e.g. levels of fertilizer applied, etc. This information may be redundant with 'levels' information recorded in Managements table..|
+| control  | citations.id  |Boolean, indicates if treatment is a control or observational (1) or experimental treatment (0).|
+
+
+#### Managements
+
+
+| Column      | References   | Comments                                      |
+|-------------|--------------|-----------------------------------------------|
+| id          |              |                                               |
+| citation_id | citations.id |                                               |
+| date        |              | Date on which management was conducted.       |
+| mgmttype    |              | Type of management                            |
+| level       |              | Amount applied, not always required.          |
+| units       |              | units, standardized for each management type. |
+
+
+#### Managements-Treatments
+
+| Column        | References     |
+|---------------|----------------|
+| treatment_id  | treatments.id  |
+| management_id | managements.id |
+
 
 ```{r}
 
@@ -17,6 +77,7 @@ year = lubridate::year
 
 # TODO: Maybe just leave this as a list in user environment and pass it explicitly
 # Need to update traits pkg so this works
+
 options(bety_auth = list(
   url="https://terraref.ncsa.illinois.edu/bety/",
   key="9999999999999999999999999999999999999999",
@@ -28,13 +89,16 @@ species <- (betydb_query(table="species", limit="none")
 
 # Regex is to convert geometry column to lat/long --
 # starts out as e.g. "POINT(40.11, -88.22, 223)"
-sites <- (betydb_query(table="sites")
-  %>% extract(
+# the cool thing will be to get all of the sites where name = "~Season+2+plot" and plot the polygons on a map. is it possible to do this + keep the polygon geometries? Most of the sites in terraref are polygons ...
+
+sites <- betydb_query(table="sites") %>% 
+  extract(
     col = geometry,
     into = c("lat", "lon", "ele"),
     regex = "POINT \\(([-.\\d]+) ([-.\\d]+) ([-.\\d]+)\\)",
     convert=TRUE)
-  %>% select(site_id = id, lat, lon, ele, sitename, city, country))
+    
+  sites %>% select(site_id = id, lat, lon, sitename, city, country)
 
 
 citations <- (betydb_query(table="citations")
