@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(jsonlite)
 library(dplyr)
 library(ggplot2)
+library(ggthemes)
 theme_set(theme_bw())
 library(traits)
 ```
