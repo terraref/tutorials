@@ -85,7 +85,9 @@ betykey="9999999999999999999999999999999999999999"
 species <- (betydb_query(table="species", limit="none", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(specie_id = id, scientificname, genus))
 
-sites <- (betydb_query(table="sites", limit="none", betyurl=betyurl, key=betykey, api_version="beta")
+sites <- (betydb_query(table="sites", limit="none", sitename="~Season 2 range",
+                       betyurl=betyurl, key=betykey,
+                       api_version="beta"))
 
 sites %>% group_by(city, state, country) %>% summarize(n())
 
@@ -101,14 +103,13 @@ site_geom <- (sites
 sites_poly = do.call("rbind", filter(site_geom, geom_type == "SpatialPolygons")$parsed_geometry)
 sites_point = do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$parsed_geometry)
 
-leaflet() %>% addTiles() %>% addPolygons(data=sites_poly, color="red") %>% addMarkers(data=sites_point)
+leaflet() %>% addTiles() %>% addPolygons(data=sites_poly, color="red") 
+#%>% addMarkers(data=sites_point) # points removed by only querying Season 2
 
 citations <- (betydb_query(table="citations", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(citation_id = id, author, year, title))
 
-# Fails because terraref BETY's yields table is empty
-# Succeeds if betyurl="https://www.betydb.org/" (with a valid key...)
-yields = (betydb_query(table="yields", betyurl=betyurl, key=betykey, api_version="beta")
+traits = (betydb_query(table="traits", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(
     id, date, mean,
     n, statname, stat,
@@ -124,7 +125,7 @@ Let's do the manual equivalent of a cross-table join. BETY actually does contain
 
 The key idea here is that each treatment is associated with some (possibly many) managements, but the treatments table only reports the number of associated managements. To see the management IDs themselves, we need to query an individual treatment ID. So, we retrieve one table, then iterate over each row extracting the foreign keys for the other table. This requires an API call for every treatment, so beware that it is likely to be slow!
 
-```r
+```{r}
 treatments <- (betydb_query(table = 'treatments', betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(treatment_id = id , name, definition, control))
 

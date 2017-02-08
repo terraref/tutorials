@@ -21,22 +21,22 @@ betykey="9999999999999999999999999999999999999999"
 
 query sites for season 2
 
-```r
+```{r}
 sites = betydb_query(
 	table="sites",
-	city="Maricopa", sitename="~Season 2",
+	city="Maricopa", sitename="~Season 2 range",
 	limit="none",
 	betyurl=betyurl, key=betykey, api_version="beta")
 ```
 
 plot polygons on a map
 
-```r
-site_bounds = (sites
+```{r}
+site_bounds <- (sites
 	%>% rowwise()
 	%>% do(boundaries = readWKT(text = .$geometry, id = .$id)))
 
-site_bounds = do.call("rbind", site_bounds$boundaries)
+site_bounds <- do.call('rbind', site_bounds$boundaries)
 
 leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
  
@@ -44,7 +44,7 @@ leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
 
 ## Cultivars
 
-```r
+```{r}
 cultivars = (
 	betydb_query(
 		table = "cultivars", limit = "none",
@@ -75,15 +75,5 @@ sites = (sites
 
 ```
 
-## Managements
-
-## Summary of traits
-
-```{r}
-
-query sites for season 2
-plot polygons on a map
-
-```
 
 ## Time series of canopy cover, height, NDVI
