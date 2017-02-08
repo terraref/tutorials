@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: md_document
 ---
 
-## Joining database tables  
+## Joining database tables
 
 ### Schema Overview
 
@@ -31,7 +31,7 @@ Here are some key tables and fields that we will look at:
 | treatment_id | treatments.id | Experimental treatment identification. Required, can indicate observational study.              |
 | date         |               | Date on which measurement was made.                                                             |
 | time         |               | Time at which measurement was taken. Sometimes necessary, e.g. for photosynthesis measurements. |
-| mean         |               | Mean value of trait.                       
+| mean         |               | Mean value of trait.
 
 
 
@@ -78,21 +78,21 @@ library(rgeos)
 library(leaflet)
 year = lubridate::year
 
-betyurl="https://terraref.ncsa.illinois.edu/bety/"
-betykey="9999999999999999999999999999999999999999"
+betyurl = "https://terraref.ncsa.illinois.edu/bety/"
+betykey = "9999999999999999999999999999999999999999"
 
 ## query and join tables
-species <- (betydb_query(table="species", limit="none", betyurl=betyurl, key=betykey, api_version="beta")
+species <- (betydb_query(table = "species", limit = "none", betyurl = betyurl, key = betykey, api_version = "beta")
   %>% select(specie_id = id, scientificname, genus))
 
-sites <- (betydb_query(table="sites", limit="none", sitename="~Season 2 range",
-                       betyurl=betyurl, key=betykey,
-                       api_version="beta"))
+sites <- (betydb_query(table = "sites", limit = "none", sitename = "~Season 2 range",
+                       betyurl = betyurl, key = betykey,
+                       api_version = "beta"))
 
 sites %>% group_by(city, state, country) %>% summarize(n())
 
-# A simple plot of all site coordinates. 
-# Marker pins = sites with coords reported as a single point 
+# A simple plot of all site coordinates.
+# Marker pins = sites with coords reported as a single point
 # Red polygons = sites reporting full boundaries
 # (Needs improvement -- currently hard to see Maricopa plots & both seasons overlap)
 site_geom <- (sites
@@ -103,13 +103,13 @@ site_geom <- (sites
 sites_poly = do.call("rbind", filter(site_geom, geom_type == "SpatialPolygons")$parsed_geometry)
 sites_point = do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$parsed_geometry)
 
-leaflet() %>% addTiles() %>% addPolygons(data=sites_poly, color="red") 
-#%>% addMarkers(data=sites_point) # points removed by only querying Season 2
+leaflet() %>% addTiles() %>% addPolygons(data = sites_poly, color = "red")
+#%>% addMarkers(data = sites_point) # points removed by only querying Season 2
 
-citations <- (betydb_query(table="citations", betyurl=betyurl, key=betykey, api_version="beta")
+citations <- (betydb_query(table = "citations", betyurl = betyurl, key = betykey, api_version = "beta")
   %>% select(citation_id = id, author, year, title))
 
-traits = (betydb_query(table="traits", betyurl=betyurl, key=betykey, api_version="beta")
+traits = (betydb_query(table = "traits", betyurl = betyurl, key = betykey, api_version = "beta")
   %>% select(
     id, date, mean,
     n, statname, stat,
@@ -126,19 +126,19 @@ Let's do the manual equivalent of a cross-table join. BETY actually does contain
 The key idea here is that each treatment is associated with some (possibly many) managements, but the treatments table only reports the number of associated managements. To see the management IDs themselves, we need to query an individual treatment ID. So, we retrieve one table, then iterate over each row extracting the foreign keys for the other table. This requires an API call for every treatment, so beware that it is likely to be slow!
 
 ```{r}
-treatments <- (betydb_query(table = 'treatments', betyurl=betyurl, key=betykey, api_version="beta")
+treatments <- (betydb_query(table = 'treatments', betyurl = betyurl, key = betykey, api_version = "beta")
   %>% select(treatment_id = id , name, definition, control))
 
 get_mgid <- function(trtid){
-  betydb_item(id=trtid, table="treatments", betyurl=betyurl, key=betykey, api_version="beta")$managements$management.id
+  betydb_item(id = trtid, table = "treatments", betyurl = betyurl, key = betykey, api_version = "beta")$managements$management.id
 }
 
-managements_treatments <- (treatments 
+managements_treatments <- (treatments
   %>% group_by(treatment_id)
   %>% do(management_id = get_mgid(.$treatment_id))
   %>% unnest())
 
-managements <- (betydb_query(table = 'managements', betyurl=betyurl, key=betykey, api_version="beta")
+managements <- (betydb_query(table = 'managements', betyurl = betyurl, key = betykey, api_version = "beta")
   %>% filter(mgmttype %in% c('fertilizer_N', 'fertilizer_N_rate', 'planting', 'irrigation'))
   %>% select(management_id = id, date, mgmttype, level, units)
   %>% left_join(managements_treatments, by = 'management_id')
@@ -152,7 +152,7 @@ grass_yields <- (yields
   %>% filter(genus %in% c('Miscanthus', 'Panicum'))
   %>% left_join(planting, by = 'treatment_id')
   %>% collect
-  %>% replace_na(replace=list(nrate = 0))
+  %>% replace_na(replace = list(nrate = 0))
   %>% mutate(
     age = year(date) - year(planting_date),
     SE = case_when(
@@ -165,7 +165,7 @@ grass_yields <- (yields
       TRUE ~ "asia"))
     %>% filter(!duplicated(.)))
 
-ggplot(data = grass_yields, aes(lon,lat)) + 
-  geom_point(aes(color = genus, size = mean), 
+ggplot(data = grass_yields, aes(lon,lat)) +
+  geom_point(aes(color = genus, size = mean),
              alpha = 0.1)
 ```
