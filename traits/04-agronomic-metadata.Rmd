@@ -76,10 +76,10 @@ library(traits)
 library(sp)
 library(rgeos)
 library(leaflet)
-year = lubridate::year
+year <- lubridate::year
 
-betyurl = "https://terraref.ncsa.illinois.edu/bety/"
-betykey = "9999999999999999999999999999999999999999"
+betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
+betykey <- "9999999999999999999999999999999999999999"
 
 ## query and join tables
 species <- (betydb_query(table = "species", limit = "none", betyurl = betyurl, key = betykey, api_version = "beta")
@@ -100,8 +100,8 @@ site_geom <- (sites
   %>% group_by(id)
   %>% do(parsed_geometry = readWKT(text = .$geometry, id = .$id))
   %>% mutate(geom_type = class(parsed_geometry)))
-sites_poly = do.call("rbind", filter(site_geom, geom_type == "SpatialPolygons")$parsed_geometry)
-sites_point = do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$parsed_geometry)
+sites_poly <- do.call("rbind", filter(site_geom, geom_type == "SpatialPolygons")$parsed_geometry)
+sites_point <- do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$parsed_geometry)
 
 leaflet() %>% addTiles() %>% addPolygons(data = sites_poly, color = "red")
 #%>% addMarkers(data = sites_point) # points removed by only querying Season 2
@@ -109,7 +109,7 @@ leaflet() %>% addTiles() %>% addPolygons(data = sites_poly, color = "red")
 citations <- (betydb_query(table = "citations", betyurl = betyurl, key = betykey, api_version = "beta")
   %>% select(citation_id = id, author, year, title))
 
-traits = (betydb_query(table = "traits", betyurl = betyurl, key = betykey, api_version = "beta")
+traits <- (betydb_query(table = "traits", betyurl = betyurl, key = betykey, api_version = "beta")
   %>% select(
     id, date, mean,
     n, statname, stat,
