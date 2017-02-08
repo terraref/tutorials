@@ -59,7 +59,7 @@ ggplot(data = par_rsr, aes(x = wavelength, y = response), alpha = 0.4) +
 
 ```{r}
 
-ndvi_metadata <- jsonlite::fromJSON("https://terraref.ncsa.illinois.edu/clowder/api/datasets/581787524f0ce77b6655b2c7/metadata.jsonld")
+ndvi_metadata <- jsonlite::fromJSON("https://terraref.ncsa.illinois.edu/clowder/api/datasets/5873a8f64f0cad7d8131af54/metadata.jsonld")
 
 knitr::kable(t(ndvi_metadata$content[-21]), col.names = '')
 
