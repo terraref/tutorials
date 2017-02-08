@@ -11,7 +11,7 @@ library(ggplot2)
 library(ggthemes)
 library(GGally)
 theme_set(theme_bw())
-
+library(dplyr)
 ```
 
 # Background: The design of a simulated dataset
@@ -60,13 +60,6 @@ These are approximate locations used to query the meteorological and soil data u
 | south | 37.0 | -88.5 |
 
 Each site has four replicate fields: A, B, C, D. This simulated dataset assumes each field within a site has similar, but different meteorology (e.g., as if they were all in the same county). 
-
-```{r query-sites}
-sites <- betydb_query(table = 'sites', name = 'Season+2')
-# plot polygons, how? leaflet? something simple?
-```
-
-> Your Turn: How would you add these points to a map?
 
 ## Meteorology
 
