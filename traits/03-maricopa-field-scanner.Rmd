@@ -49,7 +49,7 @@ cultivars = (
 	betydb_query(
 		table = "cultivars", limit = "none",
 		betyurl=betyurl, key=betykey, api_version="beta")
-	%>% rename(cultivar_id = id)
+	%>% rename(cultivar_id = id))
 
 cultivars_traits = (cultivars
 	%>% group_by(cultivar_id)
@@ -71,6 +71,7 @@ sites = (sites
 	%>% left_join(sites_traits, by="id")
 	%>% left_join(cultivars_traits, by="trait_id")
 	%>% left_join(cultivars, by="cultivar_id")
+	%>% unique())
 
 ```
 
