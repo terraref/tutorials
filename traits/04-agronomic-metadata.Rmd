@@ -73,41 +73,42 @@ Here are some key tables and fields that we will look at:
 library(dplyr)
 library(tidyr)
 library(traits)
+library(sp)
+library(rgeos)
+library(leaflet)
 year = lubridate::year
 
-# TODO: Maybe just leave this as a list in user environment and pass it explicitly
-# Need to update traits pkg so this works
-
-options(bety_auth = list(
-  url="https://terraref.ncsa.illinois.edu/bety/",
-  key="9999999999999999999999999999999999999999",
-  api_version="beta"))
+betyurl="https://terraref.ncsa.illinois.edu/bety/"
+betykey="9999999999999999999999999999999999999999"
 
 ## query and join tables
-species <- (betydb_query(table="species", limit="none")
+species <- (betydb_query(table="species", limit="none", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(specie_id = id, scientificname, genus))
 
-# Regex is to convert geometry column to lat/long --
-# starts out as e.g. "POINT(40.11, -88.22, 223)"
+sites <- (betydb_query(table="sites", limit="none", betyurl=betyurl, key=betykey, api_version="beta")
 
-# the cool thing will be to get all of the sites where name = "~Season+2+plot" and plot the polygons on a map. is it possible to do this + keep the polygon geometries? Most of the sites in terraref are polygons ...
+sites %>% group_by(city, state, country) %>% summarize(n())
 
-sites <- betydb_query(table="sites") %>% 
-  extract(
-    col = geometry,
-    into = c("lat", "lon", "ele"),
-    regex = "POINT \\(([-.\\d]+) ([-.\\d]+) ([-.\\d]+)\\)",
-    convert=TRUE)
-    
-  sites %>% select(site_id = id, lat, lon, sitename, city, country)
+# A simple plot of all site coordinates. 
+# Marker pins = sites with coords reported as a single point 
+# Red polygons = sites reporting full boundaries
+# (Needs improvement -- currently hard to see Maricopa plots & both seasons overlap)
+site_geom <- (sites
+  %>% filter(!is.na(geometry))
+  %>% group_by(id)
+  %>% do(parsed_geometry = readWKT(text = .$geometry, id = .$id))
+  %>% mutate(geom_type = class(parsed_geometry)))
+sites_poly = do.call("rbind", filter(site_geom, geom_type == "SpatialPolygons")$parsed_geometry)
+sites_point = do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$parsed_geometry)
 
+leaflet() %>% addTiles() %>% addPolygons(data=sites_poly, color="red") %>% addMarkers(data=sites_point)
 
-citations <- (betydb_query(table="citations")
+citations <- (betydb_query(table="citations", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(citation_id = id, author, year, title))
 
 # Fails because terraref BETY's yields table is empty
 # Succeeds if betyurl="https://www.betydb.org/" (with a valid key...)
-yields = (betydb_query(table="yields")
+yields = (betydb_query(table="yields", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(
     id, date, mean,
     n, statname, stat,
@@ -124,11 +125,11 @@ Let's do the manual equivalent of a cross-table join. BETY actually does contain
 The key idea here is that each treatment is associated with some (possibly many) managements, but the treatments table only reports the number of associated managements. To see the management IDs themselves, we need to query an individual treatment ID. So, we retrieve one table, then iterate over each row extracting the foreign keys for the other table. This requires an API call for every treatment, so beware that it is likely to be slow!
 
 ```r
-treatments <- (betydb_query(table = 'treatments')
+treatments <- (betydb_query(table = 'treatments', betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(treatment_id = id , name, definition, control))
 
 get_mgid <- function(trtid){
-  betydb_item(id=trtid, table="treatments")$managements$management.id
+  betydb_item(id=trtid, table="treatments", betyurl=betyurl, key=betykey, api_version="beta")$managements$management.id
 }
 
 managements_treatments <- (treatments 
@@ -136,7 +137,7 @@ managements_treatments <- (treatments
   %>% do(management_id = get_mgid(.$treatment_id))
   %>% unnest())
 
-managements <- (betydb_query(table = 'managements')
+managements <- (betydb_query(table = 'managements', betyurl=betyurl, key=betykey, api_version="beta")
   %>% filter(mgmttype %in% c('fertilizer_N', 'fertilizer_N_rate', 'planting', 'irrigation'))
   %>% select(management_id = id, date, mgmttype, level, units)
   %>% left_join(managements_treatments, by = 'management_id')
