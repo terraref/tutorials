@@ -94,7 +94,6 @@ sites %>% group_by(city, state, country) %>% summarize(n())
 # A simple plot of all site coordinates.
 # Marker pins = sites with coords reported as a single point
 # Red polygons = sites reporting full boundaries
-# (Needs improvement -- currently hard to see Maricopa plots & both seasons overlap)
 site_geom <- (sites
   %>% filter(!is.na(geometry))
   %>% group_by(id)

@@ -11,8 +11,8 @@ library(sp) # for implicitly called rbind.SpatialPolygons method
 library(leaflet)
 
 
-betyurl="https://terraref.ncsa.illinois.edu/bety/"
-betykey="9999999999999999999999999999999999999999"
+betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
+betykey <- "9999999999999999999999999999999999999999"
 ```
 
 
@@ -22,11 +22,11 @@ betykey="9999999999999999999999999999999999999999"
 query sites for season 2
 
 ```{r}
-sites = betydb_query(
-	table="sites",
-	city="Maricopa", sitename="~Season 2 range",
-	limit="none",
-	betyurl=betyurl, key=betykey, api_version="beta")
+sites <- betydb_query(
+	table = "sites",
+	city = "Maricopa", sitename = "~Season 2 range",
+	limit = "none",
+	betyurl = betyurl, key = betykey, api_version = "beta")
 ```
 
 plot polygons on a map
@@ -39,19 +39,18 @@ site_bounds <- (sites
 site_bounds <- do.call('rbind', site_bounds$boundaries)
 
 leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
- 
 ```
 
 ## Cultivars
 
 ```{r}
-cultivars = (
+cultivars <- (
 	betydb_query(
 		table = "cultivars", limit = "none",
-		betyurl=betyurl, key=betykey, api_version="beta")
+		betyurl = betyurl, key = betykey, api_version = "beta")
 	%>% rename(cultivar_id = id))
 
-cultivars_traits = (cultivars
+cultivars_traits <- (cultivars
 	%>% group_by(cultivar_id)
 	%>% do(trait_id = betydb_record(
 			id = .$cultivar_id, table = "cultivars",
@@ -59,7 +58,7 @@ cultivars_traits = (cultivars
 			)$traits$trait.id)
 	%>% unnest())
 
-sites_traits = (sites
+sites_traits <- (sites
 	%>% group_by(id)
 	%>% do(trait_id = betydb_record(
 			id = .$id, table = "sites",
@@ -67,10 +66,10 @@ sites_traits = (sites
 			)$traits$trait.id)
 	%>% unnest())
 
-sites = (sites 
-	%>% left_join(sites_traits, by="id")
-	%>% left_join(cultivars_traits, by="trait_id")
-	%>% left_join(cultivars, by="cultivar_id")
+sites <- (sites
+	%>% left_join(sites_traits, by = "id")
+	%>% left_join(cultivars_traits, by = "trait_id")
+	%>% left_join(cultivars, by = "cultivar_id")
 	%>% unique())
 
 ```
@@ -117,25 +116,24 @@ traitdata <- (traitdata
 		site_id = trait.site_id,
 		mean = trait.mean)
 	%>% mutate(date = as.Date(trait.date))
-	%>% left_join(cultivars, by="cultivar_id"))
+	%>% left_join(cultivars, by = "cultivar_id"))
 ```
 
 ```{r}
 (ggplot(
 	traitdata %>% filter(variable_name == "canopy_height"),
-	aes(date, mean, group = site_id*cultivar_id))
+	aes(date, mean, group = site_id * cultivar_id))
 	+ geom_line()
 	+ facet_wrap(~ecotype)
 	+ xlab("Date")
 	+ ylab("Canopy height, cm"))
 
 (ggplot(
-	(traitdata 
+	(traitdata
 		%>% filter(variable_name == "NDVI")
 		%>% mutate(emphasize = (ecotype != "RIL"))), # to reduce overplotting
 	aes(date, mean, color = ecotype, group = site_id*cultivar_id, alpha = emphasize))
 	+ geom_line()
 	+ scale_alpha_discrete(guide = FALSE)
 	+ theme(legend.position = c(0.1, 0.9)))
-
 ```
