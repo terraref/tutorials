@@ -77,3 +77,46 @@ sites = (sites
 
 
 ## Time series of canopy cover, height, NDVI
+
+First look up variables by name. Let's look for measurements related to canopy size:
+
+```{r}
+variables <- betydb_query(
+		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$",
+		betyurl = betyurl, key = betykey, api_version = "beta")
+
+variables %>% select(id, name, n_records = `number of associated traits`)
+```
+
+Exercise: Why are there two variables named canopy_height, and what database fields should you examine to decide which one you want?
+
+Now retrieve all available measurements for each variable.
+
+```{r}
+vars_measures <- (variables
+	%>% group_by(id, name)
+	%>% do(traits = betydb_record( # Get full trait list by variable ID
+		id = .$id, table = "variables",
+		betyurl = betyurl, key=betykey, api_version = "beta"
+		)$traits))
+
+# Only needed if some variables may contain zero traits
+# If none are empty, can just do `vars_measures %>% unnest()`
+traitdata <- left_join( # ensures we keep a blank row for any variables with no trait info
+	vars_measures %>% select(id, name),
+	vars_measures %>% filter(length(traits) > 0) %>% unnest())
+```
+
+Add cultivar information so we can plot by ecotype
+
+```{r}
+traitdata <- (traitdata
+	%>% rename(variable_name = name, cultivar_id = trait.cultivar_id)
+	%>% left_join(cultivars, by="cultivar_id"))
+```
+
+```{r}
+(ggplot(traitdata, aes(as.Date(trait.date), trait.mean))
++ geom_line(aes(group = paste(trait.site_id, cultivar_id)))
++ facet_grid(variable_name ~ ecotype, scales = "free_y"))
+```
