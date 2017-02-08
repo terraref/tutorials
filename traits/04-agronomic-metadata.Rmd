@@ -139,13 +139,13 @@ managements_treatments <- (treatments
   %>% unnest())
 
 managements <- (betydb_query(table = 'managements', betyurl = betyurl, key = betykey, api_version = "beta")
-  %>% filter(mgmttype %in% c('fertilizer_N', 'fertilizer_N_rate', 'planting', 'irrigation'))
+  %>% filter(mgmttype %in% c('Fertilization_N', 'Planting', 'Irrigation'))
   %>% select(management_id = id, date, mgmttype, level, units)
   %>% left_join(managements_treatments, by = 'management_id')
   %>% left_join(treatments, by = 'treatment_id'))
 
 planting <- (managements
-  %>% filter(mgmttype == "planting")
+  %>% filter(mgmttype == "Planting")
   %>% select(treatment_id, planting_date = date, nrate = level))
 
 grass_yields <- (yields
