@@ -85,7 +85,7 @@ variables <- betydb_query(
 		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$",
 		betyurl = betyurl, key = betykey, api_version = "beta")
 
-variables %>% select(id, name, n_records = `number of associated traits`)
+variables %>% select(id, name, units, n_records = `number of associated traits`)
 ```
 
 Exercise: Why are there two variables named canopy_height, and what database fields should you examine to decide which one you want?
@@ -111,12 +111,31 @@ Add cultivar information so we can plot by ecotype
 
 ```{r}
 traitdata <- (traitdata
-	%>% rename(variable_name = name, cultivar_id = trait.cultivar_id)
+	%>% rename(
+		variable_name = name,
+		cultivar_id = trait.cultivar_id,
+		site_id = trait.site_id,
+		mean = trait.mean)
+	%>% mutate(date = as.Date(trait.date))
 	%>% left_join(cultivars, by="cultivar_id"))
 ```
 
 ```{r}
-(ggplot(traitdata, aes(as.Date(trait.date), trait.mean))
-+ geom_line(aes(group = paste(trait.site_id, cultivar_id)))
-+ facet_grid(variable_name ~ ecotype, scales = "free_y"))
+(ggplot(
+	traitdata %>% filter(variable_name == "canopy_height"),
+	aes(date, mean, group = site_id*cultivar_id))
+	+ geom_line()
+	+ facet_wrap(~ecotype)
+	+ xlab("Date")
+	+ ylab("Canopy height, cm"))
+
+(ggplot(
+	(traitdata 
+		%>% filter(variable_name == "NDVI")
+		%>% mutate(emphasize = (ecotype != "RIL"))), # to reduce overplotting
+	aes(date, mean, color = ecotype, group = site_id*cultivar_id, alpha = emphasize))
+	+ geom_line()
+	+ scale_alpha_discrete(guide = FALSE)
+	+ theme(legend.position = c(0.1, 0.9)))
+
 ```
