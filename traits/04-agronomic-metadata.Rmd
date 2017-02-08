@@ -130,7 +130,7 @@ treatments <- (betydb_query(table = 'treatments', betyurl = betyurl, key = betyk
   %>% select(treatment_id = id , name, definition, control))
 
 get_mgid <- function(trtid){
-  betydb_item(id = trtid, table = "treatments", betyurl = betyurl, key = betykey, api_version = "beta")$managements$management.id
+  betydb_record(id = trtid, table = "treatments", betyurl = betyurl, key = betykey, api_version = "beta")$managements$management.id
 }
 
 managements_treatments <- (treatments
