@@ -73,6 +73,9 @@ Here are some key tables and fields that we will look at:
 library(dplyr)
 library(tidyr)
 library(traits)
+library(sp)
+library(rgeos)
+library(leaflet)
 year = lubridate::year
 
 betyurl="https://terraref.ncsa.illinois.edu/bety/"
@@ -82,19 +85,23 @@ betykey="9999999999999999999999999999999999999999"
 species <- (betydb_query(table="species", limit="none", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(specie_id = id, scientificname, genus))
 
-# Regex is to convert geometry column to lat/long --
-# starts out as e.g. "POINT(40.11, -88.22, 223)"
+sites <- (betydb_query(table="sites", limit="none", betyurl=betyurl, key=betykey, api_version="beta")
 
-# the cool thing will be to get all of the sites where name = "~Season+2+plot" and plot the polygons on a map. is it possible to do this + keep the polygon geometries? Most of the sites in terraref are polygons ...
+sites %>% group_by(city, state, country) %>% summarize(n())
 
-sites <- (betydb_query(table="sites", betyurl=betyurl, key=betykey, api_version="beta")
-  %>% extract(
-    col = geometry,
-    into = c("lat", "lon", "ele"),
-    regex = "POINT \\(([-.\\d]+) ([-.\\d]+) ([-.\\d]+)\\)",
-    convert=TRUE))
-  
-sites %>% select(site_id = id, lat, lon, sitename, city, country)
+# A simple plot of all site coordinates. 
+# Marker pins = sites with coords reported as a single point 
+# Red polygons = sites reporting full boundaries
+# (Needs improvement -- currently hard to see Maricopa plots & both seasons overlap)
+site_geom <- (sites
+  %>% filter(!is.na(geometry))
+  %>% group_by(id)
+  %>% do(parsed_geometry = readWKT(text = .$geometry, id = .$id))
+  %>% mutate(geom_type = class(parsed_geometry)))
+sites_poly = do.call("rbind", filter(site_geom, geom_type == "SpatialPolygons")$parsed_geometry)
+sites_point = do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$parsed_geometry)
+
+leaflet() %>% addTiles() %>% addPolygons(data=sites_poly, color="red") %>% addMarkers(data=sites_point)
 
 citations <- (betydb_query(table="citations", betyurl=betyurl, key=betykey, api_version="beta")
   %>% select(citation_id = id, author, year, title))
