@@ -155,7 +155,7 @@ public_key <- "9999999999999999999999999999999999999999"
 traits <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
 
 
-SLA <- (betydb_search(query = "SLA", betyurl = terraref_test_url, key = public_key)
+SLA <- (betydb_search(query = "SLA", betyurl = terraref_test_url, key = public_key, api_version = "beta")
   %>% filter(scientificname == 'Sorghum bicolor'))
 
 ```
