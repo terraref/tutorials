@@ -1,23 +1,139 @@
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+theme_set(theme_bw())
+library(traits)
+library(rgeos)
+library(sp) # for implicitly called rbind.SpatialPolygons method
+library(leaflet)
+
+
+betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
+betykey <- "9999999999999999999999999999999999999999"
+```
+
 
 ## Plots
 
 
 query sites for season 2
+
+```{r}
+sites <- betydb_query(
+	table = "sites",
+	city = "Maricopa", sitename = "~Season 2 range",
+	limit = "none",
+	betyurl = betyurl, key = betykey, api_version = "beta")
+```
+
 plot polygons on a map
 
+```{r}
+site_bounds <- (sites
+	%>% rowwise()
+	%>% do(boundaries = readWKT(text = .$geometry, id = .$id)))
+
+site_bounds <- do.call('rbind', site_bounds$boundaries)
+
+leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
+```
 
 ## Cultivars
 
-## Managements
-
-## Summary of traits
-
 ```{r}
+cultivars <- (
+	betydb_query(
+		table = "cultivars", limit = "none",
+		betyurl = betyurl, key = betykey, api_version = "beta")
+	%>% rename(cultivar_id = id))
 
-query sites for season 2
-plot polygons on a map
+cultivars_traits <- (cultivars
+	%>% group_by(cultivar_id)
+	%>% do(trait_id = betydb_record(
+			id = .$cultivar_id, table = "cultivars",
+			betyurl = betyurl, key = betykey, api_version = "beta"
+			)$traits$trait.id)
+	%>% unnest())
+
+sites_traits <- (sites
+	%>% group_by(id)
+	%>% do(trait_id = betydb_record(
+			id = .$id, table = "sites",
+			betyurl = betyurl, key = betykey, api_version = "beta"
+			)$traits$trait.id)
+	%>% unnest())
+
+sites <- (sites
+	%>% left_join(sites_traits, by = "id")
+	%>% left_join(cultivars_traits, by = "trait_id")
+	%>% left_join(cultivars, by = "cultivar_id")
+	%>% unique())
 
 ```
 
+
 ## Time series of canopy cover, height, NDVI
+
+First look up variables by name. Let's look for measurements related to canopy size:
+
+```{r}
+variables <- betydb_query(
+		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$",
+		betyurl = betyurl, key = betykey, api_version = "beta")
+
+variables %>% select(id, name, units, n_records = `number of associated traits`)
+```
+
+Exercise: Why are there two variables named canopy_height, and what database fields should you examine to decide which one you want?
+
+Now retrieve all available measurements for each variable.
+
+```{r}
+vars_measures <- (variables
+	%>% group_by(id, name)
+	%>% do(traits = betydb_record( # Get full trait list by variable ID
+		id = .$id, table = "variables",
+		betyurl = betyurl, key=betykey, api_version = "beta"
+		)$traits))
+
+# Only needed if some variables may contain zero traits
+# If none are empty, can just do `vars_measures %>% unnest()`
+traitdata <- left_join( # ensures we keep a blank row for any variables with no trait info
+	vars_measures %>% select(id, name),
+	vars_measures %>% filter(length(traits) > 0) %>% unnest())
+```
+
+Add cultivar information so we can plot by ecotype
+
+```{r}
+traitdata <- (traitdata
+	%>% rename(
+		variable_name = name,
+		cultivar_id = trait.cultivar_id,
+		site_id = trait.site_id,
+		mean = trait.mean)
+	%>% mutate(date = as.Date(trait.date))
+	%>% left_join(cultivars, by = "cultivar_id"))
+```
+
+```{r}
+(ggplot(
+	traitdata %>% filter(variable_name == "canopy_height"),
+	aes(date, mean, group = site_id * cultivar_id))
+	+ geom_line()
+	+ facet_wrap(~ecotype)
+	+ xlab("Date")
+	+ ylab("Canopy height, cm"))
+
+(ggplot(
+	(traitdata
+		%>% filter(variable_name == "NDVI")
+		%>% mutate(emphasize = (ecotype != "RIL"))), # to reduce overplotting
+	aes(date, mean, color = ecotype, group = site_id*cultivar_id, alpha = emphasize))
+	+ geom_line()
+	+ scale_alpha_discrete(guide = FALSE)
+	+ theme(legend.position = c(0.1, 0.9)))
+```
