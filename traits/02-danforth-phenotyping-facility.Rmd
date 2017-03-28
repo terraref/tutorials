@@ -15,35 +15,6 @@ theme_set(theme_bw())
 library(traits)
 ```
 
-
-## BETYdb
-
-BETYdb stores trait data and agronomic metadata. An introduction to the API is in ../betydb.md
-
-Also see the full documentation for accessing data from BETYdb. 
-
-
-### Setting up an API key and establishing a connection
-
-An API key is like a password. It allows you to access data, and should be kept private. Therefore, we are not going to put it in code that we share. One way to do this is to place it in a simple text file. 
-
-* click file --> new --> text file
-* copy the api key that was sent when you registered into the file
-* file --> save save as '/home/rstudio/.betykey'
-
-For the purposes of the tutorial, you can assign it to the `mykey` variable in the console window.
-
-```{r traits}
-
-terraref_betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
-mykey <- readLines('~/.betykey', warn = FALSE)
-
-sorghum_all <- betydb_search(query = 'Sorghum', 
-                         betyurl = terraref_betyurl, 
-                         key = mykey) 
-
-```
-
 ### Query data from the Danforth Phenotyping Facility
 
 First we will use the generic search to query the output from the Lemnatec indoor phenotyping system at the Danforth Center in St. Louis, MO.

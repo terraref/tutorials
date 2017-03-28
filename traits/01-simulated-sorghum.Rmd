@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r setup}
+library(traits)
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(ggplot2)
 library(ggthemes)
@@ -14,9 +15,14 @@ theme_set(theme_bw())
 library(dplyr)
 ```
 
-# Background: The design of a simulated dataset
+# Working with a simulated dataset?
 
-To explore the potential of phenotyping data, we have simulated the type of data that might be observed by daily scans by drone or robot. 
+To explore the potential of phenotyping data, we have simulated the type of data that might be observed by daily scans by drone or robot. These data are freely accessible, and thus useful for teaching and exploration that does not require access.
+
+## Methods: 
+
+### The design of a simulated dataset
+
 
 We have simulated 500 genotypes across 12 sites and five years using a mechanistic model. 
 
@@ -26,19 +32,19 @@ All of these simulated datasets are released with an unrestrive [copyright](http
 
 ### A note on variable names
 
-I have used the variable names currently used in BETYdb.org/variables, along with names inspired by the more standardized naming Climate Forecasting conventions. However, this is a very early pre-release, and we welcome comments on how such data should be formatted and accessed can be discussed on GitHub.
+The variable names are those currently used in BETYdb.org/variables, along with names inspired by the more standardized naming Climate Forecasting conventions. However, this is a very early pre-release, and we welcome comments on how such data should be formatted and accessed can be discussed on GitHub.
 
-> Exercise: can you locate the relevant issues?
+> Exercise: can you locate the GitHub issues that discuss trait data standards and variable naming conventions?
 
 [This is a slideshow](https://docs.google.com/presentation/d/10aN_5whs8y9SOC8Y9Rj1kbWCfi7YG3yFyNqVX4JUr2U/edit?usp=sharing) of interfaces from the broader community that could serve as a common interface.
 
-# Design of Simulation Experiment
+### Design of Simulation Experiment
 
 500 Sorghum lines grown at each of three sites, four blocks per site, along a N-S transect in Illinois over five years (2021-2025). 
 
-## Time Span (2021-2025) 
+#### Time Span (2021-2025) 
 
-These are historic data, but the years have been changed to emphasize the point that these are not real data. The years have been chosen to select climate extremes. Two years were dry, two were wet, and one was average.
+While the climate data are derived from historic data, the years have been changed to reinforce the fact that these are not real data. The years have been chosen to select climate extremes. Two years were dry, two were wet, and one was average.
 
 | year | drought index |
 |-----|-----|
@@ -71,11 +77,11 @@ Each site has four replicate fields: A, B, C, D. This simulated dataset assumes 
 |            | precipitation                    | precipitation_flux | mm/d                        |Daily precipitation |
 
 
-## Genotypes
+### Genotypes
 
 Two-hundred and twenty-seven lines were grown at each site. Each line is identified by a unique integer in the range [9915:10141]
 
-## Phenotypes
+### Phenotypes
 
 The phenotypes associated with each genotype is in the file `phenotypes.csv`. 
 
@@ -117,26 +123,14 @@ This dataset includes what a sensor might observe, daily for five years during t
 |            | Height                               |   canopy_height | m                        | |
 
 
-# Quick start
 
-
-For simplicity, and because I neither have a model nor the data to simulate _Sorghum_, I have started with some phenotypes and simulations of plant growth based on a model that simulates the growth of biomass crops including Miscanthus, Switchgrass, Sugarcane, and coppice Willow.
-
-## Some background / methods.
-
-I start with simulation of Miscanthus, over Illinois as a proxy for Sorghum, since I have a model, [BioCro, Miguez et al, 2009](github.com/ebimodeling/biocro), that simulates Miscanthus. [The code used to run the model and add noise is on GitHub](https://github.com/ebimodeling/biocro_regional/edit/master/vignettes/regional_pecan_workflow.Rmd). 
-Like Sorghum, Miscanthus uses C4 photosynthesis, and this is used to compute carbon uptake at hourly time steps in the simulation model. 
-Unlike Sorghum, Miscanthus grows clonally and is propagated by Rhizome instead of by seed. Furthermore, Miscanthus is perennial: it re-grows each year from carbon stored in rhizomes.
+I start with simulation over Illinois using another grass with C4 photosynthesis, [BioCro, Miguez et al, 2009](github.com/ebimodeling/biocro). [The code used to run the model and add noise is on GitHub](https://github.com/ebimodeling/biocro_regional/edit/master/vignettes/regional_pecan_workflow.Rmd). 
+The model computes carbon uptake at hourly time steps.
 The 'genotypes' are based on five-hundred quasi-random parameterizations of a biophysical crop model.
 
-The virtual "Miscanthus" is encoded as a set of associated species and prior estimates of the phenotypes used to parameterize the simulation model. The concept of Plant Functional Type (PFT) is any group of one or more plants, originally functionally related species such as 'C4 crops' or 'hardwood trees'. We use PFT at the finest scale of genotype. In the actual research that generated these data, this was the clone _Miscanthus x giganteus_, and this is [PFT #123 in BETYdb](https://www.betydb.org/pfts/123). 
+The virtual crop is encoded as a set of associated species and prior estimates of the phenotypes used to parameterize the simulation model. 
 
-## A Simulated Sorghum Breeding Population
-
-In make-believe land we take a bunch of data generated above and start to rename things
-
-* run_id -> genotype #represents quasi-random set of traits
-* lat, lon -> To estimate "E"
+* lat, lon -> To estimate "Environmental effects"
    * for within site E effects, use a few points within 1/4 degree lat/lon 
    * for across site E effects, use southern, central, and northern Illinois.
 
@@ -144,9 +138,6 @@ In make-believe land we take a bunch of data generated above and start to rename
 
 
 ```{r}
-
-library(traits)
-
 terraref_test_url <- "https://terraref.ncsa.illinois.edu/bety-test/"
 ## note that this key accesses public data. In part 2 you will use your own key to access the actual data
 
