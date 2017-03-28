@@ -1,20 +1,34 @@
 # Tutorials
 
-Learn to use TERRA REF data and software
+## An introduction to the use of TERRA REF data and software
 
-Note that many of these tutorials have complex dependencies. These can be launched from within the [TERRA REF Sensor Data Portal](https://terraref.ncsa.illinois.edu) (requires account / access). 
+Many of these tutorials have complex dependencies. 
 
-Also try:
+### Data Access
 
-* mybinder.org/repo/terraref/rstudio (for R tutorials under traits/)
-* mybinder.org/repo/terraref/rstudio-geospatial (for R tutorials under sensors/)
-* mybinder.org/repo/terraref/jupyter-plantcv (for PlantCV tutorial)
-* mybinder.org/repo/terraref/jupyter-netcdf (Python tutorials under sensors/)
+The first research-grade version of TERRA REF data products will be released in November 2018. 
+Before that, we will make evaluation releases available: the alpha version was released in November 2016 and the beta version will be released in 2017.
+
+make the data available for evaluation with the goal of receiving feedback.
+are making 
+Many access data that is available online, though most require authentication.
+
+Some make use of very large files that are available. 
+These can be launched from within the [TERRA REF Sensor Data Portal](https://terraref.ncsa.illinois.edu) (requires account / access).
+
+### 
 
 
-## Links
+### Links
 
-to quick-start documentation, README's, code for learning and applied examples
+TODO: add links to quick-start documentation, README's, code for learning and applied examples
+
+* Data portal: terraref.org/data
+* Docker Images on Docker Hub: hub.docker.com/terraref
+* 
+### References
+
+
 
 ### Slides
 

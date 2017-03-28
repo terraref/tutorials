@@ -1,4 +1,9 @@
-
+---
+title: "Plot level data from the field scanner in Maricopa, AZ"
+author: "David LeBauer, Chris Black"
+date: "`r Sys.Date()`"
+output: md_document
+---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(dplyr)
