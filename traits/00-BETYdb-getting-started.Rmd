@@ -127,32 +127,42 @@ writeLines('9999999999999999999999999999999999999999',
            con = '~/.betykey_public')
 ```
 ```{r traits}
-terraref_test_url <- "https://terraref.ncsa.illinois.edu/bety-test/"
-
-betykey <- readLines('~/.betykey_public', warn = FALSE)
+terraref_test_url <- 
+public_betykey <- 
 
 ```
+
+### Our first Query 
 
 ```{r simulated-LAI}
 sorghum_lai <- betydb_query(table = 'search',
                             trait = "LAI",
                             api_version = 'beta',
                             limit = 5000,
-                            betyurl = terraref_test_url, 
-                            key = betykey)
-
-#traits <- betydb_query(table = "traits",
-#              api_version = 'beta',
-#              limit = 5000,
-#              betyurl = terraref_test_url, 
-#              key = betykey)
-
-
+                            betyurl = "https://terraref.ncsa.illinois.edu/bety-test/", 
+                            key = readLines('~/.betykey_public', warn = FALSE))
 
 ```
 
-```{r}
+Notice all of the arguments? We can change this by setting the default options 
 
+
+```{r}
+options(betydb_key = readLines('~/.betykey_public', warn = FALSE),
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety-test/",
+        betydb_api_version = 'beta')
+```
+
+Now the same query can be reduced to:
+
+```{r eval=FALSE}
+sorghum_lai <- betydb_query(table = 'search',
+                            trait = "LAI",
+                            limit = 5000)
+```
+
+
+```{r}
 ggplot(data = sorghum_lai) +
   geom_smooth(aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean, color = as.factor(lubridate::year(lubridate::ymd_hms(raw_date)))), span = 0.5) +
 #  scale_x_datetime(date_breaks = '6 months', date_labels = "%b %Y") +

@@ -140,17 +140,13 @@ The virtual crop is encoded as a set of associated species and prior estimates o
 
 
 ```{r}
-terraref_test_url <- "https://terraref.ncsa.illinois.edu/bety-test/"
-## note that this key accesses public data. In part 2 you will use your own key to access the actual data
 
-public_key <- "9999999999999999999999999999999999999999"
+options(betydb_key = readLines('~/.betykey_public', warn = FALSE),
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety-test/",
+        betydb_api_version = 'beta')
 
-
-SLA <- (betydb_search(query = "SLA", 
-                      betyurl = terraref_test_url, 
-                      key = public_key, 
-                      api_version = "beta")
-  %>% filter(scientificname == 'Sorghum bicolor'))
+sorghum_lai <- betydb_query(trait = "LAI",
+                            api_version = 'beta')
 
 ```
 
@@ -159,7 +155,7 @@ Now we have queried all of the Specific Leaf Area records, we can see that these
 
 
 ```{r sla-fig, fig.height=2, fig.width=6}
-ggplot(SLA) + 
+ggplot(sorghum_lai) + 
   geom_histogram(aes(mean), binwidth = 1)
 ```
 
