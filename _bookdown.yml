@@ -1,0 +1,5 @@
+book_filename: "terraref-tutorials"
+language:
+  ui:
+    chapter_name: "Chapter "
+rmd_files: ["index.Rmd", "traits/00-BETYdb-getting-started.Rmd", "traits/01-simulated-sorghum.Rmd", "sensors/05-command-line-hyperspectral-workflow.Rmd"]
