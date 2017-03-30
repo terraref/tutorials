@@ -3,7 +3,13 @@
 
 ## An introduction to the use of TERRA REF data and software
 
-Many of these tutorials have complex dependencies. 
+Many of these tutorials have complex dependencies. In addition, many datasets are very large. These tutorials use the National Data Service Labs Workbench (NDS Labs Workbench). The NDS Labs Workbench provides the following:
+
+* Custom configured computing environments  
+  * In principle, it is possible to use any docker container
+  * Here, we have configured a few. If you would like to add additional applications, see [Docker Hub](https://hub.docker.com/explore/) for a fairly comprehensive set.
+* To learn how to use these, start with workbench/ndslabs_workbench_intro.Rmd
+* This will set you up to begin tutorials found in the traits, sensors, and plantCV folders
 
 ### Data Access
 
@@ -17,8 +23,6 @@ Many access data that is available online, though most require authentication.
 Some make use of very large files that are available. 
 These can be launched from within the [TERRA REF Sensor Data Portal](https://terraref.ncsa.illinois.edu) (requires account / access).
 
-### 
-
 
 ### Links
 
@@ -27,6 +31,7 @@ TODO: add links to quick-start documentation, README's, code for learning and ap
 * Data portal: terraref.org/data
 * Docker Images on Docker Hub: hub.docker.com/terraref
 * 
+
 ### References
 
 
