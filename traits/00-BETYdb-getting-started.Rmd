@@ -5,17 +5,6 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r setup}
-library(traits)
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
-library(ggplot2)
-library(ggthemes)
-library(GGally)
-theme_set(theme_bw())
-library(dplyr)
-```
-
-
 ## TERRA Ref Trait Database
 
 The TERRA Ref program uses the BETYdb database and web application software to store plant and plot level trait data. 
@@ -104,21 +93,72 @@ First, lets construct a query by putting together a URL.
 
 What do you see? Do you think that this is all of the records? What happens if you add `&limit=none`? 
 
-### Using the R traits package to query the database
+## Using the R traits package to query the database
 
 The rOpenSci traits package makes it easier to query the TERRA REF trait database, or any database that uses BETYdb software.
 
-```{r traits}
+First, make sure we have the latest version 
 
-terraref_betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
-betykey <- readLines('~/.betykey', warn = FALSE)
+```{r install_traits, echo=FALSE}
+if(packageVersion("traits") == '0.2.0'){
+  devtools::install_github('ropensci/traits')
+}
+```
+
+
+```{r setup}
+library(traits)
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+library(ggplot2)
+library(ggthemes)
+theme_set(theme_bw())
+library(dplyr)
+```
+
+
+
+```{r writing-key}
+# This should be done once with the key sent to you in your email
+# writeLines('abcdefg_rest_of_key_sent_in_email', 
+#            con = '~/.betykey')
+
+# Example with the public key:
+writeLines('9999999999999999999999999999999999999999', 
+           con = '~/.betykey_public')
+```
+```{r traits}
+terraref_test_url <- "https://terraref.ncsa.illinois.edu/bety-test/"
+
+betykey <- readLines('~/.betykey_public', warn = FALSE)
+
+```
+
+```{r simulated-LAI}
+sorghum_lai <- betydb_query(table = 'search',
+                            trait = "LAI",
+                            api_version = 'beta',
+                            limit = 5000,
+                            betyurl = terraref_test_url, 
+                            key = betykey)
+
+#traits <- betydb_query(table = "traits",
+#              api_version = 'beta',
+#              limit = 5000,
+#              betyurl = terraref_test_url, 
+#              key = betykey)
+
+
+
 ```
 
 ```{r}
-sorghum_all <- betydb_search(query = 'Sorghum', 
-                         betyurl = terraref_betyurl, 
-                         key = betykey) 
+
+ggplot(data = sorghum_lai) +
+  geom_smooth(aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean, color = as.factor(lubridate::year(lubridate::ymd_hms(raw_date)))), span = 0.5) +
+#  scale_x_datetime(date_breaks = '6 months', date_labels = "%b %Y") +
+  ylim(c(0,6)) + 
+  ylab("Day of Year") + xlab("Leaf Area Index") +  
+  labs(color='Year')
 
 ```
-
 

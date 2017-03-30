@@ -1,16 +1,18 @@
----
+<!---
 title: "Can high throughput phenotyping produce data like this?"
 author: "David LeBauer"
-date: "February 1, 2015"
+date: "`r Sys.Date()`"
 output: html_document
 ---
+-->
 
-```{r setup}
+# A Simulated Phenotype Dataset
+
+```{r}
 library(traits)
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(ggplot2)
 library(ggthemes)
-library(GGally)
 theme_set(theme_bw())
 library(dplyr)
 ```
@@ -143,10 +145,11 @@ terraref_test_url <- "https://terraref.ncsa.illinois.edu/bety-test/"
 
 public_key <- "9999999999999999999999999999999999999999"
 
-traits <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
 
-
-SLA <- (betydb_search(query = "SLA", betyurl = terraref_test_url, key = public_key, api_version = "beta")
+SLA <- (betydb_search(query = "SLA", 
+                      betyurl = terraref_test_url, 
+                      key = public_key, 
+                      api_version = "beta")
   %>% filter(scientificname == 'Sorghum bicolor'))
 
 ```
@@ -165,7 +168,12 @@ ggplot(SLA) +
 ```{r query-traits}
 
 
-traits <- betydb_search("SLA Vcmax",  betyurl = terraref_test_url, key = public_key)
+trait_list <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
+
+trait_data <- betydb_search(paste(trait_list, collapse = " "),
+                            betyurl = terraref_test_url, 
+                            key = public_key,
+                            limit = 'none')
         
 ```
 
@@ -179,7 +187,7 @@ traits <- betydb_search("SLA Vcmax",  betyurl = terraref_test_url, key = public_
 ```
 
 
-```{r}
+```{r eval=FALSE}
 library(data.table)
 library(dplyr)
 

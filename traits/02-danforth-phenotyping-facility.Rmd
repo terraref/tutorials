@@ -12,6 +12,11 @@ library(dplyr)
 library(ggplot2)
 library(ggthemes)
 theme_set(theme_bw())
+
+if(packageVersion("traits") == '0.2.0'){
+  devtools::install_github('ropensci/traits')
+}
+
 library(traits)
 ```
 
