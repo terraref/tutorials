@@ -8,7 +8,7 @@ Many of these tutorials have complex dependencies. In addition, many datasets ar
 * Custom configured computing environments  
   * In principle, it is possible to use any docker container
   * Here, we have configured a few. If you would like to add additional applications, see [Docker Hub](https://hub.docker.com/explore/) for a fairly comprehensive set.
-* To learn how to use these, start with workbench/ndslabs_workbench_intro.Rmd
+* To learn how to use these, start with [workbench/ndslabs_workbench_intro.html](https://htmlpreview.github.io/?https://github.com/terraref/tutorials/blob/master/workbench/ndslabs_workbench_intro.html)
 * This will set you up to begin tutorials found in the traits, sensors, and plantCV folders
 
 ### Data Access
