@@ -16,7 +16,7 @@ Many of these tutorials have complex dependencies. In addition, many datasets ar
 The first research-grade version of TERRA REF data products will be released in November 2018. 
 Before that, we will make evaluation releases available: the alpha version was released in November 2016 and the beta version will be released in 2017.
 
-Some make use of very large files that are available. 
+To access data and computing environments please fill out a quick [Alpha User application](https://docs.google.com/forms/d/e/1FAIpQLScBsD042RrRok70BCGCRwARTcm9etvVHqvQaz1c5X7c5y0H3w/viewform?c=0&w=1).
 
 
 ### Links
