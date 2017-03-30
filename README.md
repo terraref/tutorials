@@ -24,8 +24,3 @@ TODO: add links to quick-start documentation, README's, code for learning and ap
 * Data portal: terraref.org/data
 * Docker Images on Docker Hub: hub.docker.com/terraref
 * NDS Labs Workbench: terraref.ndslabs.org
-
-### Slides
-
-* [Project Overview](https://docs.google.com/presentation/d/1MVOGt2xKgCfeUdVF9tWyyWrcPPfSg9DQvxHWQ0nN44U/pub?start=false&loop=false&delayms=3000)
-* [Data Access Workshop](https://docs.google.com/presentation/d/1YikA_h9LIgTJkuNrAublpWIoT2pRF-E-RI1k1UlqeAE/pub?start=false&loop=false&delayms=3000)
