@@ -8,37 +8,35 @@ output: html_document
 
 # A Simulated Phenotype Dataset
 
-```{r}
+```{r warnings=FALSE, echo=FALSE}
 library(traits)
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(ggplot2)
 library(ggthemes)
+library(GGally)
 theme_set(theme_bw())
 library(dplyr)
+library(httr)
+.libPaths('~/R/library')
 ```
 
-# Working with a simulated dataset?
 
-To explore the potential of phenotyping data, we have simulated the type of data that might be observed by daily scans by drone or robot. These data are freely accessible, and thus useful for teaching and exploration that does not require access.
+To explore the potential of phenotyping data as well as to prepare for large datasets, we have simulated the type of data that might be observed by daily scans by drone or robot. These data are freely accessible, and thus useful for teaching and exploration that does not require access.
 
 ## Methods: 
 
 ### The design of a simulated dataset
 
 
-We have simulated 500 genotypes across 12 sites and five years using a mechanistic model. 
+We simulated 500 genotypes across 12 sites and five years using a mechanistic model. 
+This model was developed to simulate the physiology and biophysics of Miscanthus, which is another bioenergy grass with C4 photosynthesis, [BioCro, Miguez et al, 2009](github.com/ebimodeling/biocro). We have further added some noise to the output. [The code used to run the model and add noise is on GitHub](https://github.com/ebimodeling/biocro_regional/edit/master/vignettes/regional_pecan_workflow.Rmd).
+The model computes carbon uptake at hourly time steps.
+The 'genotypes' are based on five-hundred quasi-random parameterizations of a biophysical crop model.
 
 _Note that these data sets contain numerical artifacts and scientific reinterpretations for illustrative purpose._
 
 All of these simulated datasets are released with an unrestrive [copyright](https://creativecommons.org/publicdomain/zero/1.0/).  This means you can copy, modify, ans share the data.  Please keep in mind that the data sets are not production quality - they have been developed solely to inspire and solicit feedback.
 
-### A note on variable names
-
-The variable names are those currently used in BETYdb.org/variables, along with names inspired by the more standardized naming Climate Forecasting conventions. However, this is a very early pre-release, and we welcome comments on how such data should be formatted and accessed can be discussed on GitHub.
-
-> Exercise: can you locate the GitHub issues that discuss trait data standards and variable naming conventions?
-
-[This is a slideshow](https://docs.google.com/presentation/d/10aN_5whs8y9SOC8Y9Rj1kbWCfi7YG3yFyNqVX4JUr2U/edit?usp=sharing) of interfaces from the broader community that could serve as a common interface.
 
 ### Design of Simulation Experiment
 
@@ -57,7 +55,7 @@ While the climate data are derived from historic data, the years have been chang
 | 2025 | dry |
 
 
-### Sites
+#### Sites
 
 These are approximate locations used to query the meteorological and soil data used in the simulations. 
  
@@ -69,21 +67,12 @@ These are approximate locations used to query the meteorological and soil data u
 
 Each site has four replicate fields: A, B, C, D. This simulated dataset assumes each field within a site has similar, but different meteorology (e.g., as if they were all in the same county). 
 
-## Meteorology
 
-| variable_id|name                           |standard_name       |units                          |description                                                                                                                                                                                                      |
-|-----------:|:------------------------------|:---------------|:------------------------------|:----------------|
-|            | Tmin                               | | C  |Daily max temperature |
-|            | Tmax                               |  | C  |Daily min temperature |
-|            | Tavg                               |  | C  |Daily mean temperature |
-|            | precipitation                    | precipitation_flux | mm/d                        |Daily precipitation |
-
-
-### Genotypes
+#### Genotypes
 
 Two-hundred and twenty-seven lines were grown at each site. Each line is identified by a unique integer in the range [9915:10141]
 
-### Phenotypes
+#### Phenotypes
 
 The phenotypes associated with each genotype is in the file `phenotypes.csv`. 
 
@@ -106,7 +95,7 @@ These 'phenotypes' are used as input parameters to the simulation model. We ofte
 |           5|Jmax   |electron_transport_flux_in_thylakoid_assuming_saturated_light |umol photons m-2 s-1   |maximum rate of electron transport  |
 |         492|extinction_coefficient_diffuse |extinction_coefficient_for_diffuse_light_in_canopy            |                               |canopy extinction coefficient for diffuse light                                                                                                                                                                  |
 
-## Simulated Sensor Data
+#### Simulated Sensor Data
 
 This dataset includes what a sensor might observe, daily for five years during the growing season.
 
@@ -126,15 +115,6 @@ This dataset includes what a sensor might observe, daily for five years during t
 
 
 
-I start with simulation over Illinois using another grass with C4 photosynthesis, [BioCro, Miguez et al, 2009](github.com/ebimodeling/biocro). [The code used to run the model and add noise is on GitHub](https://github.com/ebimodeling/biocro_regional/edit/master/vignettes/regional_pecan_workflow.Rmd). 
-The model computes carbon uptake at hourly time steps.
-The 'genotypes' are based on five-hundred quasi-random parameterizations of a biophysical crop model.
-
-The virtual crop is encoded as a set of associated species and prior estimates of the phenotypes used to parameterize the simulation model. 
-
-* lat, lon -> To estimate "Environmental effects"
-   * for within site E effects, use a few points within 1/4 degree lat/lon 
-   * for across site E effects, use southern, central, and northern Illinois.
 
 ### Accessing the TERRA Simulated Data Database
 
@@ -145,17 +125,19 @@ options(betydb_key = readLines('~/.betykey_public', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety-test/",
         betydb_api_version = 'beta')
 
-sorghum_lai <- betydb_query(trait = "LAI",
-                            api_version = 'beta')
+sorghum_sla <- betydb_query(table = 'search',
+                            trait = "SLA",
+                            genus = 'Sorghum',
+                            limit = 500)
 
 ```
 
 
-Now we have queried all of the Specific Leaf Area records, we can see that these data are summarized at the level of genotype. 
+Now we have queried all `r nrow(sorghum_sla)` of the Specific Leaf Area records, we can see how this trait varies within the simulated genotypes. 
 
 
 ```{r sla-fig, fig.height=2, fig.width=6}
-ggplot(sorghum_lai) + 
+ggplot(sorghum_sla) + 
   geom_histogram(aes(mean), binwidth = 1)
 ```
 
@@ -163,92 +145,169 @@ ggplot(sorghum_lai) +
 
 ```{r query-traits}
 
-
 trait_list <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
 
-trait_data <- betydb_search(paste(trait_list, collapse = " "),
-                            betyurl = terraref_test_url, 
-                            key = public_key,
-                            limit = 'none')
+variables <- betydb_query(table = 'variables',
+                          limit = 'none')
+
+knitr::kable(variables %>% 
+               filter(name %in% trait_list) %>% 
+               select(name, description, units))
         
 ```
 
-### Simulated Biomass
+### Select and evaluate traits
+
+These traits are not time series, each of the ~500 genotypes is associated with a single value for each trait. This is different from the time series of LAI that we saw in the previous exercise or the biomass data that we will look at below. 
 
 ```{r}
 
-# query some time series of yield, LAI, 
-# time series and scater plots of 
+traits_list <- list()
+for(trait in trait_list){
+  traits_list[[trait]] <- betydb_query(table = 'search',
+                                  trait = trait,
+                                  limit = 'none')
+}
+
+traits <- bind_rows(traits_list)
+  
+```
+
+
+
+Lets summarize the trait data as histograms:
+
+```{r phenotype-histograms, fig.width = 6, fig.height = 6}
+ggplot(data = traits) +
+  geom_histogram(aes(mean), bins = 22) +
+  facet_wrap(~trait, scales = 'free', ncol = 2) + 
+  theme_minimal()
 
 ```
 
 
-```{r eval=FALSE}
-library(data.table)
-library(dplyr)
+### Plant Growth time series
 
-phenotypes <- fread("phenotypes.csv")
-sorghum_simulation <- fread("sorghum_simulation.csv")
-library(ggplot2)
-library(ggthemes)
-library(GGally)
-theme_set(theme_tufte())
+Lets now select a single cultivar and view its growth over time across many sites. There are time series of NDVI, canopy height, leaf area index, leaf biomass, root biomass, and stem biomass. 
 
-p <- phenotypes %>% dplyr::select(Vcmax, c2n_leaf, cuticular_cond, SLA, quantum_efficiency,
-                                  leaf_respiration_rate_m2, stomatal_slope.BB, growth_respiration_coefficient,
-                                  Jmax, chi_leaf, extinction_coefficient_diffuse) %>% setDT
-                                
-ggpairs(p,  
+```{r}
+timeseries_traits <- c("canopy_height", "leaf_biomass", "root_biomass", "stem_biomass", "LAI", "NDVI")
+
+knitr::kable(variables %>% 
+               filter(name %in% timeseries_traits) %>% 
+               select(name, description, units))
+```
+
+```{r all_sorghum}
+
+
+site_id <- betydb_query(table = 'sites', sitename = "Central IL Plot D")$id
+
+for(t in c('canopy_height', 'stem_biomass', 'LAI', 'NDVI')){
+  
+  variable_id <- betydb_query(table = 'variables', name = t)$id
+
+  system.time(
+    sorghum_ts <-  betydb_query(table = 'traits',
+                                limit = 'none',
+                                variable_id = variable_id,
+                                date_year ="1022",
+                                site_id = site_id)
+  )
+  
+#  save(sorghum_ts, file = paste0('data/sorghum_',t,'.RData'))
+}
+
+```
+
+```
+
+This is how you can query a time series of sorghum height data for the Northern IL site. 
+
+```{r query-sorghum-height}
+sorghum_height <-  betydb_query(table = 'search',
+                                trait = 'canopy_height',
+                                year = 1022,
+                                site = "~Northern IL",
+                                limit = 'none')
+#save(sorghum_height, file = 'data/sorghum_height.RData')
+```
+
+However, with almost 200k rows it currently takes 40 minutes to query (this is a limitation of the API). For the purposes of this tutorial, we will use a cached copy of the dataset.
+
+
+```{r}
+#load('data/sorghum_height.RData')
+
+s <- sorghum_height %>% 
+  mutate(day = lubridate::yday(raw_date), 
+         year = lubridate::year(raw_date),
+         genotype = as.factor(cultivar),
+         height = mean)
+
+
+height_max <- s %>% group_by(genotype) %>% summarise(height_rank = max(height))
+
+ggplot(data = s, aes(x = day, y = height), size = 0.25, se = FALSE) + 
+  geom_smooth(aes(group = genotype), alpha = 0.1)
+
+        
+```
+
+
+
+### Trait Correlations
+
+Now lets look at a 'pairs' plot to see if there is any covariance among the traits:
+
+
+First, lets rearrange the data from 'long' to 'wide' format. We will also take this chance to rename the 'cultivar' field to 'genotype'.
+
+```{r}
+
+traits_wide <- traits %>%  
+  select(genotype = cultivar, trait, mean) %>%
+  tidyr::spread(key = trait, value = mean)
+
+```
+
+Now, lets create a variable called `max_height` 
+
+```{r max_height}
+# create the variable max height
+max_height <- s %>% 
+  group_by(genotype) %>% 
+  summarise(max_height = max(height))
+
+```
+
+Now, join the traits data frame with the new max_height data frame trait data we will merge the two data frames on the `genotype` field.
+
+```{r join_traits_height}
+traits_height <- traits_wide %>% left_join(max_height, by = 'genotype')
+
+```
+Which traits are related to height? We can discover this in a few way, for example, a pairs plot that shows correltations:
+
+```{r trait_pairs, fig.height = 8, fig.width = 8}
+ggpairs(traits_height %>% select(-genotype),  
         lower = list(continuous = 'density'),
-        upper = list(continuous = 'blank'),
-        axisLabels = 'internal')
+        upper = list(continuous = 'cor'),
+        axisLabels = 'show') +  
+  theme(text = element_text(size=6))
 
 ```
 
-### Time series
+What we can see in this _simulated_ data set is that there is no covariance among traits. However, many of the traits are correlated to the maximum height. Is this realistic? What parameters do you think should be correlated? We will re-visit this with real data in a later tutorial. 
+
+We can also use linear regression to evaluate the relationship between traits and height:
+
+```{r trait-anova}
+height_model <- lm(max_height ~ #. -genotype,
+                     c2n_leaf + chi_leaf + cuticular_cond + extinction_coefficient_diffuse +
+                     Jmax + leaf_respiration_rate_m2 + quantum_efficiency + SLA, + Vcmax, 
+                   data = traits_height)
+summary(height_model)
 
 
-```{r}
-library(lubridate)
-library(data.table)
-# need to query from API
-s <- sorghum_simulation %>% 
-  mutate(Day = yday(date), 
-         line = as.factor(paste('Sim', genotype)),
-         Biomass = Stem + Leaf) %>% setDT
-
-## figure out best / worst
-s[year == 2023][which.max(Stem)]
-s[year == 2023 & month(date) == 10][which.min(Stem)]
-theme_set(theme_tufte()) 
-ggplot() + 
-  geom_smooth(data = s[genotype >9950 & genotype < 10000],
-              aes(x = Day, y = Biomass, fill = NULL, group = genotype), alpha = 0.1, color = 'grey') +
-  geom_smooth(data = s[genotype == 10020],
-              aes(x = Day, y = Biomass), color = 'darkgreen') +
-  geom_smooth(data = s[genotype == 9934],
-              aes(x = Day, y = Biomass), color = 'red') +
-  facet_wrap(~year, nrow = 1) 
-        
 ```
-
-# How to obtain data and give feedback:
-
-Please provide feedback by leaving a comment below, commenting on the issue in our [GitHub repository](https://github.com/terraref/reference-data/issues/20), emailing me, [dlebauer@illinois.edu](mailto:dlebauer@illinois.edu), or visiting the [TerraRef Reference Data chatroom](https://gitter.im/terraref/reference-data).
-
-* If you do something cool, please send comments and figures! 
-* I also can provide similar data at hourly or higher frequency as well as other processes and environmental drivers, 
-Data are located on Box: https://uofi.box.com/sorghum-simulation
-
-## Data on BETYdb
-
-These data have been uploaded to a [test instance of our database, BETYdb.](http://terraref.ncsa.illinois.edu/bety-test/search?search=sorghum) and can be accessed in the following ways:
-
-1. web interface: search + download
- * go to http://terraref.ncsa.illinois.edu/bety-test and search for "Sorghum" in the search box
- * click "Download Results"
-2. API: 
-  * basic search: http://terraref.ncsa.illinois.edu/bety-test/search?search=sorghum
-  * Draft API Documentation: https://terraref.ncsa.illinois.edu/bety-test/api/docs
-3. SQL Dump: https://terraref.ncsa.illinois.edu/bety-test/dump/bety.tar.gz
-4. Other Methods: https://pecan.gitbooks.io/betydb-data-access/content/introduction.html

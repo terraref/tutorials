@@ -1,4 +1,5 @@
 book_filename: "terraref-tutorials"
+output_dir: "book-output"
 language:
   ui:
     chapter_name: "Chapter "

@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: md_document
 ---
 
-```{r setup, include=FALSE}
+```{r 02-setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(jsonlite)
 library(dplyr)
@@ -20,30 +20,44 @@ if(packageVersion("traits") == '0.2.0'){
 library(traits)
 ```
 
+
+## Connect to the TERRA REF Trait database
+
+Unlike the first two tutorials, now we will be querying real data from the public TERRA REF database. So we will use a new URL, https://terraref.ncsa.illinois.edu/bety/, and we will need to use our own private key.
+
+```{r terraref-connect-options}
+options(betydb_key = readLines('~/.betykey', warn = FALSE),
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'beta')
+```
 ### Query data from the Danforth Phenotyping Facility
 
 First we will use the generic search to query the output from the Lemnatec indoor phenotyping system at the Danforth Center in St. Louis, MO.
 
 ```{r query-danforth}
-
-danforth_sorghum <- betydb_query(scientificname = 'Sorghum bicolor', 
-                                 sitename = 'Danforth Plant Science Center Bellweather Phenotyping Facility',
-                                 betyurl = terraref_betyurl, 
-                                 key = mykey)
+danforth_sorghum <- traits::betydb_query(
+#  sitename = 'Danforth Plant Science Center Bellweather Phenotyping Facility',
+  trait = 'sv_area',
+  limit = 'none')
 
 ```
 
 To get the equivalent query via the web interface, you can construct the following URL. Once you learn how to write a query using the url API, you can use this to  
 
-```{r api-query-in-browser, eval=FALSE}
-search_url <- paste0(terraref_betyurl, '/api/beta/search?',
+```{r api-query-in-browser}
+search_url <- paste0(options()$betydb_url,
+                     '/api/beta/search?',
                      'scientificname=Sorghum+bicolor',
                      '&sitename=Danforth+Plant+Science+Center+Bellweather+Phenotyping+Facility',
-                     '&key=',mykey,'&limit=none')
+                     '&key=', options()$betydb_key,'&limit=none')
+print(gsub(options()$betydb_key, 'secretkey', search_url))
+```
 
-## open in browser (may need to grant permission)
+you can open this in your browser to see (but you may need to grant permission)
+
+
+```{r open-api-url, eval=FALSE}
 browseURL(search_url)
-
 ```
 
 
@@ -51,7 +65,7 @@ Note that this returns a lot of columns. Lets take a look at what they mean
 
 ```{r all-columns}
 
-colnames(sorghum_all)
+colnames(danforth_sorghum)
 
 ```
 
@@ -60,21 +74,23 @@ Which columns do we want?
 
 
 ```{r}
-sorghum <- danforth_sorghum %>% 
-  select(date = raw_date, scientificname, cultivar, entity, trait, mean, units)
+danforth_sorghum <- danforth_sorghum %>% 
+  dplyr::select(date, scientificname, cultivar, entity, trait, mean, units) %>% 
+  mutate(label = paste0(trait, ifelse(units == '', '', paste0(' (', units, ')'))), date = lubridate::ymd(date), genotype = cultivar)
 
-head(sorghum)
+head(danforth_sorghum)
 
 ```
 
-### Summary of Available Data
+### Summary of Data from the Danforth Phenotyping Facility
 
 ```{r phenotype_counts, fig.width=8, fig.height=4}
-theme_set(theme_few())
-sorghum <- sorghum %>% mutate(label = paste0(trait, ' (', units, ')'))
-ggplot(data = sorghum) + 
+
+
+ggplot(data = danforth_sorghum) + 
   geom_histogram(aes(x = mean), bins = 100) + 
-  facet_wrap(~label, scales = 'free') 
+  facet_wrap(~label, scales = 'free') +
+  ggthemes::theme_tufte()
 
 
 ```
@@ -84,11 +100,12 @@ ggplot(data = sorghum) +
 
 ```{r danforth-phenotypes, fig.width=8, fig.height=4}
 
-ggplot(data = sorghum, aes(x = date, y = mean, color = cultivar)) +
+ggplot(data = danforth_sorghum, aes(x = date, y = mean, color = cultivar)) +
  # geom_line(aes(group = entity), size = 0.1) +
   geom_smooth(aes(group = cultivar)) +
   geom_point(alpha = 0.4, size = 0.1) +
-  facet_wrap(~label, scales = 'free')
+  facet_wrap(~label, scales = 'free_y') +
+  labs(color = 'Cultivar') + ggthemes::theme_few() 
 ```
 
 ### Your turn
