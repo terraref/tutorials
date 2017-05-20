@@ -3,7 +3,7 @@ title: "01-meteorological-data.Rmd"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r met-setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 
 api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"

@@ -73,7 +73,7 @@ Which columns do we want?
 
 
 
-```{r}
+```{r danforth-sorghum-cleanup}
 danforth_sorghum <- danforth_sorghum %>% 
   dplyr::select(date, scientificname, cultivar, entity, trait, mean, units) %>% 
   mutate(label = paste0(trait, ifelse(units == '', '', paste0(' (', units, ')'))), date = lubridate::ymd(date), genotype = cultivar)

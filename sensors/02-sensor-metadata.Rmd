@@ -6,7 +6,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r sensor-metadata-setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 library(jsonlite)
 library(dplyr)
@@ -43,7 +43,7 @@ knitr::kable(par_metadata$content$rsr)
 ```
 #### PAR sensor RSR curve 
 
-```{r rsr-curve}
+```{r par-rsr-curve}
 par_rsr <- data.frame(wavelength = unlist(par_metadata$content$rsr$wavelength),
                       response = unlist(par_metadata$content$rsr$response))
 

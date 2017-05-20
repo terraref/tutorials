@@ -7,17 +7,17 @@ output: md_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = TRUE)
-```
-
-
-Based on documentation for the `readLiDAR` package
-
-```{r}
 library(rLiDAR) 
 library(ggplot2)
 library(dplyr)
 library(rgl)
 theme_set(theme_bw())
+```
+
+
+Based on documentation for the `readLiDAR` package
+
+```{r import-las}
 # Importing LAS file:
 
 lasfile <- "~/terraref/documentation/tutorials/data/51458297-0d25-416a-91a5-a2f0ae1a1083__Top-heading-east_0.las"
@@ -26,14 +26,22 @@ LAS <- readLAS(lasfile) %>%
   as_data_frame %>% 
   mutate(Z = (Z - min(Z)))
 
+```
+
+```{r downsample-las}
 LAS_sample <- LAS %>% 
   filter(Z>200) %>% 
   sample_frac(size = 0.01)
+```
 
+```{r lidar-cluster}
 xyz <- LAS_sample[,1:3]
 # Getting LiDAR clusters
 set.seed(1)
 clLAS <- kmeans(xyz, 32)
+```
+
+```{r lidar-visualization}
 # Set the points id
 id <- as.factor(clLAS$cluster)
 
