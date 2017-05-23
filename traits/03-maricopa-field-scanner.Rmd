@@ -4,7 +4,7 @@ author: "David LeBauer, Chris Black"
 date: "`r Sys.Date()`"
 output: md_document
 ---
-```{r setup, include=FALSE}
+```{r traits-03-mac-traits-setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(dplyr)
 library(tidyr)
@@ -27,7 +27,7 @@ options(betydb_key = readLines('~/.betykey', warn = FALSE),
 
 query sites for season 2
 
-```{r}
+```{r traits-03-query-mac-sites}
 sites <- betydb_query(
 	table = "sites",
 	city = "Maricopa", sitename = "~Season 2 range", limit = "none")
@@ -35,7 +35,7 @@ sites <- betydb_query(
 
 plot polygons on a map
 
-```{r}
+```{r traits-03-map-mac-polygons}
 site_bounds <- (sites
 	%>% rowwise()
 	%>% do(boundaries = readWKT(text = .$geometry, id = .$id)))
@@ -47,7 +47,8 @@ leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
 
 ## Cultivars
 
-```{r}
+
+```{r traits-03-mac-cultivars}
 cultivars <- betydb_query(
   table = "cultivars", limit = "none") %>% 
   rename(cultivar_id = id)
@@ -77,7 +78,7 @@ sites <- sites  %>%
 
 First look up variables by name. Let's look for measurements related to canopy size:
 
-```{r}
+```{r traits-03-height-cover-ndvi}
 variables <- betydb_query(
 		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$")
 
@@ -89,7 +90,7 @@ Exercise: Why are there two variables named canopy_height, and what database fie
 
 Now retrieve all available measurements for each variable.
 
-```{r}
+```{r traits-03-get-variables}
 traits <- list()
 for(var in variables$name){
   traits[[var]] <- betydb_record(name = var, table = "variables")
@@ -108,7 +109,7 @@ traitdata <- left_join( # ensures we keep a blank row for any variables with no 
 
 Add cultivar information so we can plot by ecotype
 
-```{r}
+```{r traits-03-cultivar-info}
 traitdata <- (traitdata
 	%>% rename(
 		variable_name = name,
@@ -119,7 +120,7 @@ traitdata <- (traitdata
 	%>% left_join(cultivars, by = "cultivar_id"))
 ```
 
-```{r}
+```{r traits-03-plots}
 (ggplot(
 	traitdata %>% filter(variable_name == "canopy_height"),
 	aes(date, mean, group = site_id * cultivar_id))
