@@ -16,8 +16,9 @@ library(sp) # for implicitly called rbind.SpatialPolygons method
 library(leaflet)
 
 
-betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
-betykey <- "9999999999999999999999999999999999999999"
+options(betydb_key = readLines('~/.betykey', warn = FALSE),
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'beta')
 ```
 
 
@@ -29,9 +30,7 @@ query sites for season 2
 ```{r}
 sites <- betydb_query(
 	table = "sites",
-	city = "Maricopa", sitename = "~Season 2 range",
-	limit = "none",
-	betyurl = betyurl, key = betykey, api_version = "beta")
+	city = "Maricopa", sitename = "~Season 2 range", limit = "none")
 ```
 
 plot polygons on a map
@@ -49,33 +48,27 @@ leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
 ## Cultivars
 
 ```{r}
-cultivars <- (
-	betydb_query(
-		table = "cultivars", limit = "none",
-		betyurl = betyurl, key = betykey, api_version = "beta")
-	%>% rename(cultivar_id = id))
+cultivars <- betydb_query(
+  table = "cultivars", limit = "none") %>% 
+  rename(cultivar_id = id)
 
-cultivars_traits <- (cultivars
-	%>% group_by(cultivar_id)
-	%>% do(trait_id = betydb_record(
-			id = .$cultivar_id, table = "cultivars",
-			betyurl = betyurl, key = betykey, api_version = "beta"
-			)$traits$trait.id)
-	%>% unnest())
+cultivars_traits <- cultivars %>% 
+  group_by(cultivar_id) %>% 
+  do(trait_id = betydb_record(id = .$cultivar_id, table = "cultivars"
+  )$traits$trait.id)	%>% 
+  unnest()
 
-sites_traits <- (sites
-	%>% group_by(id)
-	%>% do(trait_id = betydb_record(
-			id = .$id, table = "sites",
-			betyurl = betyurl, key = betykey, api_version = "beta"
-			)$traits$trait.id)
-	%>% unnest())
+sites_traits <- sites %>% 
+  group_by(id) %>% 
+  do(trait_id = betydb_record(id = .$id, table = "sites"
+  )$traits$trait.id) %>% 
+  unnest()
 
-sites <- (sites
-	%>% left_join(sites_traits, by = "id")
-	%>% left_join(cultivars_traits, by = "trait_id")
-	%>% left_join(cultivars, by = "cultivar_id")
-	%>% unique())
+sites <- sites  %>% 
+  left_join(sites_traits, by = "id") %>% 
+  left_join(cultivars_traits, by = "trait_id") %>% 
+  left_join(cultivars, by = "cultivar_id") %>% 
+  unique()
 
 ```
 
@@ -86,10 +79,10 @@ First look up variables by name. Let's look for measurements related to canopy s
 
 ```{r}
 variables <- betydb_query(
-		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$",
-		betyurl = betyurl, key = betykey, api_version = "beta")
+		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$")
 
-variables %>% select(id, name, units, n_records = `number of associated traits`)
+variables %>% 
+  select(id, name, units, n_records = `number of associated traits`)
 ```
 
 Exercise: Why are there two variables named canopy_height, and what database fields should you examine to decide which one you want?
@@ -97,12 +90,14 @@ Exercise: Why are there two variables named canopy_height, and what database fie
 Now retrieve all available measurements for each variable.
 
 ```{r}
+traits <- list()
+for(var in variables$name){
+  traits[[var]] <- betydb_record(name = var, table = "variables")
+}
 vars_measures <- (variables
 	%>% group_by(id, name)
 	%>% do(traits = betydb_record( # Get full trait list by variable ID
-		id = .$id, table = "variables",
-		betyurl = betyurl, key=betykey, api_version = "beta"
-		)$traits))
+		id = .$id, table = "variables")$traits))
 
 # Only needed if some variables may contain zero traits
 # If none are empty, can just do `vars_measures %>% unnest()`
