@@ -1,0 +1,24 @@
+---
+title: "Looking at the BAP resequencing data"
+author: "Zhenbin Hu"
+date: "April 28, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# About the data
+
+(refer to documentation)
+
+## Accessing the data
+
+```{r}
+
+readLines('/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra')
+
+```
+
+## looking at the data 
+
+## (optional) a simple analysis
