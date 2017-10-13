@@ -41,8 +41,12 @@ site_bounds <- (sites
 	%>% do(boundaries = readWKT(text = .$geometry, id = .$id)))
 
 site_bounds <- do.call('rbind', site_bounds$boundaries)
+names(site_bounds) <- sites$sitename
 
-leaflet() %>% addTiles() %>% addPolygons(data=site_bounds)
+rgb20170509 <- tiff::readTIFF("/data/terraref/sites/ua-mac/Level_1/fullfield/2017-05-09/stereoTop_fullfield_10pct.tif")
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(data=site_bounds, popup = sites$sitename)
 ```
 
 ## Cultivars
@@ -91,10 +95,7 @@ Exercise: Why are there two variables named canopy_height, and what database fie
 Now retrieve all available measurements for each variable.
 
 ```{r traits-03-get-variables}
-traits <- list()
-for(var in variables$name){
-  traits[[var]] <- betydb_record(name = var, table = "variables")
-}
+
 vars_measures <- (variables
 	%>% group_by(id, name)
 	%>% do(traits = betydb_record( # Get full trait list by variable ID
