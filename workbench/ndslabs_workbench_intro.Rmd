@@ -147,7 +147,7 @@ With the RStudio Application Open
 
 ![](figures/clone_tutorials3.png)
   
-1. Type https://github.com/terraref.tutorials 
+1. Type https://github.com/terraref/tutorials 
   * this is the GitHub repository full of tutorials
   * Click "Create Project"
 
