@@ -3,3 +3,23 @@
 ```{r}
 knitr::include_url("https://docs.google.com/document/d/1QWBUHsRql_c_q15WoFrUGRMGk0gZQ-y85y6tpd9pdNM/pub")
 ```
+
+## Visualizing hyperspectral data
+
+TODO
+
+Using ncview
+
+ncview 2.1.7 is installed on ROGER.
+
+```
+ssh -Y youraccount@roger-login.ncsa.illinois.edu
+```
+
+On ROGER:
+```
+module purge; module load gdal2-stack udunits ncview
+ncview /path/to/your/netcdffile.nc
+```
+
+On mac, you need XQuartz to set up X b/w mac and remote X on ROGER; on Windows, you need an ssh client with X support.
