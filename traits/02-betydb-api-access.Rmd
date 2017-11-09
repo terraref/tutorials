@@ -1,0 +1,107 @@
+---
+title: "Accessing Trait Data Via the BETYdb API"
+author: "David LeBauer"
+date: "11/7/2017"
+output: html_document
+---
+
+
+## Using URLs to construct Queries
+
+The first step toward reproducible pipelines is to automate the process of searching the database and returning results. This is one of the key roles of an Application programming interface, or 'API'. You can learn to use the API in less than 20 minutes, starting now. 
+
+### What is an API?
+
+An API is an 'Application Programming Interface'. An API is a way that you and your software can connect to and access data. 
+
+All of our databases have web interfaces for humans to browse as well as APIs that are constructed as URLs. 
+
+
+### Using Your API key to Connect
+
+An API key is like a password. It allows you to access data, and should be kept private. 
+Therefore, we are not going to put it in code that we share. The one exception is the key 9999999999999999999999999999999999999999 that will allow you to access metadata tables (all tables except _traits_ and _yields_). It will also allow you to access all of the simulated data in the terraref.ncsa.illinois.edu/bety-test database.
+
+A common way of handling private API keys is to place it in a text file in your home directory. 
+Don't put it in a project directory where it might be inadvertently shared.
+
+Here is how to find and save your API key:
+
+* click file --> new --> text file
+* copy the api key that was sent when you registered into the file
+* file --> save as '~/.betykey'
+
+For the public key, you can call this file `~/.betykey_public`. 
+
+### Components of a URL query
+
+
+* base url: `terraref.ncsa.illinois.edu/bety`
+* path to the api: `/api/beta`
+* api endpoint: `/search` or `traits` or `sites`. For BETYdb, these are the names of database tables. 
+* Query parameters: `genus=Sorghum`
+* Authentication: `key=9999999999999999999999999999999999999999` is the public key for the TERRA REF traits database. 
+
+
+### Constructing a URL query
+
+First, lets construct a query by putting together a URL.
+
+1. start with the database url: `terraref.ncsa.illinois.edu/bety`
+  * this url brings you to the home page
+2. Add the path to the API, `/api/beta`
+  * now we have terraref.ncsa.illinois.edu/bety/api/beta, which points to the API documentation
+3. Add the name of the table you want to query. Lets start with `variables`
+  * terraref.ncsa.illinois.edu/bety/api/beta/variables
+4. add query terms by appending a `?` and combining with `&`, for example:
+  * `key=9999999999999999999999999999999999999999`
+  * `type=trait` where the variable type is 'trait'
+  * `name=~height` where the variable name contains 'height'
+5. This is your complete query:
+  * `terraref.ncsa.illinois.edu/bety/api/beta/variables?type=trait&name=~height&key=9999999999999999999999999999999999999999`
+  * it will query all variables that are type trait and have 'height' in the name
+  * Does it return the expected values?
+  
+
+#### Your Turn
+
+> What will the URL https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=9999999999999999999999999999999999999999 return?
+
+> write a URL that will query the database for sites with "Field Scanner" in the name field. Hint: combine two terms with a `+` as in `Field+Scanner`
+
+What do you see? Do you think that this is all of the records? What happens if you add `&limit=none`? 
+
+### Our first Query 
+
+#### Shell
+
+```sh
+wget -O sorghum.json \\ # -O names the output file 
+   "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=999999999999999999999999999999999999
+9999"
+```
+
+If you want to write the query without exposing the key in plain text, you can construct it thus:
+
+```sh
+wget -O sorghum.json \\
+    "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=`cat ~/.betykey_public`"
+```
+
+> What does `cat ~/.betykey_public` do?
+
+> How can you look at the files?
+
+
+#### R - using the jsonlite package
+
+```{r text-api}
+sorghum.json <- readLines(
+  paste0("https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=", 
+         readLines('~/.betykey')))
+
+## print(sorghum.json) 
+## not a particularly useful format
+## lets convert to a data frame
+sorghum <- jsonlite::fromJSON(sorghum.json)
+```

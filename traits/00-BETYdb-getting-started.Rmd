@@ -8,8 +8,10 @@ output: html_document
 ## TERRA Ref Trait Database
 
 The TERRA Ref program uses the BETYdb database and web application software to store plant and plot level trait data. 
+We use BETYdb to organize, manage and distribute agricultural and ecological data. 
+It contains trait (phenotype) data at the plot or plant level as well as meta data including plot boundaries, experimental design, methods, trait definitions, cultivars (genotypes) and agronomic managements.
 
-### BETYdb: database software and web application
+### Introduction to BETYdb 
 
 The TERRA REF trait database (terraref.ncsa.illinois.edu/bety) uses the BETYdb data schema (structure) and web application.
 The BETYdb software is actively used and developed by the [TERRA Reference](terraref.org) program as well as by the [PEcAn project](pecanproject.org).
@@ -22,224 +24,21 @@ For more information about BETYdb, see the following:
   * _BETYdb Technical Documentation_ is written for advanced users and website and database administrators who may also be interested in the [full database schema](betydb.org/schemas)
 * BETYdb: A Yield, Trait and Ecosystem Service Database Applied to Second Generation Bioenergy Feedstocks. ([LeBauer et al, 2017](dx.doi.org/10.1111/gcbb.12420))
 
-There are at least a half-dozen other databases using the BETYdb software that these exercises will work with, though the results will depend on the available data.
-The first, betydb.org is described in LeBauer et al, 2017.
-Others are listed in the 'distributed BETYdb' section of the technical documentation.
+Other than the TERRA REF trait database, there are a handful of other projects that use the BETYdb software, mostly with the PEcAn and TERRA programs. The content presented here is focused on the TERRA REF instance of BETYdb. Most of the information presented here is relevant to other databases, but the TERRA program has more emphasis on trait diversity among cultivars or genotypes within a crop whereas PEcAn focuses on the diversity of traits within ecosystems and plant functional types. In addition, the TERRA program is more focused on high throughput phenotyping - intensive monitoring of agricultural breeding trials whereas PEcAn focuses on assimilating heterogeneous data to forecast ecosystem functioning. Fortunately, both uses can use the shared ecosystem of software used for these tasks. For example, the PEcAn crop modeling infrastructure can be directly used to infer additional targets of breeding, and the diversity of traits observed in breeding trials can be a first step toward predicting the impacts of crop traits on productivity and ecosystem functioning.
+
+The original instance of betydb.org is described in LeBauer et al, 2017. 
+Others instances are listed in the 'distributed BETYdb' section of the technical documentation.
 
 When there is a public-facing website, BETYdb is only designed to keep its trait and yield data private.
 Metadata such as field management and experimental design are available if the url is public.
 
-## Getting an account for the TERRA trait database
+### Current Contents
 
-* sign up for an account at terraref.ncsa.illinois.edu/bety
-* sign up for alpha user [link to form]
-* wait for database access to be granted
-* Your API key will be sent in the email; it can also be found - and regenerated - by navigating to 'data --> users' in the web interface
+The traitvis webapp provides an interface for exploring available data that is updated daily. Below the page has been embedded in the 
 
-TODO add signup info from handout
-
-## First steps: download data from web interface
-
-* Point your browser to terraref.ncsa.illinois.edu/bety
-* login 
-* enter "NDVI" in the search box
-* on the next page you will see the results of this search 
-  * if you want all of the data, including data that has not gone through QA/QC, make sure to check the 'include unchecked records' option
-* in the upper right, you will see a button that will allow you to download the search results as a CSV file. Click it. Open the file in a text editor or spreadsheet program and review its contents.
-
-Note that the web interface only provides a core set of data and limited meta-data. To access all of the data within BETYdb, it is necessary to search and merge multiple tables. More complex queries, such as those in the [Agronomic metadata](../traits/04-agronomic-metadata.Rmd).
-
-## Advanced: Using URLs to construct Queries
-
-The first step toward reproducible pipelines is to automate the process of searching the database and returning results. This is one of the key roles of an Application programming interface, or 'API'. You can learn to use the API in less than 20 minutes, starting now. 
-
-### What is an API?
-
-An API is an 'Application Programming Interface'. An API is a way that you and your software can connect to and access data. 
-
-All of our databases have web interfaces for humans to browse as well as APIs that are constructed as URLs. 
-
-
-### Using Your API key to Connect
-
-An API key is like a password. It allows you to access data, and should be kept private. 
-Therefore, we are not going to put it in code that we share. The one exception is the key 9999999999999999999999999999999999999999 that will allow you to access metadata tables (all tables except _traits_ and _yields_). It will also allow you to access all of the simulated data in the terraref.ncsa.illinois.edu/bety-test database.
-
-A common way of handling private API keys is to place it in a text file in your home directory. 
-Don't put it in a project directory where it might be inadvertently shared.
-
-Here is how to find and save your API key:
-
-* click file --> new --> text file
-* copy the api key that was sent when you registered into the file
-* file --> save as '~/.betykey'
-
-For the public key, you can call this file `~/.betykey_public`. 
-
-### Components of a URL query
-
-
-* base url: `terraref.ncsa.illinois.edu/bety`
-* path to the api: `/api/beta`
-* api endpoint: `/search` or `traits` or `sites`. For BETYdb, these are the names of database tables. 
-* Query parameters: `genus=Sorghum`
-* Authentication: `key=9999999999999999999999999999999999999999` is the public key for the TERRA REF traits database. 
-
-
-### Constructing a URL query
-
-First, lets construct a query by putting together a URL.
-
-1. start with the database url: `terraref.ncsa.illinois.edu/bety`
-  * this url brings you to the home page
-2. Add the path to the API, `/api/beta`
-  * now we have terraref.ncsa.illinois.edu/bety/api/beta, which points to the API documentation
-3. Add the name of the table you want to query. Lets start with `variables`
-  * terraref.ncsa.illinois.edu/bety/api/beta/variables
-4. add query terms by appending a `?` and combining with `&`, for example:
-  * `key=9999999999999999999999999999999999999999`
-  * `type=trait` where the variable type is 'trait'
-  * `name=~height` where the variable name contains 'height'
-5. This is your complete query:
-  * `terraref.ncsa.illinois.edu/bety/api/beta/variables?type=trait&name=~height&key=9999999999999999999999999999999999999999`
-  * it will query all variables that are type trait and have 'height' in the name
-  * Does it return the expected values?
-  
-
-#### Your Turn
-
-> What will the URL https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=9999999999999999999999999999999999999999 return?
-
-> write a URL that will query the database for sites with "Field Scanner" in the name field. Hint: combine two terms with a `+` as in `Field+Scanner`
-
-What do you see? Do you think that this is all of the records? What happens if you add `&limit=none`? 
-
-### Our first Query 
-
-#### Shell
-
-```sh
-wget -O sorghum.json \\ # -O names the output file 
-   "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=999999999999999999999999999999999999
-9999"
-```
-
-If you want to write the query without exposing the key in plain text, you can construct it thus:
-
-```sh
-wget -O sorghum.json \\
-    "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=`cat ~/.betykey_public`"
-```
-
-> What does `cat ~/.betykey_public` do?
-
-> How can you look at the files?
-
-
-#### R - using the jsonlite package
-
-```{r text-api}
-sorghum.json <- readLines(
-  paste0("https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=", 
-         readLines('~/.betykey')))
-
-## print(sorghum.json) 
-## not a particularly useful format
-## lets convert to a data frame
-sorghum <- jsonlite::fromJSON(sorghum.json)
-```
-
-## Using the R traits package to query the database
-
-The rOpenSci traits package makes it easier to query the TERRA REF trait database, or any database that uses BETYdb software.
-
-First, make sure we have the latest version from the terraref fork of the repository on github. (you can install using the standard `install.packages('traits')` but I can't promise everything will work.
-
-### Install the package
-
-```{r install_traits, echo=FALSE}
-devtools::install_github('terraref/traits')
-```
-
-Now, we can load the packages that we will need to get started.
-
-```{r 00-setup}
-library(traits)
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
-library(ggplot2)
-library(ggthemes)
-theme_set(theme_bw())
-library(dplyr)
-```
-
-
-
-```{r writing-key}
-# This should be done once with the key sent to you in your email
-# writeLines('abcdefg_rest_of_key_sent_in_email', 
-#            con = '~/.betykey')
-
-# Example with the public key:
-writeLines('9999999999999999999999999999999999999999', 
-           con = '~/.betykey_public')
-```
-
-#### R - using the traits package
-
-The R traits package is an API 'client'. It does two important things:
-1. It makes it easier to specify the query parameters without having to construct a URL
-2. It returns the results as a data frame, which is easier to use within R
-
-Lets start with the query of information about Sorghum from species table from above
-
-```{r query-species}
-
-sorghum_info <- betydb_query(table = 'species',
-                            genus = "Sorghum",
-                            api_version = 'beta',
-                            limit = 'none',
-                            betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                            key = readLines('~/.betykey', warn = FALSE))
-
-```
-
-#### R - setting options for the traits package
-
-Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
-
+* github repository https://github.com/terraref/traitvis-webapp
+* website: https://traitvis.workbench.terraref.org
 
 ```{r}
-options(betydb_key = readLines('~/.betykey', warn = FALSE),
-        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'beta')
+knitr::include_app("https://traitvis.workbench.terraref.org/", height = "1400px")
 ```
-
-Now the same query can be reduced to:
-
-```{r sv_area}
-sorghum_height <- betydb_query(table = 'search',
-                               trait = "plant_height",
-                               site  = "~MAC",
-                               api_version = 'beta',
-                               limit = 'none',
-                               betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                               key = readLines('~/.betykey', warn = FALSE))
-```
-
-### Time series of height
-
-Now we can take a look at the data that we have just queried. 
-
-```{r}
-ggplot(data = sorghum_height, 
-       aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean, color = cultivar)) +
-  geom_smooth(se = FALSE, size = 0.5) +
-  geom_point(size = 0.5, position = position_jitter(width = 0.1)) + 
-#  scale_x_datetime(date_breaks = '6 months', date_labels = "%b %Y") +
-#  ylim(c(0,6)) + 
-  xlab("Day of Year") + ylab("Plant Height") + 
-  guides(color = guide_legend(title = 'Genotype')) +
-  theme_bw()
-
-```
-

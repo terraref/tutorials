@@ -1,0 +1,35 @@
+---
+title: "Accessing Trait Data Via the BETYdb Web Interface"
+author: "David LeBauer"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+
+## Getting an account for the TERRA trait database
+
+### Web interface
+
+* Sign up for an account at https://terraref.ncsa.illinois.edu/bety
+* Sign up for the TERRA REF [beta user program](https://docs.google.com/forms/d/e/1FAIpQLScBsD042RrRok70BCGCRwARTcm9etvVHqvQaz1c5X7c5y0H3w/viewform?c=0&w=1)
+* Wait for database access to be granted
+* Your API key will be sent in the email. It can also be found - and regenerated - by navigating to the Users page (data --> users)](https://terraref.ncsa.illinois.edu/bety/users) in the web interface.
+
+TODO add signup info from handout
+
+## Searching for data
+
+On the Welcome page there is a search option for trait and yield data. This tool allows users to search the entire collection of trait data for specific sites, citations, species, and traits.
+
+
+### Download search results as as csv file from the web interface
+
+* Point your browser to terraref.ncsa.illinois.edu/bety
+* login 
+* enter "NDVI" in the search box
+* on the next page you will see the results of this search 
+  * if you want all of the data, including data that has not gone through QA/QC, make sure to check the 'include unchecked records' option
+* in the upper right, you will see a button that will allow you to download the search results as a CSV file. Click it. Open the file in a text editor or spreadsheet program and review its contents.
+
+Note that the web interface only provides a core set of data and limited meta-data. To access all of the data within BETYdb, it is necessary to search and merge multiple tables. More complex queries, such as those in the [Agronomic metadata](../traits/04-agronomic-metadata.Rmd).

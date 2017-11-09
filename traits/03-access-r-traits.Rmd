@@ -1,0 +1,101 @@
+---
+title: "Accessing Trait Data in R"
+author: "David LeBauer"
+output: html_document
+---
+
+
+## Using the R traits package to query the database
+
+The rOpenSci traits package makes it easier to query the TERRA REF trait database, or any database that uses BETYdb software.
+
+First, make sure we have the latest version from the terraref fork of the repository on github. (you can install using the standard `install.packages('traits')` but I can't promise everything will work.
+
+### Install the package
+
+```{r install_traits, echo=FALSE}
+devtools::install_github('terraref/traits')
+```
+
+Now, we can load the packages that we will need to get started.
+
+```{r 00-setup}
+library(traits)
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+library(ggplot2)
+library(ggthemes)
+theme_set(theme_bw())
+library(dplyr)
+```
+
+
+
+```{r writing-key}
+# This should be done once with the key sent to you in your email
+# writeLines('abcdefg_rest_of_key_sent_in_email', 
+#            con = '~/.betykey')
+
+# Example with the public key:
+writeLines('9999999999999999999999999999999999999999', 
+           con = '~/.betykey_public')
+```
+
+#### R - using the traits package
+
+The R traits package is an API 'client'. It does two important things:
+1. It makes it easier to specify the query parameters without having to construct a URL
+2. It returns the results as a data frame, which is easier to use within R
+
+Lets start with the query of information about Sorghum from species table from above
+
+```{r query-species}
+
+sorghum_info <- betydb_query(table = 'species',
+                            genus = "Sorghum",
+                            api_version = 'beta',
+                            limit = 'none',
+                            betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
+                            key = readLines('~/.betykey', warn = FALSE))
+
+```
+
+#### R - setting options for the traits package
+
+Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
+
+
+```{r}
+options(betydb_key = readLines('~/.betykey', warn = FALSE),
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'beta')
+```
+
+Now the same query can be reduced to:
+
+```{r sv_area}
+sorghum_height <- betydb_query(table = 'search',
+                               trait = "plant_height",
+                               site  = "~MAC",
+                               api_version = 'beta',
+                               limit = 'none',
+                               betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
+                               key = readLines('~/.betykey', warn = FALSE))
+```
+
+### Time series of height
+
+Now we can take a look at the data that we have just queried. 
+
+```{r}
+ggplot(data = sorghum_height, 
+       aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean, color = cultivar)) +
+  geom_smooth(se = FALSE, size = 0.5) +
+  geom_point(size = 0.5, position = position_jitter(width = 0.1)) + 
+#  scale_x_datetime(date_breaks = '6 months', date_labels = "%b %Y") +
+#  ylim(c(0,6)) + 
+  xlab("Day of Year") + ylab("Plant Height") + 
+  guides(color = guide_legend(title = 'Genotype')) +
+  theme_bw()
+
+```
+
