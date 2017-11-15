@@ -34,6 +34,11 @@ properties: {
 
 The source_dataset URL can be used to view the dataset in Clowder.
 
+You can also filter the datapoints by date:
+```
+GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id={STREAM_ID}&since=2017-01-02&until=2017-06-10
+```
+
 ## Getting ROGER file path from dataset
 Given a source dataset URL, we can call the API to get the files and their paths.
 ```
