@@ -76,10 +76,7 @@ Now the same query can be reduced to:
 sorghum_height <- betydb_query(table = 'search',
                                trait = "plant_height",
                                site  = "~MAC",
-                               api_version = 'beta',
-                               limit = 'none',
-                               betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                               key = readLines('~/.betykey', warn = FALSE))
+                               limit = 'none')
 ```
 
 ### Time series of height
