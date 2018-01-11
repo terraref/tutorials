@@ -1,5 +1,81 @@
 # Generating file lists by plot
 
+The terrautils python package has a new products module that aid in connecting
+plot boundaries stored within betydb with file-based data products available
+from the workbench or Globus.
+
+## Getting started
+
+After installing terrautils, you should be able to import the *product* module.
+```
+from terrautils.products import get_sensor_list, unique_sensor_names
+from terrautils.products import get_file_listing, extract_file_paths
+```
+
+The get\_sensor\_list and get\_file\_listing both require connection, url,
+and key parameters. *Connection* can be 'None', the *url* (called host in the
+code) should be something like https://terraref.ncsa.illinois.edu/clowder/.
+The *key* is a unique access key for the Clowder api.
+
+## Getting the sensor list
+The first thing to get is the sensor name. This can be retreived using the
+get\_sensor\_list function. This function returns the full record which may
+be useful in some cases but primarily includes sensor names that include
+a plot id number. The utility function unique_sensor_names accpets the 
+sensor list and provides a list of names suitable for use in the 
+get_file_listing function.
+
+```
+sensors = get_sensor_list(None, url, key)
+names = unique_sensor_names(sensors)
+```
+
+Names will now contain a list of sensor names available in the Clowder
+geostreams API. The currently available sensors are:
+
+* IR Surface Temperature
+* Thermal IR GeoTIFFs Datasets
+* flirIrCamera Datasets
+* (EL) sensor\_weather\_station
+* Irrigation Observations
+* Canopy Cover
+* Energy Farm Observations SE
+* (EL) sensor\_par
+* scanner3DTop Datasets
+* Weather Observations
+* Energy Farm Observations NE
+* RGB GeoTIFFs Datasets
+* (EL) sensor\_co2
+* stereoTop Datasets
+* Energy Farm Observations CEN
+
+## Getting a list of files
+
+The geostreams API can be used to get a list of datasets that overlap a
+specific plot boundary and, optionally, limited by a time range. Iterating 
+over the datasets allows the paths to all the files to be extracted.
+
+```
+sensor = 'Thermal IR GeoTIFFs Datasets'
+sitename = 'MAC Field Scanner Season 1 Field Plot 101 W'
+datasets = get_file_listing(None, url, key, sensor, sitename)
+files = extract_file_paths(datasets)
+```
+
+Datasets can be further filtered using the *since* and *until* parameters
+of get\_file\_listing with a date string.
+
+```
+dataset = get_file_listing(None, url, key, sensor, sitename, 
+        since='2016-06-01', until='2016-06-10')
+```
+
+
+# Alternative method
+The following method demonstrates the same approach using the Clowder API. This
+approach is useful for understanding the data layout and when the Python
+terrautils package is not available.
+
 ## Finding plot ID
 ```
 SENSOR_NAME = "MAC Field Scanner Season 1 Field Plot 101 W"
