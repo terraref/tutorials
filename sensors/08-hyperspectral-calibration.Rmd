@@ -1,0 +1,51 @@
+
+## Hyperspectral Data
+
+### Calibration Targets
+
+These were collected on April 15 2017 every ~15 minutes
+
+
+```{r get-vnir-calibration, eval=FALSE}
+library(ncdf4)
+library(dplyr)
+
+hsi_calibration_dir <- '/data/terraref/sites/ua-mac/Level_1/hyperspectral/2017-04-15'
+hsi_calibration_files <- dir(hsi_calibration_dir, 
+                             recursive = TRUE,
+                             full.names = TRUE)
+
+fileinfo <- bind_rows(lapply(hsi_calibration_files, file.info)) %>%
+  mutate(size_gb = size/1073741824)
+
+calibration_nc <- nc_open(hsi_calibration_files[200])
+a <- calibration_nc$var$rfl_img
+
+
+#calibration_nc$dim$x$len 1600
+#calibration_nc$dim$y$len
+x_length <- round(calibration_nc$dim$x$len / 10)
+y_length <- round(calibration_nc$dim$y$len * 3/4)
+
+xstart <- ceiling(calibration_nc$dim$x$len / 2) - floor(x_length / 2) + 1
+
+ystart <- ceiling(calibration_nc$dim$y$len / 2) - floor(y_length / 2) + 1
+
+rfl <- ncvar_get(calibration_nc, 'rfl_img', 
+          #start = c(1, xstart, ystart), 
+          #count = c(955, x_length, y_length)
+          start = c(2, 2, 2),
+          count = c(1320, 10, 954)
+          )
+x <- ncvar_get(calibration_nc, 'x', start = 100, count = 160)
+y <- ncvar_get(calibration_nc, 'y', start = 100, count = 1324)
+lambda <- calibration_nc$dim$wavelength$vals
+for(i in 1 + 0:10*95){
+  image(x = x, y = y, z = rfl[i,,],
+        xlab = 'x (m)', ylab = 'y (m)',
+        col = rainbow(n=100),
+        main = paste('wavelength', 
+                      udunits2::ud.convert(lambda[i],'m','nm')))
+} 
+
+```
