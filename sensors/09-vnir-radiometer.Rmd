@@ -75,3 +75,116 @@ print(metnc)
 ### Your turn:
 
 Can you see the effect of the August 21, 2017 solar eclipse on the diurnal spectral radiance?
+
+## Raw sensor data
+
+Here we can found the original data written by the sensor. Unlike above, these are in text files and are not in a standard format like the CF format above.
+
+```{r raw-met, cache=TRUE}
+metfile <- "/data/terraref/sites/ua-mac/raw_data/EnvironmentLogger/2017-05-31/2017-05-31_12-19-38_environmentlogger.json"
+met <- jsonlite::fromJSON(metfile)
+
+timestamp <- lubridate::ymd_hms(met$environment_sensor_readings$timestamp)
+
+wavelengths <- met$environment_sensor_readings$spectrometer$wavelength[[1]]
+
+spectra <- do.call('rbind', met$environment_sensor_readings$spectrometer$spectrum)
+
+library(dplyr)
+spectra <- do.call('rbind', met$environment_sensor_readings$spectrometer$spectrum)
+
+#colnames(spectra) <- wavelengths
+#rownames(spectra) <- met$environment_sensor_readings$timestamp
+image(x = timestamp, y = wavelengths, z = spectra)
+```
+
+
+```{r}
+library(dplyr)
+library(readr)
+date = '2017-04-15'
+load_loggerdata <- function(date){
+  path <- file.path("/data/terraref/sites/ua-mac/raw_data/EnvironmentLogger", date)
+  files <- dir(path, full.names = TRUE)
+  loggerdata <- lapply(files, jsonlite::fromJSON) 
+  timestamp <- combine(sapply(loggerdata, function(x){
+    t <- x$environment_sensor_readings$timestamp
+    lubridate::ymd_hms(t)
+  }))
+  return(list(data = loggerdata, timestamp = timestamp))
+}
+
+extract_downwelling_irradiance <- function(logdata){
+
+  wavelengths <- logdata$data[[1]]$environment_sensor_readings$spectrometer$wavelength[[1]]
+  
+  spectra <- do.call('rbind', lapply(logdata$data, function(x){
+    do.call('rbind', x$environment_sensor_readings$spectrometer$spectrum)
+    }
+  ))
+  # image(x = timestamp, y = wavelengths, z = spectra)
+  return(list(spectra = spectra, wavelengths = wavelengths, timestamp = logdata$timestamp))
+}
+
+extract_logger_met <- function(logdata){
+  
+  met <- do.call('rbind', lapply(logdata$data, function(x){
+    tmp_met <- x$environment_sensor_readings
+    data.frame(par = tmp_met$`sensor par`$value,
+               co2 = tmp_met$`sensor co2`$value,
+               sundir = tmp_met$weather_station$sunDirection$value,
+               pressure = tmp_met$weather_station$airPressure$value,
+               brightness = tmp_met$weather_station$brightness$value,
+               rh = tmp_met$weather_station$relHumidity$value,
+               temp = tmp_met$weather_station$temperature$value,
+               wind_dir = tmp_met$weather_station$windDirection$value,
+               wind_speed = tmp_met$weather_station$windVelocity$value)
+    
+  })) 
+  return(met)
+}
+
+env_log_data <- load_loggerdata(date = '2017-04-15')
+env_log_spectra <- extract_downwelling_irradiance(env_log_data)
+env_log_met <- extract_logger_met(env_log_data)
+
+```
+
+#### Plots
+
+```{r}
+library(lubridate)
+library(dplyr)
+library(tidyr)
+time <- env_log_data$timestamp
+
+hourly_index <- 1+0:23*720
+
+time_hr <- time[hourly_index]
+hourly_spectra <- env_log_spectra$spectra[hourly_index,]
+wavelengths <- env_log_spectra$wavelengths
+
+colnames(hourly_spectra) <- wavelengths
+
+image(x = time_hr, y = wavelengths, z = hourly_spectra, 
+      xlab = 'local time', ylab = 'wavelength (nm)')
+```
+
+```{r spectra-ggplot}
+
+spectra_df <- data.frame(hour = 1:24, hourly_spectra)
+
+spectra_long <- spectra_df %>% 
+  gather(key = wavelength, value = radiance, -hour) %>% 
+  mutate(wavelength = as.numeric(gsub("X", "", wavelength))) 
+
+colnames(spectra_long)
+
+library(ggplot2)
+ggplot(data = spectra_long, aes(x = wavelength, y = radiance)) +
+  geom_line(size = 0.1) +
+  ggthemes::theme_tufte() +
+  facet_wrap(~hour, ncol = 6) +
+  ggtitle(paste('spectra on', date))
+
+```
