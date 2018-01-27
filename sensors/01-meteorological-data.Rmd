@@ -71,8 +71,24 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 
 ### The Geostreams Database
 
-
 !(schema)[https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg]
+
+Locations with met data
+
+TODO (MAX ...) is there code / a curl statement that can be used to retrie this list?
+
+| stream id | name                                     |
+|------------|------------------------------------------|
+| 300        | MAC weather                              |
+| 750        | MAC irrigation                           |
+| 746        | EnvironmentLogger sensor_weather_station |
+| 747        | EnvironmentLogger sensor_par             |
+| 748        | EnvironmentLogger sensor_spectrum        |
+| 749        | EnvironmentLogger sensor_co2             |
+| 1219       | UIUC Energy Farm SE                      |
+| 1222       | UIUC Energy Farm CEN                     |
+| 1223       | UIUC Energy Farm NE                      |
+
 
 Here is the json representation of a single five-minute observation:
 
@@ -108,13 +124,21 @@ Here is the json representation of a single five-minute observation:
 
 The data represent 5 minute summaries aggregated from 1/s observations.
 
+
+
+#### Using Curl
+
+```{sh eval=FALSE}
+curl -O spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=743
+```
+
 ```{r met-geostream}
 library(dplyr)
 library(ggplot2)
 library(jsonlite)
 
 url = ""
-mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=300', flatten = FALSE)
+mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASS&stream_id=300', flatten = FALSE)
 
 # change time to human-readable
 mac_weather <- mac_weather.list$properties %>% 
