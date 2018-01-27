@@ -1,0 +1,76 @@
+# Using the PEcAn atmospheric data utilities
+
+Explain what these are
+
+github.com/pecanproject/pecan
+
+insert slide from talks ... 
+
+## Dependencies
+
+```{r install-pecan-dependencies, message=FALSE, eval = FALSE}
+
+devtools::install_github("pecanproject/pecan",  
+                         subdir = 'base/utils', ref = 'develop', dependencies = FALSE)
+devtools::install_github("pecanproject/pecan",  
+                         subdir = 'base/db')
+devtools::install_github("rforge/reddyproc",
+                         subdir = "pkg/REddyProc")
+devtools::install_github("pecanproject/pecan",  
+                         subdir = 'modules/data.atmosphere',
+                         ref = 'develop')
+
+source("https://raw.githubusercontent.com/PecanProject/pecan/develop/models/biocro/R/met2model.BIOCRO.R")
+```
+
+
+## PEcAn Met Workflow 
+
+```{r write-clowder, eval = FALSE}
+writeLines("
+<pecan>
+  <clowder>
+    <hostname>terraref.ncsa.illinois.edu</hostname>
+    <user>user@illinois.edu</user>
+    <password>ask</password>
+  </clowder>
+</pecan>", 
+con =  "~/.pecan.clowder.xml")
+```
+
+![](pecan.clowder.xml.png)
+
+```{r pecan-met-workflow, message=FALSE, warning=FALSE, eval = FALSE}
+library("PEcAn.data.atmosphere")
+library("dplyr")
+
+## download raw data
+ne <- download.Geostreams(
+  outfolder="data",
+  sitename="EnvironmentLogger sensor_weather_station",
+  start_date="2016-02-28",
+  end_date="2016-04-01",
+  overwrite = TRUE)
+
+## convert to standard
+ne_cf <- met2CF.Geostreams(
+  in.path = "data/", 
+  in.prefix = ne$dbfile.name, 
+  outfolder = "data/cf",
+  start_date = "2016-03-01", # note date shift to avoid TZ issues
+  end_date = "2016-04-01",
+  overwrite = TRUE)
+
+## convert to model specific input
+met2model.BIOCRO(
+  overwrite = TRUE,
+  in.path = "data/cf", 
+  in.prefix = ne_cf$dbfile.name, 
+  outfolder = "data/biocromet",
+  lat = 40,
+  lon = -88,
+  start_date = "2016-03-01", 
+  end_date = "2016-03-30")
+
+met <- readr::read_csv('data/biocromet/Clowder.UIUC Energy Farm - NE.2016-02-28.2016-04-01.2016.csv')
+```
