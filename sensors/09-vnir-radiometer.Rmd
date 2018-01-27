@@ -1,0 +1,77 @@
+
+# VNIR Radiometer Data
+
+## Query from Environmental logger netCDF files
+
+These are used in the hyperspectral workflow. Let's look at the sky:
+
+```{r netcdf-met, eval=FALSE}
+library(ncdf4)
+library(udunits2)
+library(lubridate)
+
+for(date in c('2016-06-21', '2016-09-21', '2016-12-21', '2017-03-21', '2017-05-21')){
+  
+  directory <- file.path("/data/terraref/sites/ua-mac/Level_1/EnvironmentLogger", date)
+  files <- dir(directory, full.names = TRUE)
+  spectra_list <- lapply(files, function(x){
+    metnc <- nc_open(x)
+    spc <- ncvar_get(metnc, 'flx_spc_dwn')
+    datetime <- ymd("1970-01-01") + 
+      seconds(ud.convert(ncvar_get(metnc, 'time'), 'day', 's'))
+    wvl <- ncvar_get(metnc, 'wvl_lgr')
+    time <- hour(datetime) + 
+      minute(datetime)/60 + 
+      second(datetime)/3600
+    return(list(spc = spc, wvl = wvl, date = ymd(strftime(datetime, '%Y%m%d')), datetime = datetime))
+    
+  })
+  
+  spectra_df <- do.call('cbind',(lapply(spectra_list, '[[', 'spc') ))
+  dim(spectra_df)
+  
+  time <- do.call('c',lapply(spectra_list,'[[','datetime'))
+  wavelengths <- spectra_list[[1]]$wvl
+  save(spectra_df, time, wavelengths, file = file.path('data', paste0("spectra",date,".Rdata")))
+  idx <- 1+0:700*24
+  i <- 1:length(hr)[!is.na(hr)]
+  library(lubridate)
+  hr <- hour(time) + minute(time)/60 + second(time)/3600
+  png(filename = paste0('data/spectra',date,'.png'))
+  image(x = wavelengths, y = as.numeric(hr[idx]), spectra_df[,idx],
+        ylab = 'hour of day', 
+        xlab = 'wavelength (nm)',
+        col = cm.colors(n=100),zlim = c(-1,2.1),
+        main = paste0('diurnal solar spectral radiation\n',date))
+  dev.off()
+  
+}  
+library(lubridate)
+library(data.table)
+library(udunits2)
+
+time <- ncvar_get(metnc, 'time')
+
+wavelengths <- ncvar_get(metnc, 'wvl_lgr')
+
+f_down_spectrum <- ncvar_get(metnc, 'flx_spc_dwn')
+
+library(ggplot2)
+
+ggplot() + 
+  geom_point(aes(wavelengths, f_down_spectrum[,1])) +
+  geom_line(aes(wavelengths, f_down_spectrum[,1]))
+
+f_down_means <- rowMeans(f_down_spectrum)
+
+ggplot() + 
+  geom_point(aes(wavelengths, f_down_means)) +
+  geom_line(aes(wavelengths, f_down_means))
+
+print(metnc)
+
+```
+
+### Your turn:
+
+Can you see the effect of the August 21, 2017 solar eclipse on the diurnal spectral radiance?
