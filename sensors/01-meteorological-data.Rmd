@@ -7,7 +7,7 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 
 api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
-output_dir <- "~/data/downloads/"
+output_dir <- file.path(tempdir(), "downloads")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 ```
