@@ -10,10 +10,45 @@ library(ncdf4)
 library(udunits2)
 library(lubridate)
 
+get_spectra <- function(date, site = 'ua-mac'){
+  
+  
+  envlog_file <- file.path("/data/terraref/sites", site, "Level_1/envlog_netcdf", date, 
+                           paste0("envlog_netcdf_L1_", site, "_", date, ".nc"))
+  envlog.nc <- nc_open(envlog_file, readunlim = FALSE)
+  timepoints <- ud.convert(4*1:5, 'h', '5s')
+  
+  flx_spc_dwn <- ncvar_get(envlog.nc, 'flx_spc_dwn')[,timepoints]
+  datetime <- ymd("1970-01-01", tz ="America/Phoenix") + 
+    seconds(ud.convert(ncvar_get(envlog.nc, 'time'), 'day', 's'))
+  datetime[timepoints]
+  
+  z <- as.data.frame(flx_spc_dwn)
+  colnames(z) <- datetime[timepoints]
+  
+  wvl <- ncvar_get(envlog.nc, 'wvl_lgr')
+  wvl.idx <- sapply(c(34:81*10), 
+                    function(x) which.min(abs(x-wvl)))
+  zz <- z[wvl.idx,]
+  rownames(zz) <- round(wvl[wvl.idx])
+  return(t(zz))
+  write(zz, file = paste0('tmp/',date, '.csv'))
+}
+  
+
+dates <- seq(ymd('2017-04-15'), ymd('2017-11-12'), by = '10 days')
+all_spectra <- lapply(as.character(dates), get_spectra)
+spectra.df <- lapply(all_spectra, as.data.frame)
+zzz <- do.call(rbind, unname(spectra.df))
+write.csv(zzz, '~/tmp/spectra.csv')
+return(list(spc = spc, wvl = wvl, date = ymd(strftime(datetime, '%Y%m%d')), datetime = datetime))
+
+
+
 for(date in c('2016-06-21', '2016-09-21', '2016-12-21', '2017-03-21', '2017-05-21')){
   
-  directory <- file.path("/data/terraref/sites/ua-mac/Level_1/EnvironmentLogger", date)
-  files <- dir(directory, full.names = TRUE)
+  directory <- file.path("/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/", date)
+  files <- dir(directory, full.names = TRUE)  
   spectra_list <- lapply(files, function(x){
     metnc <- nc_open(x)
     spc <- ncvar_get(metnc, 'flx_spc_dwn')
