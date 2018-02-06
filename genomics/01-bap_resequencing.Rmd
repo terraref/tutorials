@@ -1,5 +1,5 @@
 ---
-title: "Looking at the BAP resequencing data"
+title: "TERRA_ril GBS pipeline"
 author: "Zhenbin Hu"
 date: "April 28, 2017"
 output:
@@ -14,11 +14,51 @@ output:
 ## Accessing the data
 
 ```{r}
-
-readLines('/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra')
-
+key<-read.table('/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra')
+head(key)
 ```
 
-## looking at the data 
 
-## (optional) a simple analysis
+```{r}
+key<-read.table("/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra",header=T)
+key$LibraryPrepID<-seq(1:dim(key)[1])
+key$Enzyme<-rep("ApeKI",times=dim(key)[1])
+key$FullSampleName<-paste0(as.character(key$Sample),":",as.character(key$LibraryPrepID))
+names(key)<-c("Flowcell","Lane","Barcode","DNASample","LibraryPlate","Row","Col","LibraryPrepID","Enzyme")
+write.table(key,"/home/rstudio/tutorials/genomics/key_v5",quote= F,row.names = F,sep="\t")
+```
+
+# index genome
+```{bash}
+cd tutorials
+mkdir ref_genome
+git clone https://github.com/lh3/bwa.git
+cd bwa; make
+bwa index -a ref_genome/final.Sbicolor_313_v3.1.fa 
+```
+
+
+# GBS pipeline
+```{bash}
+install tassel packages
+git clone https://bitbucket.org/tasseladmin/tassel-5-source.git
+# make dir for related output
+mkdir database
+mkdir hapmap
+mkdir alignment
+mkdir h5
+tassel5="/home/rstudio/tutorials/genomics/tassel-5-source"
+
+$tassel5 -Xms150g -Xmx200G -fork1 -GBSSeqToTagDBPlugin -e ApeKI -i /data/terraref/sites/genomics/raw_data/ril/gbs/ -db database/GBSclear.db -k clear_key.txt -kmerLength 64 -minKmerL 20 -mnQS 20 -mxKmerNum 100000000 -endPlugin -runfork1
+$tassel5 -Xms150g -Xmx200G -fork1 -TagExportToFastqPlugin -db database/GBSclear.db  -o alignment/tagsForAlign_clear1.fa.gz -endPlugin -runfork1 
+bwa-0.7.10/bwa aln -t 64 genome/final.Sbicolor_313_v3.1.fa alignment/tagsForAlign_clear1.fa.gz > alignment/tagsForAlign_clear1.sai
+bwa-0.7.10/bwa samse genome/final.Sbicolor_313_v3.1.fa alignment/tagsForAlign_clear1.sai alignment/tagsForAlign_clear1.fa.gz > alignment/tagsForAlign_clear1.sam
+$tassel5 -Xms150g -Xmx200G -fork1 -SAMToGBSdbPlugin -i alignment/tagsForAlign_clear1.sam -db database/GBSclear1.db -endPlugin -runfork1
+$tassel5 -Xms150g -Xmx200G -fork1 -DiscoverySNPCallerPluginV2 -db database/GBSclear1.db -sC 1 -eC 10 -mnLCov 0.1 -mnMAF 0.000001 -endPlugin -runfork1
+$tassel5 -Xms150g -Xmx200G -fork1 -SNPQualityProfilerPlugin -db database/GBSclear1.db -statFile "sorghum_gbsclear1_Stats.txt" -endPlugin -runfork1
+$tassel5 -Xms150g -Xmx200G -fork1 -UpdateSNPPositionQualityPlugin -db database/GBSclear1.db -qsFile h5/myclear1QsFile -endPlugin -runfork1
+$tassel5 -Xms150g -Xmx200G -fork1 -GetTagSequenceFromDBPlugin -db database/GBSclear1.db -o h5/allclear1TagFile.txt -endPlugin -runfork1
+$tassel5 -Xms150g -Xmx200G -fork1 -GetTagTaxaDistFromDBPlugin -db database/GBSclear1.db -o h5/clear1TagTaxaDistOutput.txt -endPlugin -runfork1
+$tassel5 -Xms150g -Xmx200G -fork1 -ProductionSNPCallerPluginV2 -i fastq -k clear_key.txt -e ApeKI -db database/GBSclear1.db -o h5/GBSclear1.h5 -endPlugin -runfork1 
+$tassel5 -Xms150g -Xmx200G -fork1 -h5 h5/GBSclear1.h5 -export hapmap/GBSclear1 -exportType Hapmap -runfork1
+```
