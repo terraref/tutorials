@@ -14,18 +14,22 @@ output:
 ## Accessing the data
 
 ```{r}
-key<-read.table('/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra')
+key <- read.table('/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra')
 head(key)
 ```
 
 
 ```{r}
-key<-read.table("/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra",header=T)
-key$LibraryPrepID<-seq(1:dim(key)[1])
-key$Enzyme<-rep("ApeKI",times=dim(key)[1])
-key$FullSampleName<-paste0(as.character(key$Sample),":",as.character(key$LibraryPrepID))
-names(key)<-c("Flowcell","Lane","Barcode","DNASample","LibraryPlate","Row","Col","LibraryPrepID","Enzyme")
-write.table(key,"/home/rstudio/tutorials/genomics/key_v5",quote= F,row.names = F,sep="\t")
+key <- read.table("/data/terraref/sites/genomics/raw_data/ril/gbs/Key_ril_terra",
+                  header = TRUE)
+key$LibraryPrepID <- seq(1:nrow(key))
+key$Enzyme <- rep("ApeKI", times = nrow(key))
+key$FullSampleName <- paste0(as.character(key$Sample), ":", 
+                             as.character(key$LibraryPrepID))
+names(key) <- c("Flowcell", "Lane", "Barcode", "DNASample", "LibraryPlate", 
+                "Row", "Col", "LibraryPrepID", "Enzyme")
+write.table(key, "/home/rstudio/tutorials/genomics/key_v5",
+            quote = FALSE, row.names = FALSE, sep = "\t")
 ```
 
 # index genome
@@ -39,8 +43,10 @@ bwa index -a ref_genome/final.Sbicolor_313_v3.1.fa
 
 
 # GBS pipeline
-```{bash}
+
 install tassel packages
+
+```{bash}
 git clone https://bitbucket.org/tasseladmin/tassel-5-source.git
 # make dir for related output
 mkdir database
