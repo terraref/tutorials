@@ -1,15 +1,109 @@
+---
+title: "Solar Radiance"
+author: "David LeBauer"
+date: "March 9, 2018"
+output: html_document
+---
+
 
 # VNIR Radiometer Data
 
+An Ocean Optics STS Spectrometer measures downwelling solar spectral radiance every 5s on top of the Gantry.
+
+Lets look at the output from this sensor over the course of the day (and then we will see how to acces the data):
+
+```{r one-downwelling-spectra}
+library(tidyverse)
+library(ggridges)
+load('data/spectra.RData')
+
+s <- spectra_long %>% 
+  mutate(hour = hour, 
+         radiance = radiance - min(radiance)) %>% 
+  arrange(hour, wavelength) 
+  # subset for faster exploration: %>% slice(1:(24*64)*16) 
+
+ggplot(data = s, aes(x = wavelength, y = hour, group = hour, 
+                                height = radiance )) +
+  geom_density_ridges(stat = 'identity', scale = 6, size = 0.25, alpha = 0.7, color = 'white') +
+  theme_ridges(grid = FALSE, center_axis_labels = TRUE) +
+  scale_y_continuous(trans = 'reverse') +
+  ggtitle("Downwelling Spectral Radiance", 
+          subtitle = "hourly spectra from April 15, 2017")
+
+# Fun Challenge: implement wavelength --> color mapping
+#scale_color_gradientn(
+#    colors = c('white', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange', 'red', #'black'), 
+#    values = c(300, 420, 570, 530, 580, 620, 700, 800))
+
+```
+
 ## Query from Environmental logger netCDF files
 
-These are used in the hyperspectral workflow. Let's look at the sky:
+There are 20 observations of 1024 individual wavelengths_per minute_ = `r 20 * 60 * 24 * 1024` data points per day. We convert these data to CF standards and store them in netCDF file formats.
 
-```{r netcdf-met, eval=FALSE}
+These are used in the hyperspectral workflow. 
+
+Let's take a look at one of these files:
+
+```{r netcdf-metadata}
+library(tidyverse)
 library(ncdf4)
 library(udunits2)
 library(lubridate)
+if(!require(tidync)){
+  devtools::install_github('hypertidy/ncmeta')
+  devtools::install_github('hypertidy/tidync')
+} 
 
+library(ncmeta)
+library(tidync)
+
+envlog_file <- "/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/2017-08-21/envlog_netcdf_L1_ua-mac_2017-08-21.nc"
+envlog.nc <- nc_open(envlog_file, readunlim = TRUE)
+
+time <- envlog.nc$dim$time$vals
+wvl <- envlog.nc$dim$wvl_lgr$vals
+
+metadata <- envlog.nc$var %>% bind_cols()
+
+#flx_dwn <- ncvar_get(envlog.nc, ')
+
+#if(!require(ncdf4.helpers)) install.packages("ncdf4.helpers")
+#ts <- ncdf4.helpers::nc.get.time.series(envlog.nc)
+s <- tidync::tidync(envlog_file)
+  
+  
+nc_metadata <- ncmeta::nc_meta(envlog_file)
+
+nc_metadata$variable %>% 
+  select(name, longname, units, ndims) %>% 
+  filter(!grepl('raw', name)) %>% 
+  knitr::kable()
+```
+
+
+
+Now lets query the Downwelling Spectral Irradiance  (flx_spc_dwn) from this file:
+
+```{r}
+
+library(tidync)
+flx_spc_dwn <- ncvar_get(envlog.nc, 'flx_spc_dwn', )
+time <- ncvar_get(envlog.nc, 'time')
+dim(flx_spc_dwn)
+
+if(!require(rasterVis)) install.packages("rasterVis")
+
+library(rasterVis)
+gplot(flx_spc_dwn) + 
+  geom_tile(aes(fill = value))
+  
+```
+
+
+```{r}
+time = flx_spc_dwn$  radiance = as.vector(flx_spc_dwn)
 get_spectra <- function(date, site = 'ua-mac'){
   
   
@@ -118,6 +212,7 @@ Here we can found the original data written by the sensor. Unlike above, these a
 ```{r raw-met, cache=TRUE}
 metfile <- "/data/terraref/sites/ua-mac/raw_data/EnvironmentLogger/2017-05-31/2017-05-31_12-19-38_environmentlogger.json"
 met <- jsonlite::fromJSON(metfile)
+writeLines(jsonlite::toJSON(met), con = file('foo.json'))
 
 timestamp <- lubridate::ymd_hms(met$environment_sensor_readings$timestamp)
 

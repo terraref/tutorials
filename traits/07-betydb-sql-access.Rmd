@@ -5,13 +5,40 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-## On the workbench:
+
 
 will be derived from https://github.com/pi4-uiuc/2017-bootcamp/blob/master/content/post/2017-05-30-databases-and-sql.Rmd#with
 
-## Installing the database locally 
+# On workbench
 
-This is truly an easter egg:
+On the TERRA REF Workbench, you have access to the database. These connnections will only work if you are on the workbench.
+
+
+## Using PostgresSQL Studio
+
+
+Lets connect to the terraref instance of betydb. Until now we have been accessing betydb.org. Now we will access (a copy of) the database behind `terraref.ncsa.illinois.edu/bety`
+
+This connection is only available on the local *ncsa.illinois.edu network, and can be accessed through the NDS Labs workbench.
+
+```
+Host: bety.terraref
+Port: 5432
+User: bety
+Password: bety
+DB: bety
+```
+
+```
+Host: bety6.ncsa.illinois.edu
+Port: 5432
+User: viewer
+Password: DelchevskoOro
+DB: bety
+```
+
+# Installing the database locally 
+
 
 You can run the entire database locally, with daily imports:
 
