@@ -114,13 +114,11 @@ library(ggplot2)
 library(jsonlite)
 
 url = ""
-mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=300', flatten = FALSE)
+mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=3208&since=2017-01-02&until=2017-12-31', flatten = FALSE)
 
 # change time to human-readable
 mac_weather <- mac_weather.list$properties %>% 
   mutate(time = lubridate::ymd_hms(mac_weather.list$end_time))
-  
-
 ```
 
 ### Using 
