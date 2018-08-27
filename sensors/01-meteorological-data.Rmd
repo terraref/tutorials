@@ -108,13 +108,17 @@ Here is the json representation of a single five-minute observation:
 
 The data represent 5 minute summaries aggregated from 1/s observations.
 
+First, this is what the API looks like
+
+https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=4807&since=2017-01-02&until=2017-01-31
+
 ```{r met-geostream}
 library(dplyr)
 library(ggplot2)
 library(jsonlite)
 
 url = ""
-mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=300', flatten = FALSE)
+mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=4807&since=2017-01-02&until=2017-01-31')
 
 # change time to human-readable
 mac_weather <- mac_weather.list$properties %>% 
