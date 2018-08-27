@@ -7,7 +7,7 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 
 api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
-output_dir <- "~/data/downloads/"
+output_dir <- file.path(tempdir(), "downloads")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 ```
@@ -124,13 +124,21 @@ Here is the json representation of a single five-minute observation:
 
 The data represent 5 minute summaries aggregated from 1/s observations.
 
-
-
 #### Using Curl
 
+First, this is what the API looks like as a URL. Try pasting it into your browser
+
+
+https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=746&since=2017-01-02&until=2017-01-31
+
+This is how you can automatically download the met data to a local file:
+
 ```{sh eval=FALSE}
-curl -O spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=743
+curl -O spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=746
 ```
+
+And this is how you can access the data in R:
+
 
 ```{r met-geostream}
 library(dplyr)
@@ -138,13 +146,11 @@ library(ggplot2)
 library(jsonlite)
 
 url = ""
-mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASS&stream_id=300', flatten = FALSE)
+mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=746&since=2017-01-02&until=2017-01-31', flatten = FALSE)
 
 # change time to human-readable
 mac_weather <- mac_weather.list$properties %>% 
   mutate(time = lubridate::ymd_hms(mac_weather.list$end_time))
-  
-
 ```
 
 ### Using 

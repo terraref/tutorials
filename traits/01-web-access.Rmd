@@ -14,7 +14,7 @@ output: html_document
 * Sign up for an account at https://terraref.ncsa.illinois.edu/bety
 * Sign up for the TERRA REF [beta user program](https://docs.google.com/forms/d/e/1FAIpQLScBsD042RrRok70BCGCRwARTcm9etvVHqvQaz1c5X7c5y0H3w/viewform?c=0&w=1)
 * Wait for database access to be granted
-* Your API key will be sent in the email. It can also be found - and regenerated - by navigating to the Users page (data --> users)](https://terraref.ncsa.illinois.edu/bety/users) in the web interface.
+* Your API key will be sent in the email. It can also be found - and regenerated - by navigating to the Users page (data --> [users](https://terraref.ncsa.illinois.edu/bety/users)) in the web interface.
 
 TODO add signup info from handout
 
