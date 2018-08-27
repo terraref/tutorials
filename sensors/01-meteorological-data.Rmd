@@ -22,9 +22,6 @@ Geodashboard:
 
 [Sample raw meteorological (1/s) data on Clowder](https://terraref.ncsa.illinois.edu/clowder/files/588ba5474f0c06726acfcace?dataset=587fc7444f0cd67174e7a92d&space=57e42cd44f0cff4b58dd3eea)
 
-
-
-
 ## Meteorological data formats
 
 ### Dimensions:
@@ -73,21 +70,42 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 
 !(schema)[https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg]
 
-Locations with met data
+#### Querying the API
 
-TODO (MAX ...) is there code / a curl statement that can be used to retrie this list?
+key query terms:
+
+* /sensors
+  * sensor_name=''
+* /streams
+  * 
+* /datapoints
+  * &since=YYYY-MM-DD
+  * &until=YYYY-MM-DD
+  * stream_id=
+
+How to find the stream_id from a particular station or sensor:
+
+1. find streams on "UA-MAC AZMET Weather Station" https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC AZMET Weather Station
+2. take sensor id from that response and find the streams: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
+3. take stream id from that and use in the datapoints query: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+
+
+#### Locations with met data
+
+These are some of the locations with met data:
 
 | stream id | name                                     |
 |------------|------------------------------------------|
-| 300        | MAC weather                              |
-| 750        | MAC irrigation                           |
-| 746        | EnvironmentLogger sensor_weather_station |
-| 747        | EnvironmentLogger sensor_par             |
+| 3211        | UA-MAC AZMET Weather Station - weather  |
+| 3212        | UA-MAC AZMET Weather Station - irrigation     |
+| 46431        | UA-MAC AZMET Weather Station - weather (5 min)      |
+| 3208        | EnvironmentLogger sensor_weather_station |
+| 3207        | EnvironmentLogger sensor_par             |
 | 748        | EnvironmentLogger sensor_spectrum        |
-| 749        | EnvironmentLogger sensor_co2             |
-| 1219       | UIUC Energy Farm SE                      |
-| 1222       | UIUC Energy Farm CEN                     |
-| 1223       | UIUC Energy Farm NE                      |
+| 3210        | EnvironmentLogger sensor_co2             |
+| 4806       | UIUC Energy Farm SE                      |
+| 4807       | UIUC Energy Farm CEN                     |
+| 4805       | UIUC Energy Farm NE                      |
 
 
 Here is the json representation of a single five-minute observation:
@@ -128,13 +146,12 @@ The data represent 5 minute summaries aggregated from 1/s observations.
 
 First, this is what the API looks like as a URL. Try pasting it into your browser
 
-
-https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=746&since=2017-01-02&until=2017-01-31
+https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 
 This is how you can automatically download the met data to a local file:
 
 ```{sh eval=FALSE}
-curl -O spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=746
+curl -O spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 ```
 
 And this is how you can access the data in R:
@@ -145,8 +162,7 @@ library(dplyr)
 library(ggplot2)
 library(jsonlite)
 
-url = ""
-mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?user=USER&pass=PASSWORD&stream_id=746&since=2017-01-02&until=2017-01-31', flatten = FALSE)
+mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
 
 # change time to human-readable
 mac_weather <- mac_weather.list$properties %>% 
@@ -163,14 +179,14 @@ mac_weather <- mac_weather.list$properties %>%
 ```{r weather}
 theme_set(ggthemes::theme_few())
 ggplot(data = mac_weather) +
-  geom_line(aes(x = time, y = wind_speed), size = 0.1)
+  geom_point(aes(x = time, y = wind_speed), size = 0.1)
 ```
 
 #### Rainfall
 
 ```{r precipitation}
 ggplot(data = mac_weather) +
-  geom_line(aes(x = time, y = precipitation_rate), size = 0.1)
+  geom_point(aes(x = time, y = precipitation_rate), size = 0.1)
 ```
 
 #### Your turn! 
