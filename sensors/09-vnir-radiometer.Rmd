@@ -1,0 +1,320 @@
+---
+title: "Solar Radiance"
+author: "David LeBauer"
+date: "March 9, 2018"
+output: html_document
+---
+
+
+# VNIR Radiometer Data
+
+An Ocean Optics STS Spectrometer measures downwelling solar spectral radiance every 5s on top of the Gantry.
+
+Lets look at the output from this sensor over the course of the day (and then we will see how to acces the data):
+
+```{r one-downwelling-spectra}
+library(tidyverse)
+library(ggridges)
+load('data/spectra.RData')
+
+s <- spectra_long %>% 
+  mutate(hour = hour, 
+         radiance = radiance - min(radiance)) %>% 
+  arrange(hour, wavelength) 
+  # subset for faster exploration: %>% slice(1:(24*64)*16) 
+
+ggplot(data = s, aes(x = wavelength, y = hour, group = hour, 
+                                height = radiance )) +
+  geom_density_ridges(stat = 'identity', scale = 6, size = 0.25, alpha = 0.7, color = 'white') +
+  theme_ridges(grid = FALSE, center_axis_labels = TRUE) +
+  scale_y_continuous(trans = 'reverse') +
+  ggtitle("Downwelling Spectral Radiance", 
+          subtitle = "hourly spectra from April 15, 2017")
+
+# Fun Challenge: implement wavelength --> color mapping
+#scale_color_gradientn(
+#    colors = c('white', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange', 'red', #'black'), 
+#    values = c(300, 420, 570, 530, 580, 620, 700, 800))
+
+```
+
+## Query from Environmental logger netCDF files
+
+There are 20 observations of 1024 individual wavelengths_per minute_ = `r 20 * 60 * 24 * 1024` data points per day. We convert these data to CF standards and store them in netCDF file formats.
+
+These are used in the hyperspectral workflow. 
+
+Let's take a look at one of these files:
+
+```{r netcdf-metadata}
+library(tidyverse)
+library(ncdf4)
+library(udunits2)
+library(lubridate)
+if(!require(tidync)){
+  devtools::install_github('hypertidy/ncmeta')
+  devtools::install_github('hypertidy/tidync')
+} 
+
+library(ncmeta)
+library(tidync)
+
+envlog_file <- "/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/2017-08-21/envlog_netcdf_L1_ua-mac_2017-08-21.nc"
+envlog.nc <- nc_open(envlog_file, readunlim = TRUE)
+
+time <- envlog.nc$dim$time$vals
+wvl <- envlog.nc$dim$wvl_lgr$vals
+
+metadata <- envlog.nc$var %>% bind_cols()
+
+#flx_dwn <- ncvar_get(envlog.nc, ')
+
+#if(!require(ncdf4.helpers)) install.packages("ncdf4.helpers")
+#ts <- ncdf4.helpers::nc.get.time.series(envlog.nc)
+s <- tidync::tidync(envlog_file)
+  
+  
+nc_metadata <- ncmeta::nc_meta(envlog_file)
+
+nc_metadata$variable %>% 
+  select(name, longname, units, ndims) %>% 
+  filter(!grepl('raw', name)) %>% 
+  knitr::kable()
+```
+
+
+
+Now lets query the Downwelling Spectral Irradiance  (flx_spc_dwn) from this file:
+
+```{r}
+
+library(tidync)
+flx_spc_dwn <- ncvar_get(envlog.nc, 'flx_spc_dwn', )
+time <- ncvar_get(envlog.nc, 'time')
+dim(flx_spc_dwn)
+
+if(!require(rasterVis)) install.packages("rasterVis")
+
+library(rasterVis)
+gplot(flx_spc_dwn) + 
+  geom_tile(aes(fill = value))
+  
+```
+
+
+```{r}
+time = flx_spc_dwn$  radiance = as.vector(flx_spc_dwn)
+get_spectra <- function(date, site = 'ua-mac'){
+  
+  
+  envlog_file <- file.path("/data/terraref/sites", site, "Level_1/envlog_netcdf", date, 
+                           paste0("envlog_netcdf_L1_", site, "_", date, ".nc"))
+  envlog.nc <- nc_open(envlog_file, readunlim = FALSE)
+  timepoints <- ud.convert(4*1:5, 'h', '5s')
+  
+  flx_spc_dwn <- ncvar_get(envlog.nc, 'flx_spc_dwn')[,timepoints]
+  datetime <- ymd("1970-01-01", tz ="America/Phoenix") + 
+    seconds(ud.convert(ncvar_get(envlog.nc, 'time'), 'day', 's'))
+  datetime[timepoints]
+  
+  z <- as.data.frame(flx_spc_dwn)
+  colnames(z) <- datetime[timepoints]
+  
+  wvl <- ncvar_get(envlog.nc, 'wvl_lgr')
+  wvl.idx <- sapply(c(34:81*10), 
+                    function(x) which.min(abs(x-wvl)))
+  zz <- z[wvl.idx,]
+  rownames(zz) <- round(wvl[wvl.idx])
+  return(t(zz))
+  write(zz, file = paste0('tmp/',date, '.csv'))
+}
+  
+
+dates <- seq(ymd('2017-04-15'), ymd('2017-11-12'), by = '10 days')
+all_spectra <- lapply(as.character(dates), get_spectra)
+spectra.df <- lapply(all_spectra, as.data.frame)
+zzz <- do.call(rbind, unname(spectra.df))
+write.csv(zzz, '~/tmp/spectra.csv')
+return(list(spc = spc, wvl = wvl, date = ymd(strftime(datetime, '%Y%m%d')), datetime = datetime))
+
+
+
+for(date in c('2016-06-21', '2016-09-21', '2016-12-21', '2017-03-21', '2017-05-21')){
+  
+  directory <- file.path("/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/", date)
+  files <- dir(directory, full.names = TRUE)  
+  spectra_list <- lapply(files, function(x){
+    metnc <- nc_open(x)
+    spc <- ncvar_get(metnc, 'flx_spc_dwn')
+    datetime <- ymd("1970-01-01") + 
+      seconds(ud.convert(ncvar_get(metnc, 'time'), 'day', 's'))
+    wvl <- ncvar_get(metnc, 'wvl_lgr')
+    time <- hour(datetime) + 
+      minute(datetime)/60 + 
+      second(datetime)/3600
+    return(list(spc = spc, wvl = wvl, date = ymd(strftime(datetime, '%Y%m%d')), datetime = datetime))
+    
+  })
+  
+  spectra_df <- do.call('cbind',(lapply(spectra_list, '[[', 'spc') ))
+  dim(spectra_df)
+  
+  time <- do.call('c',lapply(spectra_list,'[[','datetime'))
+  wavelengths <- spectra_list[[1]]$wvl
+  save(spectra_df, time, wavelengths, file = file.path('data', paste0("spectra",date,".Rdata")))
+  idx <- 1+0:700*24
+  i <- 1:length(hr)[!is.na(hr)]
+  library(lubridate)
+  hr <- hour(time) + minute(time)/60 + second(time)/3600
+  png(filename = paste0('data/spectra',date,'.png'))
+  image(x = wavelengths, y = as.numeric(hr[idx]), spectra_df[,idx],
+        ylab = 'hour of day', 
+        xlab = 'wavelength (nm)',
+        col = cm.colors(n=100),zlim = c(-1,2.1),
+        main = paste0('diurnal solar spectral radiation\n',date))
+  dev.off()
+  
+}  
+library(lubridate)
+library(data.table)
+library(udunits2)
+
+time <- ncvar_get(metnc, 'time')
+
+wavelengths <- ncvar_get(metnc, 'wvl_lgr')
+
+f_down_spectrum <- ncvar_get(metnc, 'flx_spc_dwn')
+
+library(ggplot2)
+
+ggplot() + 
+  geom_point(aes(wavelengths, f_down_spectrum[,1])) +
+  geom_line(aes(wavelengths, f_down_spectrum[,1]))
+
+f_down_means <- rowMeans(f_down_spectrum)
+
+ggplot() + 
+  geom_point(aes(wavelengths, f_down_means)) +
+  geom_line(aes(wavelengths, f_down_means))
+
+print(metnc)
+
+```
+
+### Your turn:
+
+Can you see the effect of the August 21, 2017 solar eclipse on the diurnal spectral radiance?
+
+## Raw sensor data
+
+Here we can found the original data written by the sensor. Unlike above, these are in text files and are not in a standard format like the CF format above.
+
+```{r raw-met, cache=TRUE}
+metfile <- "/data/terraref/sites/ua-mac/raw_data/EnvironmentLogger/2017-05-31/2017-05-31_12-19-38_environmentlogger.json"
+met <- jsonlite::fromJSON(metfile)
+writeLines(jsonlite::toJSON(met), con = file('foo.json'))
+
+timestamp <- lubridate::ymd_hms(met$environment_sensor_readings$timestamp)
+
+wavelengths <- met$environment_sensor_readings$spectrometer$wavelength[[1]]
+
+spectra <- do.call('rbind', met$environment_sensor_readings$spectrometer$spectrum)
+
+library(dplyr)
+spectra <- do.call('rbind', met$environment_sensor_readings$spectrometer$spectrum)
+
+#colnames(spectra) <- wavelengths
+#rownames(spectra) <- met$environment_sensor_readings$timestamp
+image(x = timestamp, y = wavelengths, z = spectra)
+```
+
+
+```{r}
+library(dplyr)
+library(readr)
+date = '2017-04-15'
+load_loggerdata <- function(date){
+  path <- file.path("/data/terraref/sites/ua-mac/raw_data/EnvironmentLogger", date)
+  files <- dir(path, full.names = TRUE)
+  loggerdata <- lapply(files, jsonlite::fromJSON) 
+  timestamp <- combine(sapply(loggerdata, function(x){
+    t <- x$environment_sensor_readings$timestamp
+    lubridate::ymd_hms(t)
+  }))
+  return(list(data = loggerdata, timestamp = timestamp))
+}
+
+extract_downwelling_irradiance <- function(logdata){
+
+  wavelengths <- logdata$data[[1]]$environment_sensor_readings$spectrometer$wavelength[[1]]
+  
+  spectra <- do.call('rbind', lapply(logdata$data, function(x){
+    do.call('rbind', x$environment_sensor_readings$spectrometer$spectrum)
+    }
+  ))
+  # image(x = timestamp, y = wavelengths, z = spectra)
+  return(list(spectra = spectra, wavelengths = wavelengths, timestamp = logdata$timestamp))
+}
+
+extract_logger_met <- function(logdata){
+  
+  met <- do.call('rbind', lapply(logdata$data, function(x){
+    tmp_met <- x$environment_sensor_readings
+    data.frame(par = tmp_met$`sensor par`$value,
+               co2 = tmp_met$`sensor co2`$value,
+               sundir = tmp_met$weather_station$sunDirection$value,
+               pressure = tmp_met$weather_station$airPressure$value,
+               brightness = tmp_met$weather_station$brightness$value,
+               rh = tmp_met$weather_station$relHumidity$value,
+               temp = tmp_met$weather_station$temperature$value,
+               wind_dir = tmp_met$weather_station$windDirection$value,
+               wind_speed = tmp_met$weather_station$windVelocity$value)
+    
+  })) 
+  return(met)
+}
+
+env_log_data <- load_loggerdata(date = '2017-04-15')
+env_log_spectra <- extract_downwelling_irradiance(env_log_data)
+env_log_met <- extract_logger_met(env_log_data)
+
+```
+
+#### Plots
+
+```{r}
+library(lubridate)
+library(dplyr)
+library(tidyr)
+time <- env_log_data$timestamp
+
+hourly_index <- 1+0:23*720
+
+time_hr <- time[hourly_index]
+hourly_spectra <- env_log_spectra$spectra[hourly_index,]
+wavelengths <- env_log_spectra$wavelengths
+
+colnames(hourly_spectra) <- wavelengths
+
+image(x = time_hr, y = wavelengths, z = hourly_spectra, 
+      xlab = 'local time', ylab = 'wavelength (nm)')
+```
+
+```{r spectra-ggplot}
+
+spectra_df <- data.frame(hour = 1:24, hourly_spectra)
+
+spectra_long <- spectra_df %>% 
+  gather(key = wavelength, value = radiance, -hour) %>% 
+  mutate(wavelength = as.numeric(gsub("X", "", wavelength))) 
+
+colnames(spectra_long)
+
+library(ggplot2)
+ggplot(data = spectra_long, aes(x = wavelength, y = radiance)) +
+  geom_line(size = 0.1) +
+  ggthemes::theme_tufte() +
+  facet_wrap(~hour, ncol = 6) +
+  ggtitle(paste('spectra on', date))
+
+```

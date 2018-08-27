@@ -15,7 +15,7 @@ Many of these tutorials have complex dependencies. In addition, many datasets ar
 The first research-grade version of TERRA REF data products will be released in November 2018. 
 Before that, we will make evaluation releases available: the alpha version was released in November 2016 and the beta version will be released in 2017.
 
-To access data please fill out a quick [Alpha User application](https://docs.google.com/forms/d/e/1FAIpQLScBsD042RrRok70BCGCRwARTcm9etvVHqvQaz1c5X7c5y0H3w/viewform?c=0&w=1).
+To access data please fill out a quick [Beta User application](http://terraref.org/beta).
 
 ### Links
 
@@ -23,4 +23,4 @@ TODO: add links to quick-start documentation, README's, code for learning and ap
 
 * Data portal: terraref.org/data
 * Docker Images on Docker Hub: hub.docker.com/terraref
-* NDS Labs Workbench: terraref.ndslabs.org
+* NDS Labs Workbench: workbench.terraref.org

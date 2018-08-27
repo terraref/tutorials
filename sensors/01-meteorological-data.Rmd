@@ -119,13 +119,14 @@ library(jsonlite)
 
 url = ""
 mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=4807&since=2017-01-02&until=2017-01-31')
+#mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?key=Pb3AUSqnUw&stream_id=3208&since=2017-01-02&until=2017-12-31', flatten = FALSE)
 
 # change time to human-readable
 mac_weather <- mac_weather.list$properties %>% 
   mutate(time = lubridate::ymd_hms(mac_weather.list$end_time))
-  
-
 ```
+
+### Using 
 
 ## Weather Summary
 
@@ -186,8 +187,9 @@ Did you see what we just did? We wrote some custom code to convert the units of 
 
 This higher resolution weather data can be used for VNIR calibration, for example. But at 1/s it is very large!
 
+## Lets see how data are downloaded
 
-### Lets see how data are downloaded
+Here we will download the files using the Clowder API, but note that if you have access to the filesystem (on www.workbench.terraref.org or globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger`. Folder
 
 ```{r query-clowder}
 library(jsonlite)
@@ -215,7 +217,7 @@ ncfiles <- files[grepl('environmentlogger.nc', files$filename), ]
 print(ncfiles %>% select(id, filename))
 ```
 
-#### Download netCDF 1/s data from Clowder
+## Download netCDF 1/s data from Clowder
 
 
 ```{r nc-download, echo=FALSE}

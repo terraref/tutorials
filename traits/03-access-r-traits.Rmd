@@ -9,7 +9,7 @@ output: html_document
 
 The rOpenSci traits package makes it easier to query the TERRA REF trait database, or any database that uses BETYdb software.
 
-First, make sure we have the latest version from the terraref fork of the repository on github. (you can install using the standard `install.packages('traits')` but I can't promise everything will work.
+First, make sure we have the latest version from the terraref fork of the repository on github. (you can install using the standard `install.packages('traits')` but as of Jan 2018 this version times out on very large datasets).
 
 ### Install the package
 
