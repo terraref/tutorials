@@ -74,8 +74,8 @@ Now the same query can be reduced to:
 
 ```{r sv_area}
 sorghum_height <- betydb_query(table = 'search',
-                               trait = "plant_height",
-                               site  = "~MAC",
+                               trait = "canopy_cover",
+                               site  = "~Season 6",
                                limit = 'none')
 ```
 
