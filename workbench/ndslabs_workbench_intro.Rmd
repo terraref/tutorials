@@ -17,13 +17,13 @@ For more details, please see the NDS Labs workbench [User Documentation](https:/
 
 
 1. Registration and Approval ([Documentation](https://nationaldataservice.atlassian.net/wiki/display/NDSC/User%27s+Guide#User'sGuide-Registrationandapproval)) 
-  * Sign up for an account at http://www.terraref.ndslabs.org/
+  * Sign up for an account at https://www.workbench.terraref.org
   * Verification email will be sent - click link in the email
-  * log in to terraref.ndslabs.org
+  * log in to https://www.workbench.terraref.org
 2. Orientation 
   * When you first log in, you will see the welcome page. 
   ![](figures/workbench_home.png)
-  * Click the link to [add an application](http://www.terraref.ndslabs.org/#/store). This will redirect you to the [Application Catalog](http://www.terraref.ndslabs.org/#/store) where you will see a list of computing environments:
+  * Click the link to [add an application](https://www.workbench.terraref.org/#/store). This will redirect you to the [Application Catalog](https://www.workbench.terraref.org/#/store) where you will see a list of computing environments:
 
 ![](figures/workbench_catalog.png)
 
@@ -122,7 +122,7 @@ Lets open an environment for using data in R
 
 Create Application: 
 
-1. navigate back to the [Application Catalog](http://www.terraref.ndslabs.org/#/store)
+1. navigate back to the [Application Catalog](https://www.workbench.terraref.org/#/store)
 2. Find the "RStudio Server" Application, click "Add", "View", "launch", "open" as we did in the previous tutorial
 3. Credentials
   * You will again enter your workbench username and password
