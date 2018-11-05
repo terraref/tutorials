@@ -1,4 +1,4 @@
----
+6---
 title: "Accessing Trait Data Via the BETYdb Web Interface"
 author: "David LeBauer"
 date: "`r Sys.Date()`"
@@ -32,4 +32,4 @@ On the Welcome page there is a search option for trait and yield data. This tool
   * if you want all of the data, including data that has not gone through QA/QC, make sure to check the 'include unchecked records' option
 * in the upper right, you will see a button that will allow you to download the search results as a CSV file. Click it. Open the file in a text editor or spreadsheet program and review its contents.
 
-Note that the web interface only provides a core set of data and limited meta-data. To access all of the data within BETYdb, it is necessary to search and merge multiple tables. More complex queries, such as those in the [Agronomic metadata](../traits/04-agronomic-metadata.Rmd).
+Note that the web interface only provides a core set of data and limited meta-data. To access all of the data within BETYdb, it is necessary to search and merge multiple tables. More complex queries, such as those in the [Agronomic metadata](../traits/06-agronomic-metadata.Rmd).
