@@ -100,7 +100,9 @@ wget -O sorghum.json
 
 Hint: search what a json file is
 
-#### R - using the jsonlite package
+### Accessing API data using the R jsonlite package
+
+JSON content can be converted into a R data frame using the fromJSON function.
 
 ```{r text-api}
 sorghum.json <- readLines(
