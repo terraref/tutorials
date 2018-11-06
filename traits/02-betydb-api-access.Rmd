@@ -102,7 +102,8 @@ Hint: search what a json file is
 
 ### Accessing API data using the R jsonlite package
 
-JSON content can be converted into a R data frame using the fromJSON function.
+JSON content can be converted into a R object using the fromJSON function.
+Access the 'data' element of the R object to get the data frame.
 
 ```{r text-api}
 sorghum.json <- readLines(
@@ -113,4 +114,5 @@ sorghum.json <- readLines(
 ## not a particularly useful format
 ## lets convert to a data frame
 sorghum <- jsonlite::fromJSON(sorghum.json)
+sorghum.dataframe <- sorghum$data
 ```
