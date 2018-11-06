@@ -33,7 +33,14 @@ Here is how to find and save your API key:
 
 For the public key, you can call this file `~/.betykey_public`. 
 
-### URL query
+### Ways to access API data
+
+1. Through a URL query
+2. Using the bash shell
+3. Using the R jsonlite package
+
+
+### Accessing data using a URL query
 
 ## Components of a URL query
 
@@ -42,13 +49,6 @@ For the public key, you can call this file `~/.betykey_public`.
 * api endpoint: `/search` or `traits` or `sites`. For BETYdb, these are the names of database tables. 
 * Query parameters: `genus=Sorghum`
 * Authentication: `key=9999999999999999999999999999999999999999` is the public key for the TERRA REF traits database. 
-
-### Ways to access API data
-
-1. Through a URL query
-2. Using the bash shell
-3. Using the R jsonlite package
-
 
 ## Constructing a URL query
 
@@ -69,8 +69,7 @@ First, lets construct a query by putting together a URL.
   * it will query all variables that are type trait and have 'height' in the name
   * Does it return the expected values?
   
-
-#### Your Turn
+## Your Turn
 
 > What will the URL https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=9999999999999999999999999999999999999999 return?
 
@@ -78,25 +77,28 @@ First, lets construct a query by putting together a URL.
 
 What do you see? Do you think that this is all of the records? What happens if you add `&limit=none`? 
 
- 
-#### Shell
+
+#### Accessing data using the Shell
+
+Type the following command into a bash shell (the -O option names the output file): 
 
 ```sh
-wget -O sorghum.json \\ # -O names the output file 
+wget -O sorghum.json
    "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=9999999999999999999999999999999999999999"
 ```
 
-If you want to write the query without exposing the key in plain text, you can construct it thus:
+If you want to write the query without exposing the key in plain text, you can construct it like this:
 
 ```sh
-wget -O sorghum.json \\
+wget -O sorghum.json
     "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=`cat ~/.betykey_public`"
 ```
 
-> What does `cat ~/.betykey_public` do?
+> Do you know what `cat ~/.betykey_public`. Run the command and see what it outputs in your shell.
 
 > How can you look at the files?
 
+Hint: search what a json file is
 
 #### R - using the jsonlite package
 
