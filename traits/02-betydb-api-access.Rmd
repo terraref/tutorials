@@ -33,8 +33,9 @@ Here is how to find and save your API key:
 
 For the public key, you can call this file `~/.betykey_public`. 
 
-### Components of a URL query
+### URL query
 
+## Components of a URL query
 
 * base url: `terraref.ncsa.illinois.edu/bety`
 * path to the api: `/api/beta`
@@ -42,8 +43,14 @@ For the public key, you can call this file `~/.betykey_public`.
 * Query parameters: `genus=Sorghum`
 * Authentication: `key=9999999999999999999999999999999999999999` is the public key for the TERRA REF traits database. 
 
+### Ways to access API data
 
-### Constructing a URL query
+1. Through a URL query
+2. Using the bash shell
+3. Using the R jsonlite package
+
+
+## Constructing a URL query
 
 First, lets construct a query by putting together a URL.
 
@@ -67,18 +74,16 @@ First, lets construct a query by putting together a URL.
 
 > What will the URL https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=9999999999999999999999999999999999999999 return?
 
-> write a URL that will query the database for sites with "Field Scanner" in the name field. Hint: combine two terms with a `+` as in `Field+Scanner`
+> Write a URL that will query the database for sites with "Field Scanner" in the name field. Hint: combine two terms with a `+` as in `Field+Scanner`
 
 What do you see? Do you think that this is all of the records? What happens if you add `&limit=none`? 
 
-### Our first Query 
-
+ 
 #### Shell
 
 ```sh
 wget -O sorghum.json \\ # -O names the output file 
-   "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=999999999999999999999999999999999999
-9999"
+   "https://terraref.ncsa.illinois.edu/bety/api/beta/species?genus=Sorghum&key=9999999999999999999999999999999999999999"
 ```
 
 If you want to write the query without exposing the key in plain text, you can construct it thus:
