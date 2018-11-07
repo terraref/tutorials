@@ -33,11 +33,11 @@ library(dplyr)
 ```{r writing-key}
 # This should be done once with the key sent to you in your email
 # writeLines('abcdefg_rest_of_key_sent_in_email', 
-#            con = '~/.betykey')
+#            con = '.betykey')
 
 # Example with the public key:
 writeLines('9999999999999999999999999999999999999999', 
-           con = '~/.betykey_public')
+           con = '.betykey_public')
 ```
 
 #### R - using the traits package
@@ -55,7 +55,7 @@ sorghum_info <- betydb_query(table = 'species',
                             api_version = 'beta',
                             limit = 'none',
                             betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                            key = readLines('~/.betykey', warn = FALSE))
+                            key = readLines('.betykey', warn = FALSE))
 
 ```
 
@@ -65,7 +65,7 @@ Notice all of the arguments that the `betydb_query` function requires? We can ch
 
 
 ```{r}
-options(betydb_key = readLines('~/.betykey', warn = FALSE),
+options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'beta')
 ```

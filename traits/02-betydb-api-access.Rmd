@@ -96,10 +96,6 @@ curl -o sorghum.json \
     "https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum&key=`cat .betykey_public`"
 ```
 
-> What does `cat .betykey_public` do? 
-
-> How can you look at the files?
-
 ### Accessing API data using the R jsonlite package
 
 ```{r text-api}
