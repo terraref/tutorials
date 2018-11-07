@@ -14,15 +14,15 @@ It contains trait (phenotype) data at the plot or plant level as well as meta da
 ### Introduction to BETYdb 
 
 The TERRA REF trait database (terraref.ncsa.illinois.edu/bety) uses the BETYdb data schema (structure) and web application.
-The BETYdb software is actively used and developed by the [TERRA Reference](terraref.org) program as well as by the [PEcAn project](pecanproject.org).
+The BETYdb software is actively used and developed by the [TERRA Reference](http://terraref.org) program as well as by the [PEcAn project](http://pecanproject.org).
 
 For more information about BETYdb, see the following:
 
 * BETYdb documentation (available via the web application under 'Docs')
   * _Data Access_: how to access data
   * _Data Entry Workflow:_ how to add data to the database
-  * _BETYdb Technical Documentation_ is written for advanced users and website and database administrators who may also be interested in the [full database schema](betydb.org/schemas)
-* BETYdb: A Yield, Trait and Ecosystem Service Database Applied to Second Generation Bioenergy Feedstocks. ([LeBauer et al, 2017](dx.doi.org/10.1111/gcbb.12420))
+  * _BETYdb Technical Documentation_ is written for advanced users and website and database administrators who may also be interested in the [full database schema](https://www.betydb.org/schemas)
+* BETYdb: A Yield, Trait and Ecosystem Service Database Applied to Second Generation Bioenergy Feedstocks. ([LeBauer et al, 2017](https://onlinelibrary.wiley.com/doi/abs/10.1111/gcbb.12420))
 
 Other than the TERRA REF trait database, there are a handful of other projects that use the BETYdb software, mostly with the PEcAn and TERRA programs. The content presented here is focused on the TERRA REF instance of BETYdb. Most of the information presented here is relevant to other databases, but the TERRA program has more emphasis on trait diversity among cultivars or genotypes within a crop whereas PEcAn focuses on the diversity of traits within ecosystems and plant functional types. In addition, the TERRA program is more focused on high throughput phenotyping - intensive monitoring of agricultural breeding trials whereas PEcAn focuses on assimilating heterogeneous data to forecast ecosystem functioning. Fortunately, both uses can use the shared ecosystem of software used for these tasks. For example, the PEcAn crop modeling infrastructure can be directly used to infer additional targets of breeding, and the diversity of traits observed in breeding trials can be a first step toward predicting the impacts of crop traits on productivity and ecosystem functioning.
 
@@ -40,5 +40,5 @@ The traitvis webapp provides an interface for exploring available data that is u
 * website: https://traitvis.workbench.terraref.org
 
 ```{r}
-knitr::include_app("https://traitvis.workbench.terraref.org/", height = "1400px")
+knitr::include_app("https://traitvis.workbench.terraref.org", height = "1400px") #not working; shiny app is not being displayed in html output
 ```
