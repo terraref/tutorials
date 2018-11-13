@@ -52,7 +52,7 @@ Lets start with the query of information about Sorghum from species table from a
 
 sorghum_info <- betydb_query(table = 'species',
                             genus = "Sorghum",
-                            api_version = 'beta',
+                            api_version = 'v1',
                             limit = 'none',
                             betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
                             key = readLines('.betykey', warn = FALSE))
@@ -67,32 +67,34 @@ Notice all of the arguments that the `betydb_query` function requires? We can ch
 ```{r}
 options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'beta')
+        betydb_api_version = 'v1')
 ```
 
 Now the same query can be reduced to:
 
-```{r sv_area}
-sorghum_height <- betydb_query(table = 'search',
-                               trait = "canopy_cover",
-                               site  = "~Season 6",
-                               limit = 'none')
+```{r query-species-reduce}
+sorghum_info <- betydb_query(table = 'species',
+                            genus = "Sorghum",
+                            limit = 'none')
 ```
 
 ### Time series of height
 
-Now we can take a look at the data that we have just queried. 
+Now let's query some trait data.
+```{r sv_area}
+sorghum_height <- betydb_query(table = 'search',
+                               trait = "canopy_height",
+                               site  = "~Season 6",
+                               limit = 'none')
+```
 
 ```{r}
-ggplot(data = sorghum_height, 
-       aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean, color = cultivar)) +
-  geom_smooth(se = FALSE, size = 0.5) +
-  geom_point(size = 0.5, position = position_jitter(width = 0.1)) + 
-#  scale_x_datetime(date_breaks = '6 months', date_labels = "%b %Y") +
-#  ylim(c(0,6)) + 
-  xlab("Day of Year") + ylab("Plant Height") + 
+ggplot(data = sorghum_height,
+       aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean)) +
+  geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
+# scale_x_datetime(date_breaks = '6 months') +
+  xlab("Day of Year") + ylab("Plant Height") +
   guides(color = guide_legend(title = 'Genotype')) +
   theme_bw()
-
 ```
 
