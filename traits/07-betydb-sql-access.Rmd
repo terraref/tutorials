@@ -43,7 +43,7 @@ DB: bety
 You can run the entire database locally, with daily imports:
 
 ```sh
-docker run --name betydb -p 5432:5432 terraref/betydb-postgis
+docker run --name betydb -p 5432:5432 terraref/bety-postgis
 ```
 
 Now it will appear that you have the entire trait database running at localhost on port 5432 just like if it were installed on your system!
