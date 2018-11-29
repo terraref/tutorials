@@ -1,26 +1,40 @@
 
 # Tutorials
 
+
 ## An introduction to the use of TERRA REF data and software
 
-Many of these tutorials have complex dependencies. In addition, many datasets are very large. These tutorials use the National Data Service Labs Workbench (NDS Labs Workbench). The NDS Labs Workbench provides the following:
+This repository provides a set of tutorials that are divided by data types and use cases. 
 
-* Custom configured computing environments  
-  * In principle, it is possible to use any docker container on [Docker Hub](https://hub.docker.com/explore/).
-* To get started, see the [workbench/ndslabs_workbench_intro.html](https://htmlpreview.github.io/?https://github.com/terraref/tutorials/blob/master/workbench/ndslabs_workbench_intro.html) tutorial.
-* This will set you up to begin tutorials found in the traits, sensors, and plantCV folders.
+In the repository, you will find three folders that contain examples of how to access data:
 
-### Data Access
+* traits
+* sensors
+* plantCV
 
-The first research-grade version of TERRA REF data products will be released in November 2019. 
-Before that, we will make evaluation releases available: the alpha version was released in November 2016 and the beta version will be released in 2018.
+Within each folder there are both R markdown and Jupyter notebooks. These describe different approaches to accessing data. These are intended to cover diverse use cases, and you will find information about accessing data from web interfaces but the primary focus is on accessing data using R, Python, SQL, and REST APIs. These are intended to provide quick-start introductions to access data along with computing environments required for further exploration. They are not intended to teach analyses, although some illustrative visualizations and statistical models are provided.
 
-To access data please fill out a quick [Beta User application](http://terraref.org/beta).
+This is a work in progress, and an open source community that welcomes contributions in many forms. Please feel welcome to ask questions, provide suggestions or share analyses that may be of interest to others.
 
-### Links
 
-TODO: add links to quick-start documentation, README's, code for learning and applied examples
+## Getting Started
 
-* Data portal: [terraref.org/data](https://terraref.org/data)
-* Docker Images on Docker Hub: [hub.docker.com/terraref](https://hub.docker.com/terraref)
-* NDS Labs Workbench: [www.workbench.terraref.org](https://www.workbench.terraref.org)
+### Requirements
+
+All of the tutorials have been designed to work in the cloud and can be accessed using a web browser. Therefore, the _only technical requirements_ are:
+* Web browser
+* Internet connection
+
+In addition, you will need to:
+* Sign up as as a TERRA REF [Beta User by filling out this application](http://terraref.org/beta).
+* Sign up for an account on the [TERRA REF Workbench](https://www.workbench.terraref.org), and wait for approval.
+
+### Using the Workbench
+
+The Workbench uses the National Data Service Labs Workbench (NDS Labs Workbench) software. The Workbench is a cloud analysis environment that minimizes and standardizes the software requirements so users can get started quickly. It also provides access to large files and databases that would otherwise be slow and impractical for users to download and store. 
+
+Although we provide a few pre-configured computing environments, Workbench is designed to support any Docker container - that is, anything you can install on a linux computer can be used in the workbench - for an idea of what is possible, see the large number of options on [Docker Hub](https://hub.docker.com/explore/).
+
+**To get started**, follow the [Workbench Quick Start](https://htmlpreview.github.io/?https://github.com/terraref/tutorials/blob/master/workbench/ndslabs_workbench_intro.html).
+
+This will walk you through the process of getting started with the first tutorials on how to access data.
