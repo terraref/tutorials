@@ -1,9 +1,4 @@
----
-title: "Getting Started with BETYdb"
-author: "David LeBauer"
-date: "`r Sys.Date()`"
-output: html_document
----
+# Getting Started with BETYdb
 
 ## TERRA Ref Trait Database
 
