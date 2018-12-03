@@ -1,11 +1,4 @@
----
-title: "Accessing Trait Data Via the BETYdb Web Interface"
-author: "David LeBauer"
-date: "`r Sys.Date()`"
-output: html_document
----
-
-
+# Accessing Trait Data Via the BETYdb Web Interface
 
 ## Getting an account for the TERRA trait database
 

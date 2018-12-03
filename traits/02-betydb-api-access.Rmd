@@ -1,10 +1,4 @@
----
-title: "Accessing Trait Data Via the BETYdb API"
-author: "David LeBauer"
-date: "11/7/2017"
-output: html_document
----
-
+# Accessing Trait Data Via the BETYdb API
 
 ## Using URLs to construct Queries
 
