@@ -16,9 +16,9 @@ library(sp) # for implicitly called rbind.SpatialPolygons method
 library(leaflet)
 
 
-options(betydb_key = readLines('~/.betykey', warn = FALSE),
+options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'beta')
+        betydb_api_version = 'v1')
 ```
 
 
@@ -33,7 +33,7 @@ sites <- betydb_query(
 	city = "Maricopa", sitename = "~Season 2 range", limit = "none")
 ```
 
-A more robust (but complicated way) would be to query the experiments and experimeents_sites tables. But we will leave that for later.
+A more robust (but complicated way) would be to query the experiments and experiments_sites tables. But we will leave that for later.
 
 ### Plot Season 2 plots
 
@@ -89,7 +89,8 @@ Exercise: Why are there two variables named canopy_height, and what database fie
 
 Now retrieve all available measurements for each variable.
 
-```{r traits-05-get-variables}
+```{r traits-05-get-variables} 
+#getting HTTP 504 -- Gateway Timeout when running this chunk
 
 vars_measures <- (variables
 	%>% group_by(id, name)
