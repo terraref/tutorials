@@ -1,11 +1,3 @@
-<!---
-title: "Can high throughput phenotyping produce data like this?"
-author: "David LeBauer"
-date: "`r Sys.Date()`"
-output: html_document
----
--->
-
 # A Simulated Phenotype Dataset
 
 ```{r warnings=FALSE, echo=FALSE}
