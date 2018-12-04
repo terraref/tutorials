@@ -8,13 +8,13 @@ First, make sure we have the latest version from the terraref fork of the reposi
 
 ### Install the package
 
-```{r install_traits, echo=FALSE}
+```{r install_traits, echo = FALSE, include = FALSE}
 devtools::install_github('terraref/traits')
 ```
 
 Now, we can load the packages that we will need to get started.
 
-```{r 00-setup}
+```{r 00-setup, message = FALSE}
 library(traits)
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(ggplot2)
@@ -43,7 +43,7 @@ The R traits package is an API 'client'. It does two important things:
 
 Lets start with the query of information about Sorghum from species table from above
 
-```{r query-species}
+```{r query-species, echo = TRUE}
 
 sorghum_info <- betydb_query(table = 'species',
                             genus = "Sorghum",
@@ -59,7 +59,7 @@ sorghum_info <- betydb_query(table = 'species',
 Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
 
 
-```{r}
+```{r set-up, echo = TRUE}
 options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
@@ -67,7 +67,7 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
 
 Now the same query can be reduced to:
 
-```{r query-species-reduce}
+```{r query-species-reduce, echo = TRUE}
 sorghum_info <- betydb_query(table = 'species',
                             genus = "Sorghum",
                             limit = 'none')
@@ -76,7 +76,7 @@ sorghum_info <- betydb_query(table = 'species',
 ### Time series of height
 
 Now let's query some trait data.
-```{r sv_area}
+```{r sv_area, echo = TRUE}
 sorghum_height <- betydb_query(table = 'search',
                                trait = "canopy_height",
                                site  = "~Season 6",
