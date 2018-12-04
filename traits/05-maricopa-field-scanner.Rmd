@@ -83,51 +83,61 @@ variables %>%
 
 Exercise: Why are there two variables named canopy_height, and what database fields should you examine to decide which one you want?
 
-Now retrieve all available measurements for each variable.
+```{r traits-05-get-variables-comment}
+
+#Now retrieve all available measurements for each variable.
+
+```
 
 ```{r traits-05-get-variables} 
 #getting HTTP 504 -- Gateway Timeout when running this chunk
+#comment out this chunk
 
-vars_measures <- (variables
-	%>% group_by(id, name)
-	%>% do(traits = betydb_record( # Get full trait list by variable ID
-		id = .$id, table = "variables")$traits))
+#vars_measures <- (variables
+#	%>% group_by(id, name)
+#	%>% do(traits = betydb_record( # Get full trait list by variable ID
+#		id = .$id, table = "variables")$traits))
 
 # Only needed if some variables may contain zero traits
 # If none are empty, can just do `vars_measures %>% unnest()`
-traitdata <- left_join( # ensures we keep a blank row for any variables with no trait info
-	vars_measures %>% select(id, name),
-	vars_measures %>% filter(length(traits) > 0) %>% unnest())
+#traitdata <- left_join( # ensures we keep a blank row for any variables with no trait info
+#	vars_measures %>% select(id, name),
+#	vars_measures %>% filter(length(traits) > 0) %>% unnest())
 ```
 
-Add cultivar information so we can plot by ecotype
+```{r traits-05-cultivar-info-comment}
+
+#Add cultivar information so we can plot by ecotype
+
+```
 
 ```{r traits-05-cultivar-info}
-traitdata <- (traitdata
-	%>% rename(
-		variable_name = name,
-		cultivar_id = trait.cultivar_id,
-		site_id = trait.site_id,
-		mean = trait.mean)
-	%>% mutate(date = as.Date(trait.date))
-	%>% left_join(cultivars, by = "cultivar_id"))
+#must comment out since chunk refers to traitdata object from above (that could not be created)
+#traitdata <- (traitdata
+#	%>% rename(
+#		variable_name = name,
+#		cultivar_id = trait.cultivar_id,
+#		site_id = trait.site_id,
+#		mean = trait.mean)
+#	%>% mutate(date = as.Date(trait.date))
+#	%>% left_join(cultivars, by = "cultivar_id"))
 ```
 
 ```{r traits-05-plots}
-(ggplot(
-	traitdata %>% filter(variable_name == "canopy_height"),
-	aes(date, mean, group = site_id * cultivar_id))
-	+ geom_line()
-	+ facet_wrap(~ecotype)
-	+ xlab("Date")
-	+ ylab("Canopy height, cm"))
+#(ggplot(
+#	traitdata %>% filter(variable_name == "canopy_height"),
+#	aes(date, mean, group = site_id * cultivar_id))
+#	+ geom_line()
+#	+ facet_wrap(~ecotype)
+#	+ xlab("Date")
+#	+ ylab("Canopy height, cm"))
 
-(ggplot(
-	(traitdata
-		%>% filter(variable_name == "NDVI")
-		%>% mutate(emphasize = (ecotype != "RIL"))), # to reduce overplotting
-	aes(date, mean, color = ecotype, group = site_id*cultivar_id, alpha = emphasize))
-	+ geom_line()
-	+ scale_alpha_discrete(guide = FALSE)
-	+ theme(legend.position = c(0.1, 0.9)))
+#(ggplot(
+#	(traitdata
+#		%>% filter(variable_name == "NDVI")
+#		%>% mutate(emphasize = (ecotype != "RIL"))), # to reduce overplotting
+#	aes(date, mean, color = ecotype, group = site_id*cultivar_id, alpha = emphasize))
+#	+ geom_line()
+#	+ scale_alpha_discrete(guide = FALSE)
+#	+ theme(legend.position = c(0.1, 0.9)))
 ```
