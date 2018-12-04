@@ -1,9 +1,4 @@
----
-title: "Phenotype Analysis"
-author: "David LeBauer, Craig Willis"
-date: "`r Sys.Date()`"
-output: md_document
----
+# Phenotype Analysis
 
 ## Joining database tables
 

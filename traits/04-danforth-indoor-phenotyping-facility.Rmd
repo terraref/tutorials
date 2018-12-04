@@ -1,10 +1,4 @@
----
-title: "Phenotype Analysis"
-author: "David LeBauer, Craig Willis"
-date: "`r Sys.Date()`"
-output:
-  html_document: default
----
+# Phenotype Analysis
 
 ```{r 02-setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)

@@ -1,11 +1,4 @@
----
-title: "Accessing Traits w/ PostgreSQL"
-author: "David LeBauer"
-date: "`r Sys.Date()`"
-output: html_document
----
-
-
+# Accessing Traits w/ PostgreSQL
 
 will be derived from https://github.com/pi4-uiuc/2017-bootcamp/blob/master/content/post/2017-05-30-databases-and-sql.Rmd#with
 

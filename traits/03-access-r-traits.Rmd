@@ -1,9 +1,4 @@
----
-title: "Accessing Trait Data in R"
-author: "David LeBauer"
-output: html_document
----
-
+# Accessing Trait Data in R
 
 ## Using the R traits package to query the database
 
