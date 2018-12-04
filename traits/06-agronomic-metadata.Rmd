@@ -73,16 +73,16 @@ library(rgeos)
 library(leaflet)
 year <- lubridate::year
 
-betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
-betykey <- "9999999999999999999999999999999999999999"
+options(betydb_key = readLines('.betykey', warn = FALSE),
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'v1')
 
 ## query and join tables
-species <- (betydb_query(table = "species", limit = "none", betyurl = betyurl, key = betykey, api_version = "beta")
+species <- (betydb_query(table = "species")
   %>% select(specie_id = id, scientificname, genus))
 
-sites <- (betydb_query(table = "sites", limit = "none", sitename = "~Season 2 range",
-                       betyurl = betyurl, key = betykey,
-                       api_version = "beta"))
+sites <- betydb_query(table = "sites")
+names(sites)[1] <- 'site_id'
 
 sites %>% group_by(city, state, country) %>% summarize(n())
 
@@ -100,10 +100,10 @@ sites_point <- do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$
 leaflet() %>% addTiles() %>% addPolygons(data = sites_poly, color = "red")
 #%>% addMarkers(data = sites_point) # points removed by only querying Season 2
 
-citations <- (betydb_query(table = "citations", betyurl = betyurl, key = betykey, api_version = "beta")
+citations <- (betydb_query(table = "citations")#, betyurl = betyurl, key = betykey_public, api_version = "v1")
   %>% select(citation_id = id, author, year, title))
 
-traits <- (betydb_query(table = "traits", betyurl = betyurl, key = betykey, api_version = "beta")
+traits <- (betydb_query(table = "traits")
   %>% select(
     id, date, mean,
     n, statname, stat,
@@ -120,11 +120,11 @@ Let's do the manual equivalent of a cross-table join. BETY actually does contain
 The key idea here is that each treatment is associated with some (possibly many) managements, but the treatments table only reports the number of associated managements. To see the management IDs themselves, we need to query an individual treatment ID. So, we retrieve one table, then iterate over each row extracting the foreign keys for the other table. This requires an API call for every treatment, so beware that it is likely to be slow!
 
 ```{r}
-treatments <- (betydb_query(table = 'treatments', betyurl = betyurl, key = betykey, api_version = "beta")
+treatments <- (betydb_query(table = 'treatments')
   %>% select(treatment_id = id , name, definition, control))
 
 get_mgid <- function(trtid){
-  betydb_record(id = trtid, table = "treatments", betyurl = betyurl, key = betykey, api_version = "beta")$managements$management.id
+  betydb_record(id = trtid, table = "treatments")$managements$management.id
 }
 
 managements_treatments <- (treatments
@@ -132,7 +132,7 @@ managements_treatments <- (treatments
   %>% do(management_id = get_mgid(.$treatment_id))
   %>% unnest())
 
-managements <- (betydb_query(table = 'managements', betyurl = betyurl, key = betykey, api_version = "beta")
+managements <- (betydb_query(table = 'managements')
   %>% filter(mgmttype %in% c('Fertilization_N', 'Planting', 'Irrigation'))
   %>% select(management_id = id, date, mgmttype, level, units)
   %>% left_join(managements_treatments, by = 'management_id')
