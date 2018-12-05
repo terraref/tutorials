@@ -2,7 +2,7 @@
 
 will be derived from https://github.com/pi4-uiuc/2017-bootcamp/blob/master/content/post/2017-05-30-databases-and-sql.Rmd#with
 
-# On workbench
+## On workbench
 
 On the TERRA REF Workbench, you have access to the database. These connnections will only work if you are on the workbench.
 
@@ -30,7 +30,7 @@ Password: DelchevskoOro
 DB: bety
 ```
 
-# Installing the database locally 
+## Installing the database locally 
 
 
 You can run the entire database locally, with daily imports:
