@@ -92,7 +92,7 @@ curl -o sorghum.json \
 
 ### Accessing API data using the R jsonlite package
 
-```{r text-api}
+```{r text-api, warning = FALSE}
 sorghum.json <- readLines(
   paste0("https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum&key=", 
          readLines('.betykey')))
