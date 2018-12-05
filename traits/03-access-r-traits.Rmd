@@ -11,9 +11,11 @@ The rOpenSci traits package makes it easier to query the TERRA REF trait databas
 
 First, make sure we have the latest version from the terraref fork of the repository on github. (you can install using the standard `install.packages('traits')` but as of Jan 2018 this version times out on very large datasets).
 
-### Install the package
+### Install the traits package
 
-```{r install_traits, echo=FALSE}
+This is for users working on their own computer - if you are using the TERRA REF Rstudio Docker container (including on workbench) you can skip this step. 
+
+```{r install_traits, echo=FALSE, eval = FALSE}
 devtools::install_github('terraref/traits')
 ```
 
@@ -21,7 +23,6 @@ Now, we can load the packages that we will need to get started.
 
 ```{r 00-setup}
 library(traits)
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 library(ggplot2)
 library(ggthemes)
 theme_set(theme_bw())
