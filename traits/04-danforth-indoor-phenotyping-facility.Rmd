@@ -90,7 +90,6 @@ ggplot(data = danforth_sorghum) +
 
 ```
 
-
 ### Growth rate over time
 
 ```{r danforth-phenotypes, fig.width=8, fig.height=4}
@@ -101,10 +100,10 @@ ggplot(data = danforth_sorghum, aes(x = date, y = mean, color = cultivar)) +
   geom_point(alpha = 0.4, size = 0.1) +
   facet_wrap(~label, scales = 'free_y') +
   labs(color = 'Cultivar') + ggthemes::theme_few() 
+
 ```
 
 ### Your turn
-
 1. Compute phenotypes for each cultivar
 2. An 'entity' is a replicate. 
    * How many entities are there? 
