@@ -50,7 +50,7 @@ sorghum_info <- betydb_query(table = 'species',
                             api_version = 'v1',
                             limit = 'none',
                             betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                            key = readLines('.betykey', warn = FALSE))
+                            key = readLines('traits/.betykey', warn = FALSE))
 
 ```
 
@@ -60,7 +60,7 @@ Notice all of the arguments that the `betydb_query` function requires? We can ch
 
 
 ```{r set-up, echo = TRUE}
-options(betydb_key = readLines('.betykey', warn = FALSE),
+options(betydb_key = readLines('traits/.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 ```

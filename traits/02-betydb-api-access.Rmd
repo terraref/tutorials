@@ -95,7 +95,7 @@ curl -o sorghum.json \
 ```{r text-api, warning = FALSE}
 sorghum.json <- readLines(
   paste0("https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum&key=", 
-         readLines('.betykey')))
+         readLines('traits/.betykey')))
 
 ## print(sorghum.json) 
 ## not a particularly useful format
