@@ -1,20 +1,20 @@
 # Accessing Trait Data in R
 
+The rOpenSci traits package makes it easier to query the TERRA REF trait database because 1) you can pass the query parameters in an R function, and the package takes care of putting the parameters into a valid URL and 2) because the package returns data in a tabular format that is ready to analyze.
+
 ## Using the R traits package to query the database
 
-The rOpenSci traits package makes it easier to query the TERRA REF trait database, or any database that uses BETYdb software.
+## Setup 
 
-First, make sure we have the latest version from the terraref fork of the repository on github. (you can install using the standard `install.packages('traits')` but as of Jan 2018 this version times out on very large datasets).
+Install the traits package
 
-### Install the traits package
-
-This is for users working on their own computer - if you are using the TERRA REF Rstudio Docker container (including on workbench) you can skip this step. 
+The traits package is on CRAN, and can therefore be installed using the following command:  
 
 ```{r install_traits, echo = FALSE, include = FALSE}
-devtools::install_github('terraref/traits')
+install.packages('traits')
 ```
 
-Now, we can load the packages that we will need to get started.
+Load other packages that we will need to get started.
 
 ```{r 00-setup, message = FALSE}
 library(traits)
@@ -24,7 +24,7 @@ theme_set(theme_bw())
 library(dplyr)
 ```
 
-
+Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. The public key will provide access to all metadata; you will need a personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
 
 ```{r writing-key}
 # This should be done once with the key sent to you in your email
