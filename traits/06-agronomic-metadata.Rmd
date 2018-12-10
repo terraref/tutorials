@@ -63,7 +63,7 @@ Here are some key tables and fields that we will look at:
 | management_id | managements.id |
 
 
-```{r}
+```{r set-up, include = FALSE}
 
 library(dplyr)
 library(tidyr)
@@ -77,6 +77,11 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 
+```
+
+
+
+```{r}
 ## query and join tables
 species <- betydb_query(table = "species") %>%
   select(specie_id = id, scientificname, genus)
@@ -143,6 +148,9 @@ planting <- managements %>%
   filter(mgmttype == "Planting") %>%
   select(treatment_id, planting_date = date, nrate = level)
 
+```
+
+```{r yields-chunk, include = FALSE}
 #grass_yields <- yields %>%
 #  filter(genus %in% c('Miscanthus', 'Panicum')) %>%
 #  left_join(planting, by = 'treatment_id') %>%
