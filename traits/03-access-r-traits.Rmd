@@ -76,7 +76,7 @@ sorghum_info <- betydb_query(table = 'species',
 ### Time series of height
 
 Now let's query some trait data.
-```{r sv_area, echo = TRUE}
+```{r sv_area, echo = TRUE, results = FALSE}
 sorghum_height <- betydb_query(table = 'search',
                                trait = "canopy_height",
                                site  = "~Season 6",
