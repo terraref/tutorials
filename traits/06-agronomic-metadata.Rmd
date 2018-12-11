@@ -71,7 +71,7 @@ Here are some key tables and fields that we will look at:
 | management_id | managements.id |
 
 
-```{r set-up, include = FALSE}
+```{r 06-setup, include = FALSE}
 
 library(dplyr)
 library(tidyr)

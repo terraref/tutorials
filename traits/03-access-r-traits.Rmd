@@ -33,7 +33,7 @@ Create a file that contains your API key. If you have signed up for access to th
 
 # Example with the public key:
 writeLines('9999999999999999999999999999999999999999', 
-           con = 'traits/.betykey_public')
+           con = '.betykey_public')
 ```
 
 #### R - using the traits package
@@ -51,7 +51,7 @@ sorghum_info <- betydb_query(table = 'species',
                             api_version = 'v1',
                             limit = 'none',
                             betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                            key = readLines('traits/.betykey', warn = FALSE))
+                            key = readLines('.betykey', warn = FALSE))
 
 ```
 
@@ -62,7 +62,7 @@ Notice all of the arguments that the `betydb_query` function requires? We can ch
 
 
 ```{r set-up, echo = TRUE}
-options(betydb_key = readLines('traits/.betykey', warn = FALSE),
+options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 ```
@@ -71,18 +71,18 @@ Now the same query can be reduced to:
 
 ```{r query-species-reduce, echo = TRUE, results = FALSE}
 sorghum_info <- betydb_query(table = 'species',
-                            genus = "Sorghum",
-                            limit = 'none')
+                             genus = "Sorghum",
+                             limit = 'none')
 ```
 
 ### Time series of height
 
 Now let's query some trait data.
-```{r sv_area, echo = TRUE, results = FALSE}
-sorghum_height <- betydb_query(table = 'search',
-                               trait = "canopy_height",
-                               site  = "~Season 6",
-                               limit = 'none')
+```{r canopy_height, echo = TRUE, results = FALSE, cache = TRUE}
+sorghum_height <- betydb_query(table     = 'search',
+                               trait     = "canopy_height",
+                               sitename  = "~Season 6",
+                               limit     = 'none')
 ```
 
 ```{r}
