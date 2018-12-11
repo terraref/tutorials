@@ -10,13 +10,13 @@ Install the traits package
 
 The traits package is on CRAN, and can therefore be installed using the following command:  
 
-```{r install_traits, echo = FALSE, include = FALSE}
-install.packages('traits')
+```{r install_traits, echo = TRUE, message = FALSE}
+install.packages('traits', repos = 'http://cran.rstudio.com/')
 ```
 
 Load other packages that we will need to get started.
 
-```{r 00-setup, message = FALSE}
+```{r 00-setup, message = FALSE, echo = TRUE}
 library(traits)
 library(ggplot2)
 library(ggthemes)
@@ -26,14 +26,14 @@ library(dplyr)
 
 Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. The public key will provide access to all metadata; you will need a personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
 
-```{r writing-key}
+```{r writing-key, echo = TRUE}
 # This should be done once with the key sent to you in your email
 # writeLines('abcdefg_rest_of_key_sent_in_email', 
 #            con = '.betykey')
 
 # Example with the public key:
 writeLines('9999999999999999999999999999999999999999', 
-           con = '.betykey_public')
+           con = 'traits/.betykey_public')
 ```
 
 #### R - using the traits package
@@ -69,7 +69,7 @@ options(betydb_key = readLines('traits/.betykey', warn = FALSE),
 
 Now the same query can be reduced to:
 
-```{r query-species-reduce, echo = TRUE}
+```{r query-species-reduce, echo = TRUE, results = FALSE}
 sorghum_info <- betydb_query(table = 'species',
                             genus = "Sorghum",
                             limit = 'none')

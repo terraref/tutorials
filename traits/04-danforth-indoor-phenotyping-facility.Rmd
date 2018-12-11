@@ -29,7 +29,7 @@ options(betydb_key = readLines('traits/.betykey', warn = FALSE),
 
 First we will use the generic search to query the output from the Lemnatec indoor phenotyping system at the Danforth Center in St. Louis, MO.
 
-```{r query-danforth, results='hide'}
+```{r query-danforth, message = FALSE}
 danforth_sorghum <- traits::betydb_query(
 #  sitename = 'Danforth Plant Science Center Bellweather Phenotyping Facility',
   trait = 'sv_area',

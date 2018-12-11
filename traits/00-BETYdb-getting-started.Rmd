@@ -1,3 +1,5 @@
+# (PART\*) Secton 1: Traits {-}
+
 # Getting Started with BETYdb
 
 ## TERRA Ref Trait Database
