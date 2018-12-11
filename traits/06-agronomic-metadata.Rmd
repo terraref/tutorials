@@ -1,4 +1,12 @@
-# Phenotype Analysis
+# Querying Agronomic Meta-data
+
+In previous tutorials you have learned how to query trait data using a variety of different methods, including the web interface, an API, and the R traits package. Here you will continute to use the R traits package, and learn how to access meta-data from other tables in the database.
+
+While the basic search query that we have used in previous sections provides the key information that you may need for an analysis - the genotype name, the location, date, and method, there are other tables that contain more specific metadata.
+
+For example, the managements table provides information about planting and harvest dates, planting density, and rates of fertilizer, pesticide, and herbicide applications.
+
+While the main search results provide the latitude and longitude of the center of each plot, if you query the sites table directly you can also find the plot boundary - this can be useful for subsetting georeferenced images.
 
 ## Joining database tables
 
