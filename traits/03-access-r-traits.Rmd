@@ -61,7 +61,7 @@ Notice all of the arguments that the `betydb_query` function requires? We can ch
 
 
 
-```{r set-up, echo = TRUE}
+```{r 03-set-up, echo = TRUE}
 options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
@@ -78,14 +78,14 @@ sorghum_info <- betydb_query(table = 'species',
 ### Time series of height
 
 Now let's query some trait data.
-```{r canopy_height, echo = TRUE, results = FALSE, cache = TRUE}
+```{r canopy_height, echo = TRUE, results = FALSE}
 sorghum_height <- betydb_query(table     = 'search',
                                trait     = "canopy_height",
                                sitename  = "~Season 6",
                                limit     = 'none')
 ```
 
-```{r}
+```{r plot_height}
 ggplot(data = sorghum_height,
        aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean)) +
   geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
