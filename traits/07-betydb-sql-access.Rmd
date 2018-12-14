@@ -15,14 +15,6 @@ Lets connect to the terraref instance of betydb. Until now we have been accessin
 This connection is only available on the local *ncsa.illinois.edu network, and can be accessed through the NDS Labs workbench.
 
 ```
-Host: bety.terraref
-Port: 5432
-User: bety
-Password: bety
-DB: bety
-```
-
-```
 Host: bety6.ncsa.illinois.edu
 Port: 5432
 User: viewer
