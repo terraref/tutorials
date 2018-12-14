@@ -1,9 +1,12 @@
----
-title: "Phenotype Analysis"
-author: "David LeBauer, Craig Willis"
-date: "`r Sys.Date()`"
-output: md_document
----
+# Querying Agronomic Meta-data
+
+In previous tutorials you have learned how to query trait data using a variety of different methods, including the web interface, an API, and the R traits package. Here you will continute to use the R traits package, and learn how to access meta-data from other tables in the database.
+
+While the basic search query that we have used in previous sections provides the key information that you may need for an analysis - the genotype name, the location, date, and method, there are other tables that contain more specific metadata.
+
+For example, the managements table provides information about planting and harvest dates, planting density, and rates of fertilizer, pesticide, and herbicide applications.
+
+While the main search results provide the latitude and longitude of the center of each plot, if you query the sites table directly you can also find the plot boundary - this can be useful for subsetting georeferenced images.
 
 ## Joining database tables
 
@@ -68,7 +71,7 @@ Here are some key tables and fields that we will look at:
 | management_id | managements.id |
 
 
-```{r}
+```{r 06-setup, include = FALSE}
 
 library(dplyr)
 library(tidyr)
@@ -78,45 +81,50 @@ library(rgeos)
 library(leaflet)
 year <- lubridate::year
 
-betyurl <- "https://terraref.ncsa.illinois.edu/bety/"
-betykey <- "9999999999999999999999999999999999999999"
+options(betydb_key = readLines('.betykey', warn = FALSE),
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'v1')
 
+```
+
+
+
+```{r}
 ## query and join tables
-species <- (betydb_query(table = "species", limit = "none", betyurl = betyurl, key = betykey, api_version = "beta")
-  %>% select(specie_id = id, scientificname, genus))
+species <- betydb_query(table = "species") %>%
+  select(specie_id = id, scientificname, genus)
 
-sites <- (betydb_query(table = "sites", limit = "none", sitename = "~Season 2 range",
-                       betyurl = betyurl, key = betykey,
-                       api_version = "beta"))
+sites <- betydb_query(table = "sites")
+names(sites)[1] <- 'site_id'
 
 sites %>% group_by(city, state, country) %>% summarize(n())
 
 # A simple plot of all site coordinates.
 # Marker pins = sites with coords reported as a single point
 # Red polygons = sites reporting full boundaries
-site_geom <- (sites
-  %>% filter(!is.na(geometry))
-  %>% group_by(id)
-  %>% do(parsed_geometry = readWKT(text = .$geometry, id = .$id))
-  %>% mutate(geom_type = class(parsed_geometry)))
+site_geom <- sites %>%
+  filter(!is.na(geometry)) %>%
+  group_by(site_id) %>%
+  do(parsed_geometry = readWKT(text = .$geometry, id = .$site_id)) %>%
+  mutate(geom_type = class(parsed_geometry))
 sites_poly <- do.call("rbind", filter(site_geom, geom_type == "SpatialPolygons")$parsed_geometry)
 sites_point <- do.call("rbind", filter(site_geom, geom_type == "SpatialPoints")$parsed_geometry)
 
 leaflet() %>% addTiles() %>% addPolygons(data = sites_poly, color = "red")
 #%>% addMarkers(data = sites_point) # points removed by only querying Season 2
 
-citations <- (betydb_query(table = "citations", betyurl = betyurl, key = betykey, api_version = "beta")
-  %>% select(citation_id = id, author, year, title))
+citations <- betydb_query(table = "citations") %>%
+  select(citation_id = id, author, year, title)
 
-traits <- (betydb_query(table = "traits", betyurl = betyurl, key = betykey, api_version = "beta")
-  %>% select(
+traits <- betydb_query(table = "traits") %>% 
+  select(
     id, date, mean,
     n, statname, stat,
     site_id, specie_id, treatment_id,
-    citation_id, cultivar_id)
-  %>% left_join(species, by = 'specie_id')
-  %>% left_join(sites, by = 'site_id')
-    %>% left_join(citations, by = 'citation_id'))
+    citation_id, cultivar_id) %>%
+      left_join(species, by = 'specie_id') %>%
+      left_join(sites, by = 'site_id') %>%
+    left_join(citations, by = 'citation_id')
 
 ```
 
@@ -125,46 +133,50 @@ Let's do the manual equivalent of a cross-table join. BETY actually does contain
 The key idea here is that each treatment is associated with some (possibly many) managements, but the treatments table only reports the number of associated managements. To see the management IDs themselves, we need to query an individual treatment ID. So, we retrieve one table, then iterate over each row extracting the foreign keys for the other table. This requires an API call for every treatment, so beware that it is likely to be slow!
 
 ```{r}
-treatments <- (betydb_query(table = 'treatments', betyurl = betyurl, key = betykey, api_version = "beta")
-  %>% select(treatment_id = id , name, definition, control))
+treatments <- betydb_query(table = 'treatments') %>%
+  select(treatment_id = id , name, definition, control)
 
 get_mgid <- function(trtid){
-  betydb_record(id = trtid, table = "treatments", betyurl = betyurl, key = betykey, api_version = "beta")$managements$management.id
+  betydb_record(id = trtid, table = "treatments")$managements$management.id
 }
 
-managements_treatments <- (treatments
-  %>% group_by(treatment_id)
-  %>% do(management_id = get_mgid(.$treatment_id))
-  %>% unnest())
+managements_treatments <- treatments %>%
+  group_by(treatment_id) %>%
+  do(management_id = get_mgid(.$treatment_id)) %>% 
+  filter(!is.null(management_id)) %>%
+  unnest()
 
-managements <- (betydb_query(table = 'managements', betyurl = betyurl, key = betykey, api_version = "beta")
-  %>% filter(mgmttype %in% c('Fertilization_N', 'Planting', 'Irrigation'))
-  %>% select(management_id = id, date, mgmttype, level, units)
-  %>% left_join(managements_treatments, by = 'management_id')
-  %>% left_join(treatments, by = 'treatment_id'))
+managements <- betydb_query(table = 'managements') %>% 
+  filter(mgmttype %in% c('Fertilization_N', 'Planting', 'Irrigation')) %>%
+  select(management_id = id, date, mgmttype, level, units) %>% 
+  left_join(managements_treatments, by = 'management_id') %>%
+  left_join(treatments, by = 'treatment_id')
 
-planting <- (managements
-  %>% filter(mgmttype == "Planting")
-  %>% select(treatment_id, planting_date = date, nrate = level))
+planting <- managements %>%
+  filter(mgmttype == "Planting") %>%
+  select(treatment_id, planting_date = date, nrate = level)
 
-grass_yields <- (yields
-  %>% filter(genus %in% c('Miscanthus', 'Panicum'))
-  %>% left_join(planting, by = 'treatment_id')
-  %>% collect
-  %>% replace_na(replace = list(nrate = 0))
-  %>% mutate(
-    age = year(date) - year(planting_date),
-    SE = case_when(
-      .$statname == "SE" ~ .$stat,
-      .$statname == 'SD' ~ .$stat / sqrt(.$n),
-      TRUE ~ NA_real_),
-    continent = case_when(
-      .$lon < -30 ~ "united_states",
-      .$lon < 75 ~ "europe",
-      TRUE ~ "asia"))
-    %>% filter(!duplicated(.)))
+```
 
-ggplot(data = grass_yields, aes(lon,lat)) +
-  geom_point(aes(color = genus, size = mean),
-             alpha = 0.1)
+```{r yields-chunk, include = FALSE}
+#grass_yields <- yields %>%
+#  filter(genus %in% c('Miscanthus', 'Panicum')) %>%
+#  left_join(planting, by = 'treatment_id') %>%
+#  collect %>%
+#  replace_na(replace = list(nrate = 0)) %>%
+#  mutate(
+#    age = year(date) - year(planting_date),
+#    SE = case_when(
+#      .$statname == "SE" ~ .$stat,
+#      .$statname == 'SD' ~ .$stat / sqrt(.$n),
+#      TRUE ~ NA_real_),
+#    continent = case_when(
+#      .$lon < -30 ~ "united_states",
+#      .$lon < 75 ~ "europe",
+#      TRUE ~ "asia")) %>%
+#      filter(!duplicated(.))
+
+#ggplot(data = grass_yields, aes(lon,lat)) +
+#  geom_point(aes(color = genus, size = mean),
+#             alpha = 0.1)
 ```

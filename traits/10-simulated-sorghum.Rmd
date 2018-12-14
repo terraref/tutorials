@@ -1,11 +1,3 @@
-<!---
-title: "Can high throughput phenotyping produce data like this?"
-author: "David LeBauer"
-date: "`r Sys.Date()`"
-output: html_document
----
--->
-
 # A Simulated Phenotype Dataset
 
 ```{r warnings=FALSE, echo=FALSE}
@@ -17,6 +9,10 @@ library(GGally)
 theme_set(theme_bw())
 library(dplyr)
 library(httr)
+library(labeling)
+library(highr)
+library(lubridate)
+library(tidyr)
 .libPaths('~/R/library')
 ```
 
@@ -35,7 +31,7 @@ The 'genotypes' are based on five-hundred quasi-random parameterizations of a bi
 
 _Note that these data sets contain numerical artifacts and scientific reinterpretations for illustrative purpose._
 
-All of these simulated datasets are released with an unrestrive [copyright](https://creativecommons.org/publicdomain/zero/1.0/).  This means you can copy, modify, ans share the data.  Please keep in mind that the data sets are not production quality - they have been developed solely to inspire and solicit feedback.
+All of these simulated datasets are released with an unrestrive [copyright](https://creativecommons.org/publicdomain/zero/1.0/).  This means you can copy, modify, and share the data.  Please keep in mind that the data sets are not production quality - they have been developed solely to inspire and solicit feedback.
 
 
 ### Design of Simulation Experiment
@@ -119,11 +115,17 @@ This dataset includes what a sensor might observe, daily for five years during t
 ### Accessing the TERRA Simulated Data Database
 
 
-```{r}
+```{r set-options}
 
-options(betydb_key = readLines('~/.betykey_public', warn = FALSE),
+options(betydb_key = readLines('.betykey_public', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety-test/",
-        betydb_api_version = 'beta')
+        betydb_api_version = 'v1')
+
+
+```
+
+
+```{r}
 
 sorghum_sla <- betydb_query(table = 'search',
                             trait = "SLA",
@@ -145,10 +147,12 @@ ggplot(sorghum_sla) +
 
 ```{r query-traits}
 
+
 trait_list <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
 
 variables <- betydb_query(table = 'variables',
                           limit = 'none')
+
 
 knitr::kable(variables %>% 
                filter(name %in% trait_list) %>% 

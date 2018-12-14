@@ -1,9 +1,6 @@
----
-title: "Getting Started with BETYdb"
-author: "David LeBauer"
-date: "`r Sys.Date()`"
-output: html_document
----
+# (PART\*) Secton 1: Traits {-}
+
+# Getting Started with BETYdb
 
 ## TERRA Ref Trait Database
 
@@ -40,5 +37,5 @@ The traitvis webapp provides an interface for exploring available data that is u
 * website: https://traitvis.workbench.terraref.org
 
 ```{r}
-knitr::include_app("https://traitvis.workbench.terraref.org", height = "1400px") #not working; shiny app is not being displayed in html output
+knitr::include_app("https://traitvis.workbench.terraref.org", height = "1400px")
 ```
