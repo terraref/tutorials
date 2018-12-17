@@ -81,7 +81,7 @@ library(rgeos)
 library(leaflet)
 year <- lubridate::year
 
-options(betydb_key = readLines('traits/.betykey', warn = FALSE),
+options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 

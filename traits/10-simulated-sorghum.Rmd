@@ -1,8 +1,8 @@
 # A Simulated Phenotype Dataset
 
-```{r warnings=FALSE, echo=FALSE}
+```{r include = FALSE}
 library(traits)
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE, cache =FALSE)
 library(ggplot2)
 library(ggthemes)
 library(GGally)
@@ -145,7 +145,7 @@ ggplot(sorghum_sla) +
 
 ## Your turn: query the list of available traits from the variables table
 
-```{r query-traits}
+```{r query-traits, message = FALSE}
 
 
 trait_list <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
@@ -164,7 +164,7 @@ knitr::kable(variables %>%
 
 These traits are not time series, each of the ~500 genotypes is associated with a single value for each trait. This is different from the time series of LAI that we saw in the previous exercise or the biomass data that we will look at below. 
 
-```{r}
+```{r traits-sel, message = FALSE}
 
 traits_list <- list()
 for(trait in trait_list){
@@ -202,7 +202,7 @@ knitr::kable(variables %>%
                select(name, description, units))
 ```
 
-```{r all_sorghum, cache=TRUE}
+```{r all_sorghum, cache = TRUE, results = 'hide'}
 
 
 site_id <- betydb_query(table = 'sites', sitename = "Central IL Plot D")$id
@@ -224,24 +224,24 @@ for(t in c('canopy_height', 'stem_biomass', 'LAI', 'NDVI')){
 
 ```
 
-```
 
 This is how you can query a time series of sorghum height data for the Northern IL site. 
 
-```{r query-sorghum-height}
-sorghum_height <-  betydb_query(table = 'search',
-                                trait = 'canopy_height',
-                                year = 1022,
-                                site = "~Northern IL",
-                                limit = 'none')
-#save(sorghum_height, file = 'data/sorghum_height.RData')
+```{r query-sorghum-height, echo = TRUE}
+#sorghum_height <-  betydb_query(table = 'search',
+#                                trait = 'canopy_height',
+#                                year = 1022,
+#                                site = "~Northern IL",
+#                                limit = 'none')
+
+#save(sorghum_height, file = 'traits/sorghum_height.RData')
 ```
 
 However, with almost 200k rows it currently takes 40 minutes to query (this is a limitation of the API). For the purposes of this tutorial, we will use a cached copy of the dataset.
 
 
-```{r}
-#load('data/sorghum_height.RData')
+```{r 10-sim-sorg-plot, message = FALSE}
+load('traits/sorghum_height.RData')
 
 s <- sorghum_height %>% 
   mutate(day = lubridate::yday(raw_date), 
@@ -267,7 +267,7 @@ Now lets look at a 'pairs' plot to see if there is any covariance among the trai
 
 First, lets rearrange the data from 'long' to 'wide' format. We will also take this chance to rename the 'cultivar' field to 'genotype'.
 
-```{r}
+```{r 10_traits_wide, echo = TRUE}
 
 traits_wide <- traits %>%  
   select(genotype = cultivar, trait, mean) %>%
@@ -277,7 +277,7 @@ traits_wide <- traits %>%
 
 Now, lets create a variable called `max_height` 
 
-```{r max_height}
+```{r max_height, echo = TRUE}
 # create the variable max height
 max_height <- s %>% 
   group_by(genotype) %>% 
@@ -287,13 +287,14 @@ max_height <- s %>%
 
 Now, join the traits data frame with the new max_height data frame trait data we will merge the two data frames on the `genotype` field.
 
-```{r join_traits_height}
+```{r join_traits_height, echo = TRUE, warning = FALSE}
+
 traits_height <- traits_wide %>% left_join(max_height, by = 'genotype')
 
 ```
 Which traits are related to height? We can discover this in a few way, for example, a pairs plot that shows correltations:
 
-```{r trait_pairs, fig.height = 8, fig.width = 8}
+```{r trait_pairs, fig.height = 8, fig.width = 8, warning = FALSE}
 ggpairs(traits_height %>% select(-genotype),  
         lower = list(continuous = 'density'),
         upper = list(continuous = 'cor'),

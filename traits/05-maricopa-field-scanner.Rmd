@@ -1,7 +1,7 @@
 # Plot level data from the field scanner in Maricopa, AZ
 
 ```{r traits-05-mac-traits-setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE, cache = FALSE)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -23,7 +23,7 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
 
 First, query the plots for Season 2. The simple way to use this is based on the fact that the plot names at Maricopa contain the season. 
 
-```{r traits-05-query-mac-sites, echo = TRUE}
+```{r traits-05-query-mac-sites, echo = TRUE, message = FALSE}
 sites <- betydb_query(
 	table = "sites",
 	city = "Maricopa", sitename = "~Season 2 range", limit = "none")
@@ -34,9 +34,10 @@ A more robust (but complicated way) would be to query the experiments and experi
 ### Plot Season 2 plots
 
 ```{r traits-05-map-mac-polygons, echo = TRUE}
-site_bounds <- (sites
-  %>% rowwise()
-  %>% do(boundaries = readWKT(text = .$geometry, id = .$id)))
+
+site_bounds <- sites %>%
+  rowwise() %>%
+  do(boundaries = readWKT(text = .$geometry, id = .$id))
 
 site_bounds <- do.call('rbind', site_bounds$boundaries)
 #names(site_bounds) <- sites$sitename
@@ -54,6 +55,7 @@ leaflet() %>%
 ```
 
 ```{r}
+
 ## Cultivars
 
 ```
