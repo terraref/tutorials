@@ -1,7 +1,7 @@
 # Danforth Indoor Phenotype Analysis
 
 ```{r 02-setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
 library(jsonlite)
 library(dplyr)
 library(ggplot2)
@@ -21,7 +21,7 @@ library(traits)
 Unlike the first two tutorials, now we will be querying real data from the public TERRA REF database. So we will use a new URL, https://terraref.ncsa.illinois.edu/bety/, and we will need to use our own private key.
 
 ```{r terraref-connect-options}
-options(betydb_key = readLines('traits/.betykey', warn = FALSE),
+options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 ```
@@ -92,7 +92,7 @@ ggplot(data = danforth_sorghum) +
 
 ### Growth rate over time
 
-```{r danforth-phenotypes, fig.width=8, fig.height=4}
+```{r danforth-phenotypes, fig.width=8, fig.height=4, message = FALSE}
 
 ggplot(data = danforth_sorghum, aes(x = date, y = mean, color = cultivar)) +
  # geom_line(aes(group = entity), size = 0.1) +
