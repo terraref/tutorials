@@ -74,7 +74,7 @@ At a minimum, you should have:
 - [Google](https://www.google.com/)
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 options(warn = -1)
 ```
 
