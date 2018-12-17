@@ -8,10 +8,14 @@ The rOpenSci traits package makes it easier to query the TERRA REF trait databas
 
 Install the traits package
 
-The traits package is on CRAN, and can therefore be installed using the following command:  
+The traits package can be installed through github using the following command: 
 
 ```{r install_traits, echo = TRUE, message = FALSE}
-install.packages('traits', repos = 'http://cran.rstudio.com/')
+
+if(packageVersion("traits") == '0.2.0'){
+  devtools::install_github('ropensci/traits')
+}
+
 ```
 
 Load other packages that we will need to get started.
@@ -44,7 +48,7 @@ The R traits package is an API 'client'. It does two important things:
 
 Lets start with the query of information about Sorghum from species table from above
 
-```{r query-species, echo = TRUE}
+```{r query-species, results = 'hide', echo = TRUE}
 
 sorghum_info <- betydb_query(table = 'species',
                             genus = "Sorghum",
@@ -69,7 +73,7 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
 
 Now the same query can be reduced to:
 
-```{r query-species-reduce, echo = TRUE}
+```{r query-species-reduce, message = FALSE, echo = TRUE}
 sorghum_info <- betydb_query(table = 'species',
                              genus = "Sorghum",
                              limit = 'none')
@@ -78,7 +82,7 @@ sorghum_info <- betydb_query(table = 'species',
 ### Time series of height
 
 Now let's query some trait data.
-```{r canopy_height, echo = TRUE, results = FALSE}
+```{r canopy_height, echo = TRUE, message = FALSE}
 sorghum_height <- betydb_query(table     = 'search',
                                trait     = "canopy_height",
                                sitename  = "~Season 2",
