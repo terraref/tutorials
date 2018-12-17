@@ -69,7 +69,7 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
 
 Now the same query can be reduced to:
 
-```{r query-species-reduce, echo = TRUE, results = FALSE}
+```{r query-species-reduce, echo = TRUE}
 sorghum_info <- betydb_query(table = 'species',
                              genus = "Sorghum",
                              limit = 'none')
@@ -81,7 +81,7 @@ Now let's query some trait data.
 ```{r canopy_height, echo = TRUE, results = FALSE}
 sorghum_height <- betydb_query(table     = 'search',
                                trait     = "canopy_height",
-                               sitename  = "~Season 6",
+                               sitename  = "~Season 2",
                                limit     = 'none')
 ```
 
