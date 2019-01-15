@@ -3,15 +3,6 @@ title: "01-meteorological-data.Rmd"
 output: html_document
 ---
 
-```{r met-setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
-
-api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
-output_dir <- file.path(tempdir(), "downloads")
-dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
-
-```
-
 ## The Maricopa Weather Station
 
 Locating the weather station via the geodashboard:
@@ -154,77 +145,97 @@ This is how you can automatically download the met data to a local file:
 curl -O spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 ```
 
-And this is how you can access the data in R:
+### Using R
 
+The following code sets the defaults for showing R code. 
+```{r met-setup}
+knitr::opts_chunk$set(cache = TRUE, message = FALSE)
+```
+
+And this is how you can access the same data in R. This uses the jsonlite R package 
+and desired URL to pull the data in. The data is in a dataframe with two nested
+dataframes, called `properties` and `geometries`. 
 
 ```{r met-geostream}
 library(dplyr)
 library(ggplot2)
 library(jsonlite)
+library(lubridate)
 
-mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
-
-# change time to human-readable
-mac_weather <- mac_weather.list$properties %>% 
-  mutate(time = lubridate::ymd_hms(mac_weather.list$end_time))
+weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
 ```
 
-### Using 
+The `geometries` dataframe is then pulled out from these data, which contains
+the datapoints from this stream. This is combined with a transformed version of the
+end of the time period from the stream. 
 
-## Weather Summary
+```{r met-datapoints}
+weather_data <- weather_all$properties %>% 
+  mutate(time = ymd_hms(weather_all$end_time))
+```
 
+## Weather Plots
 
 #### Wind Speed
 
+Create a time series plot of one of the eight variables in the newly created dataframe. 
+
 ```{r weather}
 theme_set(ggthemes::theme_few())
-ggplot(data = mac_weather) +
+ggplot(data = weather_data) +
   geom_point(aes(x = time, y = wind_speed), size = 0.1)
 ```
 
 #### Rainfall
 
+A time series plot of another one of the variables. 
+
 ```{r precipitation}
-ggplot(data = mac_weather) +
+ggplot(data = weather_data) +
   geom_point(aes(x = time, y = precipitation_rate), size = 0.1)
 ```
 
 #### Your turn! 
 
 Try the following:
-* Convert temperature in K to C
-  * what other unit conversions would be useful?
-* plot two metrics of solar radiation flux. 
-  * What is the difference between these?
 
-Here is one way you might convert the given units into ones appropriate for the scale that you are working on:
+1. Convert temperature from K to C and plot data. 
+    * What other unit conversions would be useful?
+2. Plot two metrics of solar radiation flux side by side. 
+    * What is the difference between these?
+
+Here is one way you might convert the given units into ones appropriate for the scale 
+that you are working on. This creates a new dataframe with simplified column names 
+that contains only five of the meteorological variables. Two of these are converted. 
 
 ```{r convert-units}
-# from https://raw.githubusercontent.com/PecanProject/pecan/master/models/biocro/R/met2model.BIOCRO.R
 library(convertr)
-library(lubridate)
-met <- mac_weather %>% 
+subset_weather_data <- weather_data %>% 
   transmute(date = time,
             par = surface_downwelling_photosynthetic_photon_flux_in_air, 
             temperature = convert(air_temperature, "K", "degC"),
             rh = relative_humidity, 
             ws = wind_speed,
             precip = convert(precipitation_rate, "1/s", "1/min") * 5 )
-
-## your turn: summarize by day
-
-ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-12-01"))) +
-  geom_line(aes(date, precip))
 ```
 
-```{r precip-mm-m}
-ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-10-01"))) +
+Plot the time series of one of the converted variables for a subset of dates. 
+
+```{r plot-converted-unit}
+
+ggplot(data = subset_weather_data %>% filter(date > ymd("2017-01-19") & date < ymd("2017-01-23"))) +
+  geom_line(aes(date, precip)) +
   geom_point(aes(date, precip))
 ```
 
 #### A notice on reuseable code
 
-Did you see what we just did? We wrote some custom code to convert the units of our meteorological data. Wouldn't it be nice if that were available as a library function? In fact, it is. That code was from the function `cf2biocro()` in the PEcAn.BIOCRO package. It converts standard meteorological data to the format that the user wants.
+Did you see what we just did? We wrote some custom code to convert the units of 
+our meteorological data. Wouldn't it be nice if that were available as a library 
+function? In fact, it is. That code was from the function `cf2biocro()` in the 
+PEcAn.BIOCRO package. See the function
+[here](https://github.com/PecanProject/pecan/blob/develop/models/biocro/R/met2model.BIOCRO.R). 
+It converts standard meteorological data to the format that the user wants.
 
 # High resolution data (1/s) + spectroradiometer
 
@@ -233,6 +244,13 @@ This higher resolution weather data can be used for VNIR calibration, for exampl
 ## Lets see how data are downloaded
 
 Here we will download the files using the Clowder API, but note that if you have access to the filesystem (on www.workbench.terraref.org or globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger`. Folder
+
+```{r met-setup2}
+knitr::opts_chunk$set(eval = FALSE)
+api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+output_dir <- file.path(tempdir(), "downloads")
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+```
 
 ```{r query-clowder}
 library(jsonlite)
