@@ -59,7 +59,7 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 
 ### The Geostreams Database
 
-!(schema)[https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg]
+![Schema](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
 
 #### Querying the API
 
@@ -76,7 +76,7 @@ key query terms:
 
 How to find the stream_id from a particular station or sensor:
 
-1. find streams on "UA-MAC AZMET Weather Station" https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC AZMET Weather Station
+1. find streams on "UA-MAC AZMET Weather Station" https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
 2. take sensor id from that response and find the streams: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
 3. take stream id from that and use in the datapoints query: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 
