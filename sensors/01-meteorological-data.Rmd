@@ -63,27 +63,27 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 
 #### Querying the API
 
-key query terms:
+The data can be accessed using a URL. You can find data for a particular station, 
+a certain sensor from a station, or the datapoints from a sensor. Below are
+the URLs for the UA-MAC AZMET weather station, a certain sensor at that station, 
+and datapoints from that sensor for the month of January 2017. 
 
-* /sensors
-  * sensor_name=''
-* /streams
-  * 
-* /datapoints
-  * &since=YYYY-MM-DD
-  * &until=YYYY-MM-DD
-  * stream_id=
+* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
+* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
+* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 
-How to find the stream_id from a particular station or sensor:
+All URLs have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api/geostreams/), 
+then additional information is added for each type of data as shown below. 
 
-1. find streams on "UA-MAC AZMET Weather Station" https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
-2. take sensor id from that response and find the streams: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
-3. take stream id from that and use in the datapoints query: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+* Station: /sensors/sensor_name=[name]
+* Sensor: /sensors/[sensor number]/streams
+* Datapoints: /datapoints?stream_id=[datapoints number]&since=[start date]&until=[end date]
 
+Possible sensor numbers for a station are found on the page for that station under
+"id:", and then datapoints numbers are found on the sensor page under "stream_id:". 
 
-#### Locations with met data
-
-These are some of the locations with met data:
+The table belows lists the names of some stations that have available 
+meteorological data and associated stream ids. 
 
 | stream id | name                                     |
 |------------|------------------------------------------|
