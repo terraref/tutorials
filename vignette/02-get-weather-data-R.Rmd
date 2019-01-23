@@ -13,92 +13,40 @@ which is accessed using an API. Data across time for two of the weather
 variables, temperature and precipitation, are plotted in R. Lastly, how to get 
 the list of all possible weather variables is demonstrated. 
 
-### The Geostreams Database
+### The structure of the database
 
-![Schema](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
+The meteorological data that is collected for the TERRA REF project is contained in multiple related tables, also know as a [relational database](https://datacarpentry.org/sql-socialsci/01-relational-database/index.html). The first table contains data about the sensor that is collecting data. This is then linked to a stream table, which contains information about a datastream from the sensor. Sensors can have multiple datastreams. The actual weather data is in the third table, the datapoint table. A visual representation of this structure is shown below. 
 
-#### Querying the API
+![](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
 
-The data can be accessed using a URL. You can find data for a particular station, 
-a certain sensor from a station, or the datapoints from a sensor. Below are
-the URLs for the UA-MAC AZMET weather station, a certain sensor at that station, 
-and datapoints from that sensor for the month of January 2017. 
+In this vignette, we will be using data from a weather station at the Maricopa Agricultural Center, with datapoints for the month of January 2017 from a certain sensor. These data are five minute summaries aggregated from observations taken every second. 
 
-* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
-* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
-* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+
+### Creating the URL for the API
+
+In order to access the data, we need to contruct a URL that links to where the data is located on [Clowder](https://clowder.ncsa.illinois.edu/). The data is then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82), for Clowder. 
 
 All URLs have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api/geostreams/), 
-then additional information is added for each type of data as shown below. 
+then additional information is added for each type of data table as shown below. 
 
 * Station: /sensors/sensor_name=[name]
 * Sensor: /sensors/[sensor number]/streams
 * Datapoints: /datapoints?stream_id=[datapoints number]&since=[start date]&until=[end date]
 
+A certain time period can be specified for the datapoints. 
+
+For example, below are the URLs for the particular data being used in this vignette. These can be pasted into a browser to see how the data is stored as text using JSON. 
+
+* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
+* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
+* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+
 Possible sensor numbers for a station are found on the page for that station under
 "id:", and then datapoints numbers are found on the sensor page under "stream_id:". 
 
-The table belows lists the names of some stations that have available 
-meteorological data and associated stream ids. 
+### Download data using the command line
 
-| stream id | name                                     |
-|------------|------------------------------------------|
-| 3211        | UA-MAC AZMET Weather Station - weather  |
-| 3212        | UA-MAC AZMET Weather Station - irrigation     |
-| 46431        | UA-MAC AZMET Weather Station - weather (5 min)      |
-| 3208        | EnvironmentLogger sensor_weather_station |
-| 3207        | EnvironmentLogger sensor_par             |
-| 748        | EnvironmentLogger sensor_spectrum        |
-| 3210        | EnvironmentLogger sensor_co2             |
-| 4806       | UIUC Energy Farm SE                      |
-| 4807       | UIUC Energy Farm CEN                     |
-| 4805       | UIUC Energy Farm NE                      |
-
-
-Here is the json representation of a single five-minute observation:
-
-```
-[
-   {
-      "geometry":{
-         "type":"Point",
-         "coordinates":[
-            33.0745666667,
-            -111.9750833333,
-            0
-         ]
-      },
-      "start_time":"2016-08-30T00:06:24-07:00",
-      "type":"Feature",
-      "end_time":"2016-08-30T00:10:00-07:00",
-      "properties":{
-         "precipitation_rate":0.0,
-         "wind_speed":1.6207870370370374,
-         "surface_downwelling_shortwave_flux_in_air":0.0,
-         "northward_wind":0.07488770951583902,
-         "relative_humidity":26.18560185185185,
-         "air_temperature":300.17606481481516,
-         "eastward_wind":1.571286062845733,
-         "surface_downwelling_photosynthetic_photon_flux_in_air":0.0
-      }
-   },
-```
-
-
-### Querying weather sensor data stream
-
-The data represent 5 minute summaries aggregated from 1/s observations.
-
-#### Using Curl
-
-First, below is what the API looks like as a URL. Try pasting it into your browser.
-
-https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
-
-These data are for one stream within a chosen time period. They can be 
-automatically downloaded into a file on your computer by typing the following
-into the command line. This uses the URL from above and the new file is named
-spectra.json.
+Data can be downloaded from Clowder using the command line program Curl. If the following is typed into the commmand line, it will download the datapoints data that we're interested in as a file which we have chosen to call `spectra.json`. 
 
 ```{sh eval=FALSE}
 curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
