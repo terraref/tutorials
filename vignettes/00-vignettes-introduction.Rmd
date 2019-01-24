@@ -1,3 +1,0 @@
-# (PART\*) Secton 1: Vignettes {-}
-
-# Vignettes Introduction
