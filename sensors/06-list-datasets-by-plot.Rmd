@@ -1,6 +1,8 @@
 # Generating file lists by plot
 
-**Note:** you may need to get access permissions to perform the steps 
+## Pre-requisites: 
+
+* if you have not already done so, you will need to 1) sign up for the [beta user program](terraref.org/beta) and 2) sign up and be approved for access to the the [sensor data portal](terraref.ncsa.illinois.edu/clowder) in order to get the API key that will be used in this tutorial
 described in this tutorial. 
 
 The terrautils python package has a new `products` module that aids in connecting
