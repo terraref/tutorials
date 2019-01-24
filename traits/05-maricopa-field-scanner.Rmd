@@ -78,7 +78,7 @@ leaflet() %>%
 ```{r}
 ## Time series of canopy cover, height, NDVI
 
-#First look up variables by name. Let's look for measurements related to canopy size:
+First look up variables by name. Let's look for measurements related to canopy size:
 
 ```
 
