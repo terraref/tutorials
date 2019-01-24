@@ -28,17 +28,17 @@ theme_set(theme_bw())
 library(dplyr)
 ```
 
-Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. The public key will provide access to all metadata; you will need a personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
+Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. You will need this personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
 
 ```{r writing-key, echo = TRUE}
 # This should be done once with the key sent to you in your email
-# writeLines('abcdefg_rest_of_key_sent_in_email', 
+
+# Example:
+#writeLines('abcdefg_rest_of_key_sent_in_email',
 #            con = '.betykey')
 
-# Example with the public key:
-writeLines('9999999999999999999999999999999999999999', 
-           con = '.betykey_public')
 ```
+
 
 #### R - using the traits package
 
@@ -46,23 +46,22 @@ The R traits package is an API 'client'. It does two important things:
 1. It makes it easier to specify the query parameters without having to construct a URL
 2. It returns the results as a data frame, which is easier to use within R
 
-Lets start with the query of information about Sorghum from species table from above
+Lets start with the query of information about Sorghum from the species table
 
 ```{r query-species, results = 'hide', echo = TRUE}
 
 sorghum_info <- betydb_query(table = 'species',
-                            genus = "Sorghum",
-                            api_version = 'v1',
-                            limit = 'none',
-                            betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                            key = readLines('.betykey', warn = FALSE))
+                             genus = "Sorghum",
+                             api_version = 'v1',
+                             limit = 'none',
+                             betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
+                             key = readLines('.betykey', warn = FALSE))
 
 ```
 
 #### R - setting options for the traits package
 
 Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
-
 
 
 ```{r 03-set-up, echo = TRUE}
