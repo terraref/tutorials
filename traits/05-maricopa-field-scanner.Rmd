@@ -29,7 +29,7 @@ sites <- betydb_query(
 	city = "Maricopa", sitename = "~Season 2 range", limit = "none")
 ```
 
-A more robust (but complicated way) would be to query the experiments and experiments_sites tables. But we will leave that for later.
+A more robust (but complicated way) would be to query the experiments and experiments_sites tables. But we will leave that as an exercise for the ambitious user.
 
 ### Plot Season 2 plots
 
@@ -78,7 +78,7 @@ leaflet() %>%
 ```{r}
 ## Time series of canopy cover, height, NDVI
 
-#First look up variables by name. Let's look for measurements related to canopy size:
+First look up variables by name. Let's look for measurements related to canopy size:
 
 ```
 
