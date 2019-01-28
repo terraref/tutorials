@@ -13,6 +13,13 @@ which is accessed using an API. Data across time for two of the weather
 variables, temperature and precipitation, are plotted in R. Lastly, how to get 
 the list of all possible weather variables is demonstrated. 
 
+### Using the API to get data
+
+In order to access the data, we need to contruct a URL that links to where the 
+data is located on [Clowder](https://clowder.ncsa.illinois.edu/). The data is 
+then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
+, for Clowder. 
+
 ### The structure of the database
 
 The meteorological data that is collected for the TERRA REF project is contained 
@@ -30,13 +37,7 @@ Agricultural Center, with datapoints for the month of January 2017 from a
 certain sensor. These data are five minute summaries aggregated from 
 observations taken every second. 
 
-
-### Creating the URL for the API
-
-In order to access the data, we need to contruct a URL that links to where the 
-data is located on [Clowder](https://clowder.ncsa.illinois.edu/). The data is 
-then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
-, for Clowder. 
+### Creating the URLs for all data table types
 
 All URLs have the same beginning 
 (https://terraref.ncsa.illinois.edu/clowder/api/geostreams/), 
