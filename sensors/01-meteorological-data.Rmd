@@ -3,15 +3,13 @@ title: "01-meteorological-data.Rmd"
 output: html_document
 ---
 
+
+* Objectives:
+  * This tutorial will walk through the steps required to access meteorological data from the Maricopa Agricultural Center.
+* Pre-requisites
+  * need to have R packages tidyverse, jsonlite, and convertr installed. 
+
 ## The Maricopa Weather Station
-
-Locating the weather station via the geodashboard:
-
-TODO: screenshots / tutorials
-
-Geodashboard:
-
-[Sample raw meteorological (1/s) data on Clowder](https://terraref.ncsa.illinois.edu/clowder/files/588ba5474f0c06726acfcace?dataset=587fc7444f0cd67174e7a92d&space=57e42cd44f0cff4b58dd3eea)
 
 ## Meteorological data formats
 
@@ -145,14 +143,14 @@ into the command line. This uses the URL from above and the new file is named
 spectra.json.
 
 ```{sh eval=FALSE}
-curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-01&until=2017-12-31
 ```
 
 #### Using R
 
 The following code sets the defaults for showing R code. 
 ```{r met-setup}
-knitr::opts_chunk$set(cache = TRUE, message = FALSE)
+knitr::opts_chunk$set(cache = FALSE, message = FALSE)
 ```
 
 And this is how you can access the same data in R. This uses the jsonlite R package 
@@ -165,7 +163,7 @@ library(ggplot2)
 library(jsonlite)
 library(lubridate)
 
-weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
+weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-01&until=2017-12-31', flatten = FALSE)
 ```
 
 The `geometries` dataframe is then pulled out from these data, which contains
@@ -219,15 +217,14 @@ subset_weather_data <- weather_data %>%
             temperature = convert(air_temperature, "K", "degC"),
             rh = relative_humidity, 
             ws = wind_speed,
-            precip = convert(precipitation_rate, "1/s", "1/min") * 5 )
+            precip = convert(precipitation_rate, "1/s", "1/min") * 1/5 ) #orig. observations are 1/5 s
 ```
 
 Plot the time series of one of the converted variables for a subset of dates. 
 
 ```{r plot-converted-unit}
 
-ggplot(data = subset_weather_data %>% filter(date > ymd("2017-01-19") & date < ymd("2017-01-23"))) +
-  geom_line(aes(date, precip)) +
+ggplot(data = subset_weather_data) +
   geom_point(aes(date, precip))
 ```
 
