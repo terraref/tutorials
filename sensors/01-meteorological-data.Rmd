@@ -63,7 +63,7 @@ and datapoints from that sensor for the month of January 2017.
 * Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
 * Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 
-All URLs have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api/geostreams/), 
+All URLs have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
 then additional information is added for each type of data as shown below. 
 
 * Station: /sensors/sensor_name=[name]
