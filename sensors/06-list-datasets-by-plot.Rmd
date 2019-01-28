@@ -71,7 +71,7 @@ over the datasets allows the paths to all the files to be extracted.
 ```{python eval = FALSE}
 sensor = 'Thermal IR GeoTIFFs Datasets'
 sitename = 'MAC Field Scanner Season 1 Field Plot 101 W'
-key = 'INSERT YOUR KEY HERE' 
+key = 'INSERT YOUR KEY HERE'
 datasets = get_file_listing(None, url, key, sensor, sitename)
 files = extract_file_paths(datasets)
 ```
