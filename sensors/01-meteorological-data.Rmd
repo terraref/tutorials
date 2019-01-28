@@ -25,26 +25,16 @@ output: html_document
 
 | CF standard-name                          | units | bety         | isimip       | cruncep | narr  | ameriflux |
 |:------------------------------------------|:------|:-------------|:-------------|:--------|:------|:----------|
-| **air_temperature**                       | K     | airT         | tasAdjust    | tair    | air   | TA (C)    |
-| air_temperature_max                       | K     |              | tasmaxAdjust | NA      | tmax  |           |
-| air_temperature_min                       | K     |              | tasminAdjust | NA      | tmin  |           |
-| **air_pressure**                          | Pa    | air_pressure |              |         |       | PRESS (KPa) |
+| air_temperature                       | K     | airT         | tasAdjust    | tair    | air   | TA (C)    |
+| air_pressure                          | Pa    | air_pressure |              |         |       | PRESS (KPa) |
 | mole_fraction_of_carbon_dioxide_in_air    | mol/mol |            |              |         |       | CO2       |
-| moisture_content_of_soil_layer            | kg m-2 |             |              |         |       |           |
-| soil_temperature                          | K     | soilT        |              |         |       | TS1 *(NOT DONE)* |
 | relative_humidity                         | % | relative_humidity | rhurs       | NA      | rhum  | RH        |
-| **specific_humidity**                     | 1 | specific_humidity | NA          | qair    | shum  | CALC(RH)  |
-| water_vapor_saturation_deficit            | Pa    | VPD          |              |         |       | VPD *(NOT DONE)*     |
-| **surface_downwelling_longwave_flux_in_air** | W m-2 | same      | rldsAdjust   | lwdown  | dlwrf | Rgl       |
-| **surface_downwelling_shortwave_flux_in_air**| W m-2 |solar_radiation|rsdsAdjust| swdown  | dswrf | Rg        |
 | surface_downwelling_photosynthetic_photon_flux_in_air | mol m-2 s-1 | PAR |     |         |       | PAR *(NOT DONE)*          |
-| **precipitation_flux**                    |  kg m-2 s-1 | cccc   | prAdjust     | rain    | acpc  | PREC (mm/s)          |
+| precipitation_flux                    |  kg m-2 s-1 | cccc   | prAdjust     | rain    | acpc  | PREC (mm/s)          |
 |                                           | degrees | wind_direction |          |         |       | WD        |
 | wind_speed                                | m/s   | Wspd         |              |         |       | WS        |
-| **eastward_wind**                         | m/s   | eastward_wind |             |         |       | CALC(WS+WD) |
-| **northward_wind**                        | m/s   | northward_wind |            |         |       | CALC(WS+WD) |
 
-* preferred variables indicated in bold
+
 * variable names are from [MsTMIP](http://nacp.ornl.gov/MsTMIP_variables.shtml).
 * standard_name is CF-convention standard names
 * units can be converted by udunits, so these can vary (e.g. the time denominator may change with time frequency of inputs)
