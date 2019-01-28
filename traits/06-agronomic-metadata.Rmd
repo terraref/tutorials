@@ -90,6 +90,7 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
 
 
 ```{r 06_tibble, echo = TRUE, warning = FALSE}
+
 ## query and join tables
 species <- betydb_query(table = "species") %>%
   select(specie_id = id, scientificname, genus)
@@ -133,6 +134,7 @@ Let's do the manual equivalent of a cross-table join. BETY actually does contain
 The key idea here is that each treatment is associated with some (possibly many) managements, but the treatments table only reports the number of associated managements. To see the management IDs themselves, we need to query an individual treatment ID. So, we retrieve one table, then iterate over each row extracting the foreign keys for the other table. This requires an API call for every treatment, so beware that it is likely to be slow!
 
 ```{r 06_cross_join, echo = TRUE, results = 'hide'}
+
 treatments <- betydb_query(table = 'treatments') %>%
   select(treatment_id = id , name, definition, control)
 

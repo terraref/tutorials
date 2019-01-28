@@ -31,6 +31,7 @@ sites <- betydb_query(
 
 A more robust (but complicated way) would be to query the experiments and experiments_sites tables. But we will leave that as an exercise for the ambitious user.
 
+
 ### Plot Season 2 plots
 
 ```{r traits-05-map-mac-polygons, echo = TRUE}
@@ -38,6 +39,7 @@ A more robust (but complicated way) would be to query the experiments and experi
 site_bounds <- sites %>%
   rowwise() %>%
   do(boundaries = readWKT(text = .$geometry, id = .$id))
+
 
 site_bounds <- do.call('rbind', site_bounds$boundaries)
 #names(site_bounds) <- sites$sitename
@@ -78,7 +80,9 @@ leaflet() %>%
 ```{r}
 ## Time series of canopy cover, height, NDVI
 
-First look up variables by name. Let's look for measurements related to canopy size:
+#First look up variables by name. Let's look for measurements related to canopy size:
+
+```
 
 ```
 

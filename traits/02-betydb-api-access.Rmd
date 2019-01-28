@@ -26,6 +26,7 @@ The first step toward reproducible pipelines is to automate the process of searc
 ### Using Your API key to Connect
 
 An API key is like a password. It allows you to access data, and should be kept private. 
+
 Therefore, we are not going to put it in code that we share. 
 
 A common way of handling private API keys is to place it in a text file in your current directory. Don't put it in a project directory where it might be inadvertently shared.
@@ -39,6 +40,7 @@ Here is how to find and save your API key:
 An API key is not needed to access public data. This includes metadata tables and simulated data in the https://terraref.ncsa.illinois.edu/bety-test database.
 
 
+
 ## Accessing data using a URL query
 
 
@@ -48,7 +50,9 @@ An API key is not needed to access public data. This includes metadata tables an
 * path to the api: `/api/v1`
 * api endpoint: `/search` or `traits` or `sites`. For BETYdb, these are the names of database tables. 
 * Query parameters: `genus=Sorghum`
+
 * Authentication: `key=api_key` is your assigned API key. This will only be needed when querying trait data. No key is needed to access the public metadata tables.
+
 
 ### Constructing a URL query
 
@@ -72,6 +76,7 @@ First, lets construct a query by putting together a URL.
 
 > What will the URL https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum return?
 
+
 > Write a URL that will query the database for sites with "Field Scanner" in the name field. Hint: combine two terms with a `+` as in `Field+Scanner`
 
 What do you see? Do you think that this is all of the records? What happens if you add `&limit=none`? 
@@ -94,6 +99,7 @@ curl -o sorghum.json \
 
 ## Using the R jsonlite package to access the API with a URL query 
 
+
 ```{r 02-jsonlite-load, include = FALSE}
 
 library(jsonlite)
@@ -104,7 +110,7 @@ library(jsonlite)
 sorghum.json <- readLines(
   paste0("https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum&key=", 
          readLines('.betykey')))
-
+         
 ## print(sorghum.json) 
 ## not a particularly useful format
 ## lets convert to a data frame
