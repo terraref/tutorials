@@ -24,6 +24,16 @@ other files containing the data the sensors have collected.
    * this can be installed from pypi by running `pip install terrautils` in the terminal
 * an API key to access these data
 
+The API key is a string that gets generated upon request through your Clowder account. Existing
+API keys will work with this vignette. To get a new API key it is necessary to first register 
+with Clowder at "https://terraref.ncsa.illinois.edu/clowder/". First click the `Login` button and 
+wait for the login screen to appear. Then select the `Sign up` button and enter an email
+address you have access to. An email is sent to the entered address with instructions for 
+completing the registration process. Once registration is complete, log 
+into Clowder and select the `View profile` menu option from the drop-down that is near the search 
+control. By clicking the `+ Add` button under "User API Keys" heading in the profile page, a new 
+key is gnerated that can be used.
+
 ## Locating the images
 
 To begin looking for files, a sensor name and site name are needed. We will be using 
