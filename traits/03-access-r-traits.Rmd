@@ -27,8 +27,8 @@ library(ggthemes)
 theme_set(theme_bw())
 library(dplyr)
 ```
-
 Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. You will need this personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
+
 
 ```{r writing-key, echo = TRUE}
 # This should be done once with the key sent to you in your email
@@ -63,7 +63,6 @@ sorghum_info <- betydb_query(table = 'species',
 
 Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
 
-
 ```{r 03-set-up, echo = TRUE}
 options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
@@ -73,6 +72,7 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
 Now the same query can be reduced to:
 
 ```{r query-species-reduce, message = FALSE, echo = TRUE}
+
 sorghum_info <- betydb_query(table = 'species',
                              genus = "Sorghum",
                              limit = 'none')
@@ -81,6 +81,7 @@ sorghum_info <- betydb_query(table = 'species',
 ### Time series of height
 
 Now let's query some trait data.
+
 ```{r canopy_height, echo = TRUE, message = FALSE}
 canopy_height <- betydb_query(table     = 'search',
                                trait     = "canopy_height",
@@ -89,6 +90,7 @@ canopy_height <- betydb_query(table     = 'search',
 ```
 
 ```{r plot_height}
+
 ggplot(data = canopy_height,
        aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean)) +
   geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
@@ -96,5 +98,6 @@ ggplot(data = canopy_height,
   xlab("Day of Year") + ylab("Plant Height") +
   guides(color = guide_legend(title = 'Genotype')) +
   theme_bw()
+  
 ```
 

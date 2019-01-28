@@ -1,7 +1,8 @@
 # Danforth Indoor Phenotype Analysis
 
 ```{r 02-setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
+
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 library(jsonlite)
 library(dplyr)
 library(ggplot2)
@@ -21,6 +22,7 @@ library(traits)
 Unlike the first two tutorials, now we will be querying real data from the public TERRA REF database. So we will use a new URL, https://terraref.ncsa.illinois.edu/bety/, and we will need to use our own private key.
 
 ```{r terraref-connect-options}
+
 options(betydb_key = readLines('.betykey', warn = FALSE),
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
