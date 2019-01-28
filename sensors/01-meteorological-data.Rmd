@@ -57,11 +57,12 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 The data can be accessed using a URL. You can find data for a particular station, 
 a certain sensor from a station, or the datapoints from a sensor. Below are
 the URLs for the UA-MAC AZMET weather station, a certain sensor at that station, 
-and datapoints from that sensor for the month of January 2017. 
+and datapoints from that sensor for April 2018 through to the first day of 
+August 2018. 
 
 * Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
 * Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
-* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
 
 All URLs have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
 then additional information is added for each type of data as shown below. 
@@ -128,7 +129,7 @@ The data represent 5 minute summaries aggregated from 1/s observations.
 
 First, below is what the API looks like as a URL. Try pasting it into your browser.
 
-https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
 
 These data are for one stream within a chosen time period. They can be 
 automatically downloaded into a file on your computer by typing the following
@@ -136,7 +137,7 @@ into the command line. This uses the URL from above and the new file is named
 spectra.json.
 
 ```{sh eval=FALSE}
-curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-01&until=2017-12-31
+curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
 ```
 
 #### Using R
@@ -156,7 +157,7 @@ library(ggplot2)
 library(jsonlite)
 library(lubridate)
 
-weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-01&until=2017-12-31', flatten = FALSE)
+weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01', flatten = FALSE)
 ```
 
 The `geometries` dataframe is then pulled out from these data, which contains
