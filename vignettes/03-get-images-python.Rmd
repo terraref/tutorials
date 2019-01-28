@@ -32,7 +32,7 @@ address you have access to. An email is sent to the entered address with instruc
 completing the registration process. Once registration is complete, log 
 into Clowder and select the `View profile` menu option from the drop-down that is near the search 
 control. By clicking the `+ Add` button under "User API Keys" heading in the profile page, a new 
-key is gnerated that can be used.
+key is gnerated.
 
 ## Locating the images
 
