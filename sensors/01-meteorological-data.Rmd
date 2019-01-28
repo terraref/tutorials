@@ -168,25 +168,19 @@ weather_data <- weather_all$properties %>%
   mutate(time = ymd_hms(weather_all$end_time))
 ```
 
-## Weather Plots
+### Weather Plots
 
-#### Wind Speed
-
-Create a time series plot of one of the eight variables in the newly created dataframe. 
+Create overlaid time series plots for two of the eight variables, wind speed and 
+precipitation rate, in the newly created dataframe. 
 
 ```{r weather}
 theme_set(ggthemes::theme_few())
 ggplot(data = weather_data) +
-  geom_point(aes(x = time, y = wind_speed), size = 0.1)
-```
-
-#### Rainfall
-
-A time series plot of another one of the variables. 
-
-```{r precipitation}
-ggplot(data = weather_data) +
-  geom_point(aes(x = time, y = precipitation_rate), size = 0.1)
+  geom_point(aes(x = time, y = wind_speed), size = 0.7, color = "grey", alpha = 0.5) +
+  geom_point(aes(x = time, y = precipitation_rate/2), size = 0.7, color = "red") +
+  labs(x = "Date", y = "Speed of wind (m/s)") +
+  scale_y_continuous(sec.axis = sec_axis(~.*2, name = "Rate of precipitation (kg/m2s)")) +
+  theme(legend.position = c(0.5, 0.5))
 ```
 
 # High resolution data (1/s) + spectroradiometer
