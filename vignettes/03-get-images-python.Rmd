@@ -18,6 +18,12 @@ As an added bonus we've also included an exmple of how to retrieve the list of a
 sensor names through the API. By using the sensor names returned, it's possible to retrieve
 other files containing the data the sensors have collected.
 
+**requirements** 
+* Python 3 
+* the terrautils library
+   * this can be installed from pypi by running `pip install terrautils` in the terminal
+* an API key to access these data
+
 ## Locating the images
 
 To begin looking for files, a sensor name and site name are needed. We will be using 
