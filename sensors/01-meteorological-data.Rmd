@@ -3,11 +3,14 @@ title: "01-meteorological-data.Rmd"
 output: html_document
 ---
 
+Objectives:
 
-* Objectives:
   * This tutorial will walk through the steps required to access meteorological data from the Maricopa Agricultural Center.
-* Pre-requisites
-  * need to have R packages tidyverse, jsonlite, and convertr installed. 
+
+Pre-requisites: 
+
+  * Need to have R packages tidyverse, jsonlite, and convertr installed. 
+  * Need to have an internet connection. 
 
 ## The Maricopa Weather Station
 
