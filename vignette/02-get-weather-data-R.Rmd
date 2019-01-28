@@ -73,7 +73,7 @@ curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geost
 
 ### Read in data using R
 
-```{r met-setup, include=FALSE}
+```{r met-vignette-setup, include=FALSE}
 knitr::opts_chunk$set(cache = TRUE, message = FALSE)
 ```
 
@@ -82,7 +82,7 @@ are calling that library along with several others that will be used to clean
 and plot the data. The data is read in by the `fromJSON` function as a dataframe 
 that also has two nested dataframes, called `properties` and `geometries`. 
 
-```{r met-geostream}
+```{r met-geostream-example}
 library(dplyr)
 library(ggplot2)
 library(jsonlite)
