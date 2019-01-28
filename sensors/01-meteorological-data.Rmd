@@ -189,47 +189,6 @@ ggplot(data = weather_data) +
   geom_point(aes(x = time, y = precipitation_rate), size = 0.1)
 ```
 
-#### Your turn! 
-
-Try the following:
-
-1. Convert temperature from K to C and plot data. 
-    * What other unit conversions would be useful?
-2. Plot two metrics of solar radiation flux side by side. 
-    * What is the difference between these?
-
-Here is one way you might convert the given units into ones appropriate for the scale 
-that you are working on. This creates a new dataframe with simplified column names 
-that contains only five of the meteorological variables. Two of these are converted. 
-
-```{r convert-units}
-library(convertr)
-subset_weather_data <- weather_data %>% 
-  transmute(date = time,
-            par = surface_downwelling_photosynthetic_photon_flux_in_air, 
-            temperature = convert(air_temperature, "K", "degC"),
-            rh = relative_humidity, 
-            ws = wind_speed,
-            precip = convert(precipitation_rate, "1/s", "1/min") * 1/5 ) #orig. observations are 1/5 s
-```
-
-Plot the time series of one of the converted variables for a subset of dates. 
-
-```{r plot-converted-unit}
-
-ggplot(data = subset_weather_data) +
-  geom_point(aes(date, precip))
-```
-
-#### A notice on reuseable code
-
-Did you see what we just did? We wrote some custom code to convert the units of 
-our meteorological data. Wouldn't it be nice if that were available as a library 
-function? In fact, it is. That code was from the function `cf2biocro()` in the 
-PEcAn.BIOCRO package. See the function
-[here](https://github.com/PecanProject/pecan/blob/develop/models/biocro/R/met2model.BIOCRO.R). 
-It converts standard meteorological data to the format that the user wants.
-
 # High resolution data (1/s) + spectroradiometer
 
 This higher resolution weather data can be used for VNIR calibration, for example. But at 1/s it is very large!
