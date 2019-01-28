@@ -10,10 +10,13 @@ The terrautils python package has a new `products` module that aids in connectin
 plot boundaries stored within betydb with the file-based data products available
 from the workbench or Globus.
 
+* if are using Rstudio and want to run the Python code chunks, the R package "reticulate" is required
+* use `pip install terrautils` to install the terrautils Python library
+
 ## Getting started
 
 After installing terrautils, you should be able to import the `products` module.
-```{python eval=FALSE}
+```{python}
 from terrautils.products import get_sensor_list, unique_sensor_names
 from terrautils.products import get_file_listing, extract_file_paths
 ```
@@ -21,7 +24,7 @@ from terrautils.products import get_file_listing, extract_file_paths
 The `get_sensor_list` and `get_file_listing` functions both require the *connection*,
 *url*, and *key* parameters. The *connection* can be 'None'. The *url* (called host in the
 code) should be something like `https://terraref.ncsa.illinois.edu/clowder/`.
-The *key* is a unique access key for the Clowder api.
+The *key* is a unique access key for the Clowder API.
 
 ## Getting the sensor list
 
@@ -32,10 +35,20 @@ a plot id number. The utility function `unique_sensor_names` accpets the
 sensor list and provides a list of names suitable for use in the 
 `get_file_listing` function.
 
-```{python eval=FALSE}
+We are only going to be working with public data in this tutorial, so we can 
+use an empty API key.
+
+```{python}
+url = 'https://terraref.ncsa.illinois.edu/clowder/'
+key = ''
+```
+
+```{python}
 sensors = get_sensor_list(None, url, key)
 names = unique_sensor_names(sensors)
+print(names)
 ```
+
 
 Names will now contain a list of sensor names available in the Clowder
 geostreams API. The list of returned sensor names could be something like the 
@@ -55,9 +68,10 @@ The geostreams API can be used to get a list of datasets that overlap a
 specific plot boundary and, optionally, limited by a time range. Iterating 
 over the datasets allows the paths to all the files to be extracted.
 
-```{python eval=FALSE}
+```{python eval = FALSE}
 sensor = 'Thermal IR GeoTIFFs Datasets'
 sitename = 'MAC Field Scanner Season 1 Field Plot 101 W'
+key = 'INSERT YOUR KEY HERE'
 datasets = get_file_listing(None, url, key, sensor, sitename)
 files = extract_file_paths(datasets)
 ```
@@ -73,6 +87,10 @@ dataset = get_file_listing(None, url, key, sensor, sitename,
 
 # Querying the API
 
+<!-- 
+TODO: move this to a separate tutorial page focused on using curl
+-->
+
 The source files behind the data are available for downloading through the API. By executing a series
 of requests against the API it's possible to determine the files of interest and then download them.
 
@@ -82,7 +100,7 @@ to see how then end of the URL changes depending upon the reuqest.
 
 Below is what the API looks like as a URL. Try pasting it into your browser.
 
-https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W
+[https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W](https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W)
 
 This will return data for the requested plot including its id. This id (or identifier) can then be used for 
 additional queries against the API.
@@ -92,6 +110,8 @@ API is accessed through URLs, it's possible to use the URLs in software programs
 to retrieve its data. 
 
 ## A Word of Caution
+
+We are no longer using the python terrautils package, which is a python library that provides helper functions that simplify interactions with the Clowder API. One of the ways it makes the interface easier is by using function names that make sense in the scope of the project. The API and the Clowder database have different names and _this is confusing_ since the same names are used for different parts of the database.
 
 The names and meanings of variables in this section don't necessarily match the ones in the section 
 above and it may be easy to get them confused. The API queries the database directly and thereby reflects 
