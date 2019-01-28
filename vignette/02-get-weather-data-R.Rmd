@@ -40,7 +40,7 @@ observations taken every second.
 ### Creating the URLs for all data table types
 
 All URLs have the same beginning 
-(https://terraref.ncsa.illinois.edu/clowder/api/geostreams/), 
+(https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
 then additional information is added for each type of data table as shown below. 
 
 * Station: /sensors/sensor_name=[name]
