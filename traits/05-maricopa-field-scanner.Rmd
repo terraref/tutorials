@@ -88,7 +88,7 @@ leaflet() %>%
 
 ```{r traits-05-height-cover-ndvi}
 #variables <- betydb_query(
-#		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$")
+#		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$") # a tilde ~ can be used to partially match a string #the tilde is used in this query to get variable names that contain either 'NDVI', 'canopy_height', or 'canopy_cover'
 
 #variables %>% 
 #  select(id, name, units, n_records = `number of associated traits`)
