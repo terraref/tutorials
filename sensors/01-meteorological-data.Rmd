@@ -3,24 +3,16 @@ title: "01-meteorological-data.Rmd"
 output: html_document
 ---
 
-```{r met-setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+Objectives:
 
-api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
-output_dir <- file.path(tempdir(), "downloads")
-dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+  * This tutorial will walk through the steps required to access meteorological data from the Maricopa Agricultural Center.
 
-```
+Pre-requisites: 
+
+  * Need to have R packages tidyverse, jsonlite, and convertr installed. 
+  * Need to have an internet connection. 
 
 ## The Maricopa Weather Station
-
-Locating the weather station via the geodashboard:
-
-TODO: screenshots / tutorials
-
-Geodashboard:
-
-[Sample raw meteorological (1/s) data on Clowder](https://terraref.ncsa.illinois.edu/clowder/files/588ba5474f0c06726acfcace?dataset=587fc7444f0cd67174e7a92d&space=57e42cd44f0cff4b58dd3eea)
 
 ## Meteorological data formats
 
@@ -36,26 +28,16 @@ Geodashboard:
 
 | CF standard-name                          | units | bety         | isimip       | cruncep | narr  | ameriflux |
 |:------------------------------------------|:------|:-------------|:-------------|:--------|:------|:----------|
-| **air_temperature**                       | K     | airT         | tasAdjust    | tair    | air   | TA (C)    |
-| air_temperature_max                       | K     |              | tasmaxAdjust | NA      | tmax  |           |
-| air_temperature_min                       | K     |              | tasminAdjust | NA      | tmin  |           |
-| **air_pressure**                          | Pa    | air_pressure |              |         |       | PRESS (KPa) |
+| air_temperature                       | K     | airT         | tasAdjust    | tair    | air   | TA (C)    |
+| air_pressure                          | Pa    | air_pressure |              |         |       | PRESS (KPa) |
 | mole_fraction_of_carbon_dioxide_in_air    | mol/mol |            |              |         |       | CO2       |
-| moisture_content_of_soil_layer            | kg m-2 |             |              |         |       |           |
-| soil_temperature                          | K     | soilT        |              |         |       | TS1 *(NOT DONE)* |
 | relative_humidity                         | % | relative_humidity | rhurs       | NA      | rhum  | RH        |
-| **specific_humidity**                     | 1 | specific_humidity | NA          | qair    | shum  | CALC(RH)  |
-| water_vapor_saturation_deficit            | Pa    | VPD          |              |         |       | VPD *(NOT DONE)*     |
-| **surface_downwelling_longwave_flux_in_air** | W m-2 | same      | rldsAdjust   | lwdown  | dlwrf | Rgl       |
-| **surface_downwelling_shortwave_flux_in_air**| W m-2 |solar_radiation|rsdsAdjust| swdown  | dswrf | Rg        |
 | surface_downwelling_photosynthetic_photon_flux_in_air | mol m-2 s-1 | PAR |     |         |       | PAR *(NOT DONE)*          |
-| **precipitation_flux**                    |  kg m-2 s-1 | cccc   | prAdjust     | rain    | acpc  | PREC (mm/s)          |
+| precipitation_flux                    |  kg m-2 s-1 | cccc   | prAdjust     | rain    | acpc  | PREC (mm/s)          |
 |                                           | degrees | wind_direction |          |         |       | WD        |
 | wind_speed                                | m/s   | Wspd         |              |         |       | WS        |
-| **eastward_wind**                         | m/s   | eastward_wind |             |         |       | CALC(WS+WD) |
-| **northward_wind**                        | m/s   | northward_wind |            |         |       | CALC(WS+WD) |
 
-* preferred variables indicated in bold
+
 * variable names are from [MsTMIP](http://nacp.ornl.gov/MsTMIP_variables.shtml).
 * standard_name is CF-convention standard names
 * units can be converted by udunits, so these can vary (e.g. the time denominator may change with time frequency of inputs)
@@ -68,31 +50,32 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 
 ### The Geostreams Database
 
-!(schema)[https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg]
+![Schema](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
 
 #### Querying the API
 
-key query terms:
+The data can be accessed using a URL. You can find data for a particular station, 
+a certain sensor from a station, or the datapoints from a sensor. Below are
+the URLs for the UA-MAC AZMET weather station, a certain sensor at that station, 
+and datapoints from that sensor for April 2018 through to the first day of 
+August 2018. 
 
-* /sensors
-  * sensor_name=''
-* /streams
-  * 
-* /datapoints
-  * &since=YYYY-MM-DD
-  * &until=YYYY-MM-DD
-  * stream_id=
+* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
+* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
+* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
 
-How to find the stream_id from a particular station or sensor:
+All URLs have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
+then additional information is added for each type of data as shown below. 
 
-1. find streams on "UA-MAC AZMET Weather Station" https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC AZMET Weather Station
-2. take sensor id from that response and find the streams: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
-3. take stream id from that and use in the datapoints query: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+* Station: /sensors/sensor_name=[name]
+* Sensor: /sensors/[sensor number]/streams
+* Datapoints: /datapoints?stream_id=[datapoints number]&since=[start date]&until=[end date]
 
+Possible sensor numbers for a station are found on the page for that station under
+"id:", and then datapoints numbers are found on the sensor page under "stream_id:". 
 
-#### Locations with met data
-
-These are some of the locations with met data:
+The table belows lists the names of some stations that have available 
+meteorological data and associated stream ids. 
 
 | stream id | name                                     |
 |------------|------------------------------------------|
@@ -144,87 +127,59 @@ The data represent 5 minute summaries aggregated from 1/s observations.
 
 #### Using Curl
 
-First, this is what the API looks like as a URL. Try pasting it into your browser
+First, below is what the API looks like as a URL. Try pasting it into your browser.
 
-https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
 
-This is how you can automatically download the met data to a local file:
+These data are for one stream within a chosen time period. They can be 
+automatically downloaded into a file on your computer by typing the following
+into the command line. This uses the URL from above and the new file is named
+spectra.json.
 
 ```{sh eval=FALSE}
-curl -O spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
 ```
 
-And this is how you can access the data in R:
+#### Using R
 
+The following code sets the defaults for showing R code. 
+```{r met-setup}
+knitr::opts_chunk$set(cache = FALSE, message = FALSE)
+```
+
+And this is how you can access the same data in R. This uses the jsonlite R package 
+and desired URL to pull the data in. The data is in a dataframe with two nested
+dataframes, called `properties` and `geometries`. 
 
 ```{r met-geostream}
 library(dplyr)
 library(ggplot2)
 library(jsonlite)
+library(lubridate)
 
-mac_weather.list <- jsonlite::fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
-
-# change time to human-readable
-mac_weather <- mac_weather.list$properties %>% 
-  mutate(time = lubridate::ymd_hms(mac_weather.list$end_time))
+weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01', flatten = FALSE)
 ```
 
-### Using 
+The `geometries` dataframe is then pulled out from these data, which contains
+the datapoints from this stream. This is combined with a transformed version of the
+end of the time period from the stream. 
 
-## Weather Summary
+```{r met-datapoints}
+weather_data <- weather_all$properties %>% 
+  mutate(time = ymd_hms(weather_all$end_time))
+```
 
+### Weather Plots
 
-#### Wind Speed
+Create time series plot for one of the eight variables, wind speed, in the 
+newly created dataframe. 
 
 ```{r weather}
 theme_set(ggthemes::theme_few())
-ggplot(data = mac_weather) +
-  geom_point(aes(x = time, y = wind_speed), size = 0.1)
+ggplot(data = weather_data) +
+  geom_point(aes(x = time, y = wind_speed), size = 0.7) +
+  labs(x = "Day", y = "Wind speed (m/s)")
 ```
-
-#### Rainfall
-
-```{r precipitation}
-ggplot(data = mac_weather) +
-  geom_point(aes(x = time, y = precipitation_rate), size = 0.1)
-```
-
-#### Your turn! 
-
-Try the following:
-* Convert temperature in K to C
-  * what other unit conversions would be useful?
-* plot two metrics of solar radiation flux. 
-  * What is the difference between these?
-
-Here is one way you might convert the given units into ones appropriate for the scale that you are working on:
-
-```{r convert-units}
-# from https://raw.githubusercontent.com/PecanProject/pecan/master/models/biocro/R/met2model.BIOCRO.R
-library(convertr)
-library(lubridate)
-met <- mac_weather %>% 
-  transmute(date = time,
-            par = surface_downwelling_photosynthetic_photon_flux_in_air, 
-            temperature = convert(air_temperature, "K", "degC"),
-            rh = relative_humidity, 
-            ws = wind_speed,
-            precip = convert(precipitation_rate, "1/s", "1/min") * 5 )
-
-## your turn: summarize by day
-
-ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-12-01"))) +
-  geom_line(aes(date, precip))
-```
-
-```{r precip-mm-m}
-ggplot(data = met %>% filter(date > ymd("2016-08-01") & date < ymd("2016-10-01"))) +
-  geom_point(aes(date, precip))
-```
-
-#### A notice on reuseable code
-
-Did you see what we just did? We wrote some custom code to convert the units of our meteorological data. Wouldn't it be nice if that were available as a library function? In fact, it is. That code was from the function `cf2biocro()` in the PEcAn.BIOCRO package. It converts standard meteorological data to the format that the user wants.
 
 # High resolution data (1/s) + spectroradiometer
 
@@ -233,6 +188,13 @@ This higher resolution weather data can be used for VNIR calibration, for exampl
 ## Lets see how data are downloaded
 
 Here we will download the files using the Clowder API, but note that if you have access to the filesystem (on www.workbench.terraref.org or globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger`. Folder
+
+```{r met-setup2}
+knitr::opts_chunk$set(eval = FALSE)
+api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+output_dir <- file.path(tempdir(), "downloads")
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+```
 
 ```{r query-clowder}
 library(jsonlite)
