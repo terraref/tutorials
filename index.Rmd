@@ -42,6 +42,7 @@ At a minimum, you should have:
 We have tried to write these tutorials using open access sample data sets. However, access to much of the data will require you to 1) fill out the TERRA REF Beta user questionaire ([terraref.org/beta](terraref.org/beta)) and 2) request access to specific databases.
 
 <!-- Not sure where this goes, either in documentation or perhaps in an appendix. But I don't think this belongs in the introduction. Perhaps after the vignettes chaper 
+-->
 
 ## Ways of Acessing Data
 
@@ -72,7 +73,10 @@ The TERRA REF Technical Documentation: [docs.terraref.org](docs.terraref.org)
   - about the data in the [reference-data repository](https://github.com/terraref/reference-data/issues)
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE,
+                      engine.path = list(
+                        python = 'python3'
+                      ))
 
 options(warn = -1)
 ```
