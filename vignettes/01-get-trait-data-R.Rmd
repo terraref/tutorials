@@ -41,7 +41,7 @@ Note: the `betydb_key` option only needs to be set when accessing non-public dat
 
 ```{r options-setup}
 
-options(betydb_key = readLines('.betykey', warn = FALSE), #need to comment this out later
+options(# betydb_key = 'Your API Key', # to access non-public data
         betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 
