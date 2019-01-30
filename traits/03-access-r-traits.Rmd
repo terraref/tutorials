@@ -84,7 +84,7 @@ Now let's query some trait data.
 ```{r canopy_height, echo = TRUE, message = FALSE}
 canopy_height <- betydb_query(table     = 'search',
                                trait     = "canopy_height",
-                               sitename  = "~Season 2",
+                               sitename  = "~Season 6",
                                limit     = 'none')
 ```
 
