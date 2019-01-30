@@ -29,7 +29,8 @@ sites <- betydb_query(
 	city = "Maricopa", sitename = "~Season 2 range", limit = "none")
 ```
 
-A more robust (but complicated way) would be to query the experiments and experiments_sites tables. But we will leave that for later.
+A more robust (but complicated way) would be to query the experiments and experiments_sites tables. But we will leave that as an exercise for the ambitious user.
+
 
 ### Plot Season 2 plots
 
@@ -38,6 +39,7 @@ A more robust (but complicated way) would be to query the experiments and experi
 site_bounds <- sites %>%
   rowwise() %>%
   do(boundaries = readWKT(text = .$geometry, id = .$id))
+
 
 site_bounds <- do.call('rbind', site_bounds$boundaries)
 #names(site_bounds) <- sites$sitename
@@ -82,9 +84,11 @@ leaflet() %>%
 
 ```
 
+```
+
 ```{r traits-05-height-cover-ndvi}
 #variables <- betydb_query(
-#		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$")
+#		table = "variables", name = "~^(NDVI|canopy_height|canopy_cover|)$") # a tilde ~ can be used to partially match a string #the tilde is used in this query to get variable names that contain either 'NDVI', 'canopy_height', or 'canopy_cover'
 
 #variables %>% 
 #  select(id, name, units, n_records = `number of associated traits`)

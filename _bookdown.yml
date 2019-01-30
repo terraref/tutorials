@@ -3,6 +3,7 @@ output_dir: "docs"
 language:
   ui:
     chapter_name: "Chapter "
-rmd_files: ["index.Rmd", "traits/00-BETYdb-getting-started.Rmd", "traits/01-web-access.Rmd", 
-"traits/02-betydb-api-access.Rmd", "traits/03-access-r-traits.Rmd", "traits/04-danforth-indoor-phenotyping-facility.Rmd",
-"traits/05-maricopa-field-scanner.Rmd", "traits/06-agronomic-metadata.Rmd", "traits/07-betydb-sql-access.Rmd", "traits/10-simulated-sorghum.Rmd"]
+rmd_files: ["index.Rmd", "vignettes/00-introduction.Rmd", "vignettes/01-get-trait-data-R.Rmd", "vignettes/02-get-weather-data-R.Rmd",
+"vignettes/03-get-images-python.Rmd", "vignettes/04-synthesis-data.Rmd", "traits/03-access-r-traits.Rmd","sensors/01-meteorological-data.Rmd",
+"sensors/06-list-datasets-by-plot.Rmd"]
+

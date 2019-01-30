@@ -1,0 +1,171 @@
+# Accessing trait data in R 
+
+```{r chunk-options-setup, echo = FALSE}
+
+options(width = 100)
+
+```
+
+# Introduction
+
+The objective of this vignette is to demonstrate to users how to query TERRA REF trait data using the traits package. The traits package allows users to easily pass query parameters into a R function, and returns the data in a tabular format that can be analyzed. 
+
+Through this vignette, users will learn how to query and visualize season 6 canopy height data for May 2018. In addition, users will also be shown how to find more information on a season, such as available traits and dates, when performing their own queries. 
+
+\newline
+\newline
+
+# Getting Started
+
+First, you will need to install and load the traits package from github.
+
+```{r traits-setup, message = FALSE, results = FALSE}
+
+devtools::install_github('terraref/traits', force = TRUE)
+library(traits)
+
+
+```
+
+\newline
+\newline
+
+# How to query trait data
+
+## Setting options
+
+The function that you will be using to perform your queries is `betydb_query`. Options can be set to reduce the number of arguments that need to be passed into the function.
+
+Note: the `betydb_key` option only needs to be set when accessing non-public data. We will be using public data, so this option does not need to be set. However, when needed, pass in the API key that you were assigned when you first registered for access to the TERRA REF database. The key should be kept private and saved to a file named `.betykey` in your current directory. If you are having trouble locating your API key, you can go to [https://terraref.ncsa.illinois.edu/bety/users](https://terraref.ncsa.illinois.edu/bety/users). 
+
+
+```{r options-setup}
+
+options(# betydb_key = 'Your API Key', # to access non-public data
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'v1')
+
+```
+
+## An example: Season 6 canopy height data
+
+The following is an example of how to query season 6, canopy height data for May 2018. 
+
+```{r canopy_height_query, message = FALSE}
+
+canopy_height <- betydb_query(table     = "search", 
+                              trait     = "canopy_height", 
+                              sitename  = "~Season 6",
+                              date      = "~2018 May",
+                              limit     =  "none")
+
+
+```
+
+A breakdown of the above query:
+
+* `table = "search"`
+    + Specify a table to query with the `table` parameter. Trait data may be queried using the `search` table.
+
+* `trait = "canopy_height"`
+    + Specify the trait of interest with the `trait` parameter.
+    + Trait names must be expressed exactly as they are in the TERRA REF databse. So passing in `Canopy height` instead of `canopy_height` would give NULL results.
+    + More information on how to determine available traits for a season can be found below under `How to query other seasons, traits, and dates`.
+    
+* `sitename = "~Season 6"`
+    + Indicate the sites that you would like to query using the `sitename` parameter. 
+    + A tilde `~` is used in this query to get all sitenames that contain `Season 6` 
+
+* `date = "~2018 May"`
+    + Indicate the date of data collection using the `date` parameter.
+    + A tilde `~` is used in this query to get all records that have a collection date that contains `2018 May`
+    
+* `limit = "none"`
+    + Indicate the maximum numnber of records you would like returned with the `limit` parameter. We want all records for this query, so we set limit to `none`.
+    
+## Time series of canopy height
+
+Here is an example of how to visualize the data that we just queried. 
+
+```{r canopy_height_plot, warning = FALSE, message = FALSE, results = FALSE}
+
+#load in necessary packages
+library(ggplot2)
+library(lubridate)
+
+#plot a time series of canopy height 
+ggplot(data = canopy_height,
+       aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean)) +
+  geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
+  xlab("Day of Year") + ylab("Plant Height") +
+  guides(color = guide_legend(title = 'Genotype')) +
+  theme_bw()
+
+```
+
+\newline
+\newline
+
+# May 2018 Season 6 Summary
+
+The TERRA REF database contains other trait data for May 2018 of season 6. Each trait was measured using a specific method. Here is a summary of available traits and their corresponding methods of measurement. 
+
+```{r season_6_query, message = FALSE, results = FALSE, echo = FALSE}
+
+#load in dplyr package
+library(dplyr)
+
+#get all season 6 data for May 2018 
+season_6 <- betydb_query(table     = "search",
+                         sitename  = "~Season 6",
+                         date      = "~2018 May",
+                         limit     =  "none")
+#get summary
+season_6_summary <- season_6 %>% group_by(trait, method_name) %>% summarise(number_of_observations = n())
+
+```
+
+```{r season_6_summary, echo = FALSE, comment = ""}
+
+print.data.frame(season_6_summary)
+
+```
+
+\newline
+\newline
+
+# How to query other seasons, traits, and dates
+
+You can query other seasons, traits, and dates by changing the season number, trait name, and date in the example query. If you are unsure of what traits or dates are available for a season, you can use the following R code to get a subset of a season and figure out what specific dates and traits are available. 
+
+To broaden your queries, remove specific parameters. For example, in order to get all of season 2's data for October 2016, remove the `trait` parameter.
+
+```{r season_2_query, results = FALSE, message = FALSE}
+
+#get all of season 2 data for October 2016
+season_2_sub <- betydb_query(table     = "search",
+                             sitename  = "~Season 2",
+                             date      = "~2016 Oct",
+                             limit     =  "none")
+
+```
+
+```{r season_2_traits, comment = ""}
+
+#get traits available for the subset of season 2 data
+traits <- unique(season_2_sub$trait)
+
+print(traits)
+
+```
+
+```{r season_2_dates, comment = ""}
+
+#filter for NDVI trait records
+ndvi <- dplyr::filter(season_2_sub, trait == 'NDVI') 
+
+#get unique dates for NDVI records
+ndvi_dates <- unique(ndvi$date)
+
+print(ndvi_dates)
+```

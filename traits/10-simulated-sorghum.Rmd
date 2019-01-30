@@ -148,6 +148,7 @@ ggplot(sorghum_sla) +
 ```{r query-traits, message = FALSE}
 
 
+
 trait_list <- c("Vcmax", "c2n_leaf", "cuticular_cond", "SLA", "quantum_efficiency", "leaf_respiration_rate_m2", "stomatal_slope.BB", "Jmax", "chi_leaf", "extinction_coefficient_diffuse")
 
 variables <- betydb_query(table = 'variables',

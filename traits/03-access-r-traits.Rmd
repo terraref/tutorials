@@ -20,25 +20,25 @@ if(packageVersion("traits") == '0.2.0'){
 
 Load other packages that we will need to get started.
 
-```{r 00-setup, message = FALSE, echo = TRUE}
+```{r 00-setup, message = FALSE, echo = TRUE, warning = FALSE}
 library(traits)
 library(ggplot2)
 library(ggthemes)
 theme_set(theme_bw())
 library(dplyr)
 ```
+Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. You will need this personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
 
-Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. The public key will provide access to all metadata; you will need a personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
 
 ```{r writing-key, echo = TRUE}
 # This should be done once with the key sent to you in your email
-# writeLines('abcdefg_rest_of_key_sent_in_email', 
+
+# Example:
+#writeLines('abcdefg_rest_of_key_sent_in_email',
 #            con = '.betykey')
 
-# Example with the public key:
-writeLines('9999999999999999999999999999999999999999', 
-           con = '.betykey_public')
 ```
+
 
 #### R - using the traits package
 
@@ -46,24 +46,22 @@ The R traits package is an API 'client'. It does two important things:
 1. It makes it easier to specify the query parameters without having to construct a URL
 2. It returns the results as a data frame, which is easier to use within R
 
-Lets start with the query of information about Sorghum from species table from above
+Lets start with the query of information about Sorghum from the species table
 
 ```{r query-species, results = 'hide', echo = TRUE}
 
 sorghum_info <- betydb_query(table = 'species',
-                            genus = "Sorghum",
-                            api_version = 'v1',
-                            limit = 'none',
-                            betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                            key = readLines('.betykey', warn = FALSE))
+                             genus = "Sorghum",
+                             api_version = 'v1',
+                             limit = 'none',
+                             betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
+                             key = readLines('.betykey', warn = FALSE))
 
 ```
 
 #### R - setting options for the traits package
 
 Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
-
-
 
 ```{r 03-set-up, echo = TRUE}
 options(betydb_key = readLines('.betykey', warn = FALSE),
@@ -74,6 +72,7 @@ options(betydb_key = readLines('.betykey', warn = FALSE),
 Now the same query can be reduced to:
 
 ```{r query-species-reduce, message = FALSE, echo = TRUE}
+
 sorghum_info <- betydb_query(table = 'species',
                              genus = "Sorghum",
                              limit = 'none')
@@ -82,20 +81,23 @@ sorghum_info <- betydb_query(table = 'species',
 ### Time series of height
 
 Now let's query some trait data.
+
 ```{r canopy_height, echo = TRUE, message = FALSE}
-sorghum_height <- betydb_query(table     = 'search',
+canopy_height <- betydb_query(table     = 'search',
                                trait     = "canopy_height",
                                sitename  = "~Season 2",
                                limit     = 'none')
 ```
 
 ```{r plot_height}
-ggplot(data = sorghum_height,
+
+ggplot(data = canopy_height,
        aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean)) +
   geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
 # scale_x_datetime(date_breaks = '6 months') +
   xlab("Day of Year") + ylab("Plant Height") +
   guides(color = guide_legend(title = 'Genotype')) +
   theme_bw()
+  
 ```
 
