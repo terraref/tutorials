@@ -13,7 +13,7 @@ The traits package can be installed through github using the following command:
 ```{r install_traits, echo = TRUE, message = FALSE}
 
 if(packageVersion("traits") == '0.2.0'){
-  devtools::install_github('ropensci/traits')
+  devtools::install_github('terraref/traits', force = TRUE)
 }
 
 ```
