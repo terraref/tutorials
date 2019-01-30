@@ -1,1 +1,21 @@
-# Synthesis Vignette
+# Combining trait, weather, and image datasets
+
+The objective of this vignette is to join and plot the trait and weather data, and also the trait and image data. 
+
+The first synthesis plot will be of the greenness from the image data against the canopy cover from the trait data. 
+The second synthesis plot will be a histogram of the inflection points for each cultivar's growing degree days. 
+
+## Plot growing degree days for each cultivar
+
+
+## Do logistic regression
+
+
+## Create histogram of regression output for all cultivars
+
+
+## Calculate greenness metric for each image
+
+
+## Combine with canopy cover and plot
+
