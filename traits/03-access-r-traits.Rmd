@@ -13,7 +13,7 @@ The traits package can be installed through github using the following command:
 ```{r install_traits, echo = TRUE, message = FALSE}
 
 if(packageVersion("traits") == '0.2.0'){
-  devtools::install_github('ropensci/traits')
+  devtools::install_github('terraref/traits', force = TRUE)
 }
 
 ```
@@ -27,6 +27,7 @@ library(ggthemes)
 theme_set(theme_bw())
 library(dplyr)
 ```
+
 Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. You will need this personal key _and_ permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions. 
 
 
@@ -54,8 +55,7 @@ sorghum_info <- betydb_query(table = 'species',
                              genus = "Sorghum",
                              api_version = 'v1',
                              limit = 'none',
-                             betyurl = "https://terraref.ncsa.illinois.edu/bety/", 
-                             key = readLines('.betykey', warn = FALSE))
+                             betyurl = "https://terraref.ncsa.illinois.edu/bety/")
 
 ```
 
@@ -64,8 +64,7 @@ sorghum_info <- betydb_query(table = 'species',
 Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
 
 ```{r 03-set-up, echo = TRUE}
-options(betydb_key = readLines('.betykey', warn = FALSE),
-        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 ```
 
@@ -85,7 +84,7 @@ Now let's query some trait data.
 ```{r canopy_height, echo = TRUE, message = FALSE}
 canopy_height <- betydb_query(table     = 'search',
                                trait     = "canopy_height",
-                               sitename  = "~Season 2",
+                               sitename  = "~Season 6",
                                limit     = 'none')
 ```
 
