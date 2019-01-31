@@ -5,13 +5,77 @@ The objective of this vignette is to join and plot the trait and weather data, a
 The first synthesis plot will be of the greenness from the image data against the canopy cover from the trait data. 
 The second synthesis plot will be a histogram of the inflection points for each cultivar's growing degree days. 
 
-## Plot growing degree days for each cultivar
+## Get and join data
+```{r synth_setup}
 
+options(# betydb_key = 'Your API Key', # to access non-public data
+        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'v1', 
+        betydb_key = '9999999999999999999999999999999999999999')
 
-## Do logistic regression
+```
 
+```{r get_trait_data, message = FALSE}
 
-## Create histogram of regression output for all cultivars
+trait <- betydb_query(table     = "search", 
+                              trait     = "canopy_height", 
+                              date      = "~2017",
+                              limit     =  "none")
+
+# Pull day out of raw_date
+trait = trait %>% 
+  mutate(day = as.Date(raw_date))
+```
+
+```{r, get_weather_data}
+weather <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-01&until=2017-12-31', flatten = FALSE)
+
+weather <- weather$properties %>% 
+  mutate(time = ymd_hms(weather$end_time))
+
+daily_values = weather %>% 
+  mutate(day = as.Date(time), 
+         air_temp_converted = air_temperature - 273.15) %>% 
+  group_by(day) %>% 
+  summarise(min_temp = min(air_temp_converted), 
+            max_temp = max(air_temp_converted), 
+            gdd = ifelse(sum(min_temp, max_temp) / 2 > 10, 
+                         (max_temp + min_temp) / 2 - 10, 0))
+
+daily_values = daily_values %>% 
+  mutate(gdd_cum = cumsum(gdd))
+```
+
+```{r, combine_trait_weather}
+
+combine_test = full_join(trait, daily_values, by = "day")
+combine_test2 = combine_test %>% 
+  select(day, cultivar, mean, gdd_cum) %>% 
+  na.omit()
+```
+
+## Plot and model relationship between GDD and canopy cover for each cultivar
+
+```{r, plot_trait_weather}
+ggplot(combine_test2, aes(x = gdd_cum, y = mean)) +
+  geom_point() +
+  facet_wrap(~cultivar, scales = "free_y")
+```
+
+```{r, model_trait_weather}
+
+single_cultivar = combine_test2 %>% 
+  filter(cultivar == "PI656026")
+
+ggplot(single_cultivar, aes(x = gdd_cum, y = mean)) +
+  geom_point() 
+
+model_all = nls(mean ~ cap / (1 + exp(initial + rate * gdd_cum)), 
+                start = list(cap = 120, initial = 25, rate = 0.2), 
+                data = single_cultivar, trace = TRUE)
+```
+
+## Create histogram of growth rate for all cultivars
 
 
 ## Calculate greenness metric for each image
