@@ -1,11 +1,18 @@
 # Combining trait, weather, and image datasets
 
-The objective of this vignette is to join and plot the trait and weather data, and also the trait and image data. 
+The objective of this vignette is to walk through how to combine our several types of data, and demonstrate several realistic analyses that can be done on these merged data. 
 
-The first synthesis plot will be of the greenness from the image data against the canopy cover from the trait data. 
-The second synthesis plot will be a histogram of the inflection points for each cultivar's growing degree days. 
+For the first analysis, we want to figure out how the number of sufficiently warm days affects the amount of canopy cover at our site. We do this by combining the canopy cover data with the meteorological data on growing degree days, then modeling and plotting their relationship. We are specifically interested in figuring out when the increase in canopy cover starts to slow down in response to warm temperature days. 
+
+The second analysis compares greenness from image data with canopy cover. 
 
 ## Get and join data
+
+Here we combine two dataframes. 
+The first contains all the canopy height values for 2017, which was created in the traits vignette. 
+The second is the cumulative growing degree days for all of 2017, which were calculated from the daily minimum and maximum temperatures in the weather vignette. 
+They are combined by their common column, the date. 
+
 ```{r synth_setup}
 library(dplyr)
 library(ggplot2)
@@ -56,6 +63,12 @@ trait_weather_df = trait_weather_df %>%
 ```
 
 ## Plot and model relationship between GDD and canopy cover for each cultivar
+
+We are interested in how growing degree days affects canopy cover. 
+To investigate this, we are going to model and plot their relationship. 
+We want to know the relationship for each cultivar, so we'll start of by determining the parameters of the model for one of the cultivars in our dataset. 
+We are using a logistic growth model here because it is appropriate for the shape of the GDD-cover relationship. 
+
 ```{r, model_get_parameters}
 single_cultivar = trait_weather_df %>% 
   filter(cultivar == "PI656026")
@@ -73,6 +86,9 @@ model_single_cultivar = nls(mean ~ cap / (1 + exp(initial + rate * gdd_cum)),
 single_cultivar = single_cultivar %>% 
   mutate(mean_predict = coef(model_single_cultivar)[1] / (1 + exp(coef(model_single_cultivar)[2] + coef(model_single_cultivar)[3] * gdd_cum)))
 ```
+
+We then use the parameters from a single cultivar to run a model for each of the rest of the cultivars. 
+These results are used to plot the model predictions, which are shown as an orange line. 
 
 ```{r, model_all_cultivars}
 all_cultivars = c(day = as.double(), cultivar = as.character(), mean = as.numeric(), 
@@ -95,6 +111,12 @@ ggplot(all_cultivars) +
 ```
 
 ## Create histogram of growth rate for all cultivars
+
+The last thing that we are going to do is assess the difference in this relationship among the cultivars. 
+We are going to use the inflection point from the logistic growth model, which indicates when canopy cover stops increasing as quickly with increasingly more warm days. 
+The `inflection` R package is used for the calculation. 
+The resulting inflection points for each cultivar are plotted as a histogram. 
+
 ```{r, calculate_inflections}
 inflection_points = c(cultivar = as.character(), value = as.numeric())
 for(each_cultivar in unique(all_cultivars$cultivar)){
