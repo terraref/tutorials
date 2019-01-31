@@ -1,24 +1,22 @@
 # Accessing trait data in R 
 
-```{r chunk-options-setup, echo = FALSE}
-
-options(width = 100)
-
-```
-
 ## Objective: To be able to use the R traits package to query trait data
 
 This vignette will demonstrate to users how to query TERRA REF trait data using the traits package. 
-Users will be shown an example of how to query and visualize season 6 canopy height data as well as how to find more information on a season, such as available traits and dates.
+Users will be shown an example of how to query and visualize season 6 canopy height data as well as how to create a visual summary of a season's available traits and methods.
 
 ## Getting Started
 
 First, you will need to install and load the traits package from github.
+You will also need to load in other packages that we will be used.
 
 ```{r traits-vig-pack, message = FALSE, results = FALSE}
 
 devtools::install_github('terraref/traits', force = TRUE)
 library(traits)
+library(ggplot2)
+library(lubridate)
+library(dplyr)
 
 ```
 
@@ -56,10 +54,6 @@ Here is an example of how to visualize the data that we just queried.
 
 ```{r traits-vig-canopy-plot, warning = FALSE, message = FALSE, results = FALSE}
 
-#load in necessary packages
-library(ggplot2)
-library(lubridate)
-
 #plot a time series of canopy height 
 ggplot(data = canopy_height,
        aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean)) +
@@ -70,52 +64,27 @@ ggplot(data = canopy_height,
 
 ```
 
-## Season 6 Summary
+## Season Summary
 
-The TERRA REF database contains other trait data for season 6.
-Each trait was measured using a specific method. 
-Here is a summary of available traits and their corresponding methods of measurement. 
+The TERRA REF database contains trait data for many other seasons.
+The following chunk of code can be used to get a visual summary of available traits and methods of measurement for a season.
+Season 4 will be used as an example.
 
-```{r traits-vig-s6-all, message = FALSE, results = FALSE, echo = FALSE}
-
-#load in dplyr package
-library(dplyr)
-
-#get all season 6 data 
-season_6 <- betydb_query(table     = "search",
-                         sitename  = "~Season 6",
-                         limit     =  "none")
-#get summary
-season_6_summary <- season_6 %>% group_by(trait, method_name) %>% summarise(number_of_observations = n())
-
-```
-
-```{r traits-vig-s6-print, echo = FALSE, comment = ""}
-
-print.data.frame(season_6_summary)
-
-```
-
-## How to query other seasons, traits, and dates
-
-You can query other seasons and traits by changing the season number and trait name in the example query.
-If you are interested in data for a specific date, you can add the `date` parameter to make your query more specific. 
-If you are unsure of what traits or dates are available for a season, you can use the following R code as an example to get a subset of a season and figure out what specific dates and traits are available. 
-
-```{r traits-vig-s4-example, results = FALSE, message = FALSE}
+```{r traits-vig-s4-summary, message = FALSE, echo = TRUE}
 
 #get all of season 4 data 
 season_4 <- betydb_query(table     = "search",
                          sitename  = "~Season 4",
                          limit     =  "none")
 
-#get traits available for season 4 
-traits <- unique(season_4$trait)
+#update the values of the date column
+season_4_update <- season_4 %>% mutate(date = ymd_hms(raw_date))
 
-#filter for canopy_cover records
-canopy_cover <- dplyr::filter(season_4, trait == 'canopy_cover') 
+#create facet wrap
+ggplot(data = season_4_update) +
+  geom_point(aes(date, mean, color = method_name)) +
+  geom_line(aes(date, mean, group = cultivar, color = method_name)) +
+  facet_wrap(~trait, ncol = 1)
 
-#get unique dates for canopy_cover records
-canopy_cover_dates <- unique(canopy_cover$date)
 
 ```
