@@ -144,12 +144,17 @@ ggplot(inflection_points, aes(x = inf_value)) +
 ```
 
 ## Get image data
+
+For the second analysis, we are going to put together some trait data with RGB sensor data. 
+These data are for May 2018, and are read in below. 
+The image data are in the raster format. 
+
 ```{r get_image_data}
 library(raster)
 library(rgdal)
 library(stringr)
 
-# File downloaded from : https://terraref.ncsa.illinois.edu/clowder/datasets/5c507cb74f0c436195ba8eb4?space=5c50512a4f0c436195b9ad67
+# File downloaded from: https://terraref.ncsa.illinois.edu/clowder/datasets/5c507cb74f0c436195ba8eb4?space=5c50512a4f0c436195b9ad67
 tif_url = "vignettes/rgb_geotiff_L1_ua-mac_2018-05-04__13-04-09-888_left.tif"
 
 rgb_raster_1 = raster(tif_url, band = 1)
@@ -176,6 +181,11 @@ trait2 = trait2 %>%
 ```
 
 ## Calculate greenness metric for each image
+
+We then want a summary statistic for the entire image data. 
+The chosen statistic here uses the red and green bands from the image raster. 
+This metric is a way to characterize the greenness of the area where the data were taken from. 
+
 ```{r image_calculations}
 add_rasters = rgb_raster_2_crop + rgb_raster_1_crop
 numerator = cellStats(add_rasters, stat = "sum")
@@ -188,6 +198,10 @@ greenness_df = data.frame(greenness = numerator / denominator,
 ```
 
 ## Combine with canopy cover and plot
+
+We then determine the average canopy cover across the site for the day that the sensor data were collected. 
+The relationship between our greenness metric and average canopy cover are plotted. 
+
 ```{r plot_sensor_trait}
 trait2 = trait2 %>% 
   filter(day %in% greenness_df$day) %>% 
