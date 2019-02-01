@@ -99,7 +99,7 @@ for(each_cultivar in unique(trait_weather_df$cultivar)){
                             start = list(cap = 120, initial = 25, rate = rate),
                             data = each_cultivar_df)
   each_cultivar_df <- each_cultivar_df %>% 
-      mutate(mean_predict <- coef(each_cultivar_model)[1] / (1 + exp(coef(each_cultivar_model)[2] + coef(each_cultivar_model)[3] * gdd_cum)))
+      mutate(mean_predict = coef(each_cultivar_model)[1] / (1 + exp(coef(each_cultivar_model)[2] + coef(each_cultivar_model)[3] * gdd_cum)))
   all_cultivars <- rbind(each_cultivar_df, all_cultivars)
 }
 
