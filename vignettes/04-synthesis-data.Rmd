@@ -155,16 +155,16 @@ library(rgdal)
 library(stringr)
 
 # File downloaded from: https://terraref.ncsa.illinois.edu/clowder/datasets/5c507cb74f0c436195ba8eb4?space=5c50512a4f0c436195b9ad67
-tif_url <- "vignettes/rgb_geotiff_L1_ua-mac_2018-05-04__13-04-09-888_left.tif"
+tif_url <- "rgb_geotiff_L1_ua-mac_2018-05-04__13-04-09-888_left.tif"
 
 rgb_raster_1      <- raster(tif_url, band = 1)
-rgb_raster_1_crop <- crop(rgb_raster_1, extent(rgb_raster_1, 1500, 2500, 3000, 4000))
+rgb_raster_1_crop <- crop(rgb_raster_1, extent(rgb_raster_1, 4200, 7500, 1800, 4200))
 plot(rgb_raster_1_crop)
 cellStats(rgb_raster_1_crop, stat = "mean")
 hist(rgb_raster_1_crop)
 
 rgb_raster_2      <- raster(tif_url, band = 2)
-rgb_raster_2_crop <- crop(rgb_raster_2, extent(rgb_raster_2, 1500, 2500, 3000, 4000))
+rgb_raster_2_crop <- crop(rgb_raster_2, extent(rgb_raster_2, 4200, 7500, 1800, 4200))
 plot(rgb_raster_2_crop)
 cellStats(rgb_raster_2_crop, stat = "mean")
 hist(rgb_raster_2_crop)
