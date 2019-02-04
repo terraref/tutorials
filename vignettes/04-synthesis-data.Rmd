@@ -73,14 +73,14 @@ We are using a logistic growth model here because it is appropriate for the shap
 single_cultivar <- trait_weather_df %>% 
   filter(cultivar == "PI656026")
 
-cap     <- 120
+cap     <- 150
 initial <- 25
-mean    <- single_cultivar$mean[57]
-gdd_cum <- single_cultivar$gdd_cum[57]
+mean    <- single_cultivar$mean[67]
+gdd_cum <- single_cultivar$gdd_cum[67]
 rate    <- ((log((cap/mean) - 1)) - initial)/gdd_cum
 
 model_single_cultivar <- nls(mean ~ cap / (1 + exp(initial + rate * gdd_cum)), 
-                             start = list(cap = 120, initial = 25, rate = rate),
+                             start = list(cap = cap, initial = initial, rate = rate),
                              data = single_cultivar, trace = TRUE)
 
 single_cultivar <- single_cultivar %>% 
@@ -96,7 +96,7 @@ all_cultivars <- c(day = as.double(), cultivar = as.character(), mean = as.numer
 for(each_cultivar in unique(trait_weather_df$cultivar)){
   each_cultivar_df <- filter(trait_weather_df, cultivar == each_cultivar)
   each_cultivar_model <- nls(mean ~ cap / (1 + exp(initial + rate * gdd_cum)), 
-                            start = list(cap = 120, initial = 25, rate = rate),
+                            start = list(cap = cap, initial = initial, rate = rate),
                             data = each_cultivar_df)
   each_cultivar_df <- each_cultivar_df %>% 
       mutate(mean_predict = coef(each_cultivar_model)[1] / (1 + exp(coef(each_cultivar_model)[2] + coef(each_cultivar_model)[3] * gdd_cum)))
