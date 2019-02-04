@@ -31,6 +31,7 @@ library(dplyr)
 library(ggplot2)
 library(jsonlite)
 library(lubridate)
+library(tidyr)
 
 weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
 ```
@@ -73,15 +74,17 @@ ggplot(data = weather_data) +
   labs(x = "Date", y = "Temperature (K)")
 ```
 
-### Get all available weather variables
+We can also plot the time series for all eight of the weather variables in a 
+single figure. We first have to rearrange the data to making plotting possible
+using R package `ggplot`. 
 
-The weather variables that are available from these datapoints data are 
-extracted below from the column names of the dataframe that we read in earlier. 
-Any of these variables that are of interest can be analyzed and plotted. 
+```{r}
+weather_data_long = weather_data %>% select(-source, -source_file) %>% gather(weather_variable, observation, -time)
 
-```{r variables-list}
-cols = colnames(weather_data)
-cols[!cols %in% c("source", "source_file", "time")]
+ggplot(data = weather_data_long) +
+  geom_point(aes(x = time, y = observation), size = 0.1) +
+  facet_wrap(~weather_variable, scales = "free_y") +
+  labs(x = "Date", y = "Weather variable")
 ```
 
 You should now be able to find, get, and use weather data from the TERRA REF 
