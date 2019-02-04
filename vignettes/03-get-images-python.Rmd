@@ -47,10 +47,10 @@ You will want to use the key you created for your Clowder account when querying 
 As mentioned in the Objectives, we are limiting the search timeframe through the use of the `since` and `until` parameters.
 These parameters can be omitted to search for all available images (or all other files by changing the sensor).
 
-```{python eval=FALSE}
+```{python py_get_file_listing, eval=FALSE}
 from terrautils.products import get_file_listing
 
-url = 'https://terraref.ncsa.illinois.edu/clowder/api'
+url = 'https://terraref.ncsa.illinois.edu/clowder/'
 key = ''
 sensor = 'RGB GeoTIFFs Datasets'
 sitename = 'MAC Field Scanner Season 6 Range 20 Column 6'
@@ -86,7 +86,7 @@ If you are following along using the vignette examples, and not your own data, t
 By adding the following assignment statement you will be able to download some of the publicly available images.
 If you are not using these examples verbatum, do not use the following assignment statement as it will give you incorrect (aka bad) results.
 
-```{python eval=FALSE}
+```{python py_sample_images_data, eval=FALSE}
 # Use the following code *only* if you are following these examples. Otherwise you will get incorrect results
 files = [ {"id": "5c507cb74f0c4b0cbe6705f2",
            "filename": "rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_right.tif"}, 
@@ -101,7 +101,7 @@ files = [ {"id": "5c507cb74f0c4b0cbe6705f2",
 
 The following shows how to download the image files.
 
-```{python eval=FALSE}
+```{python py_fetch_image_files, eval=FALSE}
 # We are using the same `url` and `key` variables declared in the previous example above.
 import requests
 from io import open
@@ -125,7 +125,7 @@ The images are now stored on the local file system.
 In this section we retrieve the names of different sensor types that are available. This will
 allow you to retrieve files other than those containing RBG image data.
 
-```{python eval=FALSE}
+```{python py_get_sensor_data, eval=FALSE}
 # We are using the same `url` and `key` variables declared in the previous example above.
 from terrautils.products import get_sensor_list, unique_sensor_names
 
@@ -140,7 +140,7 @@ assigned above.
 
 ## Sample Images
 
-Below are some examples of images captured approximately one month apart [^1] [^2]
+Below are examples of images captured approximately one month apart [^1] [^2]
 
 | Date        | Images                                              |
 |-------------|-----------------------------------------------------|
