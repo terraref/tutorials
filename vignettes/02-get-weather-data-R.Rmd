@@ -2,7 +2,7 @@
 
 ## Objective
 
-* To be able to demonstrate how to get TERRA REF meteorological data
+* To demonstrate how to get TERRA REF meteorological data
 
 This vignette shows how to read weather data for the month of January 2017 from 
 the [weather station](https://cals-mac.arizona.edu/weather-station) at the 

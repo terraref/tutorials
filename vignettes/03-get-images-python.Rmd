@@ -1,9 +1,8 @@
----
-title: "Get Source Image Files"
-output: html_document
----
+# Retrieve source RGB image files
 
-# Objective: To be able to demonstrate how to locate and retrieve RGB image files
+## Objective
+
+* To demonstrate how to locate and retrieve RGB image files
 
 This vignette shows how to locate and retrieve image files associated with growing Season 6 
 from the University of Arizona's [Maricopa Agricultural Center](http://cals-mac.arizona.edu/) 
@@ -59,7 +58,7 @@ The `files` variable now contains an array of all the file in the datasets that 
 sensor in the plot for the month of May. When performing you own queries it's possible that there
 are no matches found and the `files` array would be empty.
 
-# Retrieving the images
+## Retrieving the images
 
 Now that we have a list of files we can retrieve them one-by-one. We do this by creating a URL
 that identifies the file to retrieve, making the API call to retrieve the file contents, and writing
@@ -96,7 +95,7 @@ for f in files:
 
 The images are now stored on the local file system.
 
-# Retrieving sensor names
+## Retrieving sensor names
 
 In this section we retrieve the names of different sensor types that are available. This will
 allow you to retrieve files other than those containing RBG image data.
