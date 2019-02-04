@@ -9,67 +9,11 @@ This vignette shows how to read weather data for the month of January 2017 from
 the [weather station](https://cals-mac.arizona.edu/weather-station) at the 
 University of Arizona's [Maricopa Agricultural Center](http://cals-mac.arizona.edu/) 
 into R. These data are stored online on the data management system Clowder, 
-which is accessed using an API. Data across time for two of the weather 
-variables, temperature and precipitation, are plotted in R. Lastly, how to get 
-the list of all possible weather variables is demonstrated. 
-
-### Using the API to get data
-
-In order to access the data, we need to contruct a URL that links to where the 
-data is located on [Clowder](https://clowder.ncsa.illinois.edu/). The data is 
-then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
-, for Clowder. 
-
-### The structure of the database
-
-The meteorological data that is collected for the TERRA REF project is contained 
-in multiple related tables, also know as a [relational database](https://datacarpentry.org/sql-socialsci/01-relational-database/index.html). 
-The first table contains data about the sensor that is collecting data. This is 
-then linked to a stream table, which contains information about a datastream 
-from the sensor. Sensors can have multiple datastreams. The actual weather data 
-is in the third table, the datapoint table. A visual representation of this 
-structure is shown below. 
-
-![](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
-
-In this vignette, we will be using data from a weather station at the Maricopa 
-Agricultural Center, with datapoints for the month of January 2017 from a 
-certain sensor. These data are five minute summaries aggregated from 
-observations taken every second. 
-
-### Creating the URLs for all data table types
-
-All URLs have the same beginning 
-(https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
-then additional information is added for each type of data table as shown below. 
-
-* Station: /sensors/sensor_name=[name]
-* Sensor: /sensors/[sensor number]/streams
-* Datapoints: /datapoints?stream_id=[datapoints number]&since=[start date]&until=[end date]
-
-A certain time period can be specified for the datapoints. 
-
-For example, below are the URLs for the particular data being used in this 
-vignette. These can be pasted into a browser to see how the data is stored as 
-text using JSON. 
-
-* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
-* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
-* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
-
-Possible sensor numbers for a station are found on the page for that station 
-under "id:", and then datapoints numbers are found on the sensor page under 
-"stream_id:".
-
-### Download data using the command line
-
-Data can be downloaded from Clowder using the command line program Curl. If the 
-following is typed into the commmand line, it will download the datapoints data 
-that we're interested in as a file which we have chosen to call `spectra.json`. 
-
-```{sh eval=FALSE}
-curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
-```
+which is accessed using an API. More detailed information about the structure of 
+the database and how API URLs are created is available in the 
+[weather tutorial]("sensors/01-meteorological-data.Rmd"). Data across time for 
+two of the weather variables, temperature and precipitation, are plotted in R. 
+Lastly, how to get the list of all possible weather variables is demonstrated. 
 
 ### Read in data using R
 
