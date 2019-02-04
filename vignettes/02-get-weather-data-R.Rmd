@@ -64,19 +64,13 @@ daily_values = weather_data %>%
 ### Plot data using R
 
 The five minute summary weather variables in the `weather_data` dataframe can be 
-plotted across time, as shown below for temperature and precipitation. 
+plotted across time, as shown below for temperature.  
 
 ```{r temp-plot}
 theme_set(ggthemes::theme_few())
 ggplot(data = weather_data) +
   geom_point(aes(x = time, y = air_temperature), size = 0.1) +
   labs(x = "Date", y = "Temperature (K)")
-```
-
-```{r precip-plot}
-ggplot(data = weather_data) +
-  geom_point(aes(x = time, y = precipitation_rate), size = 0.1) +
-  labs(x = "Date", y = "Precipitation (kg/m2s)")
 ```
 
 ### Get all available weather variables
