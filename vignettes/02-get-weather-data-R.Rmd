@@ -17,10 +17,6 @@ Lastly, how to get the list of all possible weather variables is demonstrated.
 
 ### Read in data using R
 
-```{r met-vignette-setup, include=FALSE}
-knitr::opts_chunk$set(cache = TRUE, message = FALSE)
-```
-
 The same data can be accessed with the URL using the R package `jsonlite`. We 
 are calling that library along with several others that will be used to clean 
 and plot the data. The data is read in by the `fromJSON` function as a dataframe 
@@ -68,7 +64,6 @@ The five minute summary weather variables in the `weather_data` dataframe can be
 plotted across time, as shown below for temperature.  
 
 ```{r temp-plot}
-theme_set(ggthemes::theme_few())
 ggplot(data = weather_data) +
   geom_point(aes(x = time, y = air_temperature), size = 0.1) +
   labs(x = "Date", y = "Temperature (K)")
