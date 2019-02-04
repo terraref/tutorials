@@ -8,7 +8,7 @@ Users will be shown an example of how to query and visualize season 6 canopy hei
 ## Getting Started
 
 First, you will need to install and load the traits package from github.
-You will also need to load in other packages that we will be used.
+You will also need to load in other packages that will be used.
 
 ```{r traits-vig-pack, message = FALSE, results = FALSE}
 
