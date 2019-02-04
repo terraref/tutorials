@@ -164,7 +164,7 @@ The `geometries` dataframe is then pulled out from these data, which contains
 the datapoints from this stream. This is combined with a transformed version of the
 end of the time period from the stream. 
 
-```{r met-datapoints}
+```{r met-datapoints2}
 weather_data <- weather_all$properties %>% 
   mutate(time = ymd_hms(weather_all$end_time))
 ```
