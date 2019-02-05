@@ -12,9 +12,6 @@ documentclass: book
 
 This book is intended to quickly introduce users to TERRA REF data through a series of tutorials. TERRA REF has many types of data, and most can be  accessed in multiple ways. Although this makes it more complicated to learn (and teach!), the objective is to provide users with the flexibility to access data in the most useful way.
 
-
-## Contents
-
 The first section walks the user through the steps of downloading and combining three different types of data: plot level phenotypes, meteorological data, and images. Subesquent sections provide more detailed examples that show how to access a larger variety of data and meta-data.
 
 ## Pre-requisites
@@ -25,7 +22,7 @@ These tutorials are aimed at users who are familiar with or willing to learn pro
 
 Some of the lessons only require a web browser; others will assume familarity with programming at the command line in (typically only one of) Python, R, and / or SQL. You should be willing to find help (see finding help, below).
 
-## Technical Requirements
+### Technical Requirements
 
 At a minimum, you should have:
 
@@ -36,7 +33,7 @@ At a minimum, you should have:
 * Software:
     + Software requirements vary with the tutorials, and may be complex
 
-## User Accounts and permission to access TERRA REF data
+### User Accounts and permission to access TERRA REF data
 
 We have tried to write these tutorials using open access sample data sets. However, access to much of the data will require you to 1) fill out the TERRA REF Beta user questionaire ([terraref.org/beta](terraref.org/beta)) and 2) request access to specific databases.
 
@@ -63,7 +60,7 @@ The TERRA REF website: [terraref.org](http://terraref.org/)
 The TERRA REF Technical Documentation: [docs.terraref.org](docs.terraref.org)
 
 
-## Finding help
+### Finding help
 
 - Slack at terra-ref.slack.com ([signup](https://terraref-slack-invite.herokuapp.com/))
 - Browse issues and repositories in GitHub: 
