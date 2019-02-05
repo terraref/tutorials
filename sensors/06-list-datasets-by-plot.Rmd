@@ -16,7 +16,7 @@ from the workbench or Globus.
 ## Getting started
 
 After installing terrautils, you should be able to import the `products` module.
-```{python}
+```{python eval = F}
 from terrautils.products import get_sensor_list, unique_sensor_names
 from terrautils.products import get_file_listing, extract_file_paths
 ```
@@ -38,12 +38,12 @@ sensor list and provides a list of names suitable for use in the
 To use this tutorial you will need to sign up for Clowder, have your 
 account approved, and then get an API key from the [Clowder web interface](https://terraref.ncsa.illinois.edu/clowder).
 
-```{python}
+```{python eval = F}
 url = 'https://terraref.ncsa.illinois.edu/clowder/'
 key = 'ENTER YOUR KEY HERE'
 ```
 
-```{python}
+```{python eval = F}
 sensors = get_sensor_list(None, url, key)
 names = unique_sensor_names(sensors)
 print(names)
@@ -85,7 +85,7 @@ dataset = get_file_listing(None, url, key, sensor, sitename,
 ```
 
 
-# Querying the API
+## Querying the API
 
 <!-- 
 TODO: move this to a separate tutorial page focused on using curl
@@ -109,7 +109,7 @@ In the examples below we will be using **curl** on the command line to make our 
 API is accessed through URLs, it's possible to use the URLs in software programs or with a programming language
 to retrieve its data. 
 
-## A Word of Caution
+### A Word of Caution
 
 We are no longer using the python terrautils package, which is a python library that provides helper functions that simplify interactions with the Clowder API. One of the ways it makes the interface easier is by using function names that make sense in the scope of the project. The API and the Clowder database have different names and _this is confusing_ since the same names are used for different parts of the database.
 
@@ -120,7 +120,7 @@ client.
 
 For example, the Clowder API's use of the term *SENSOR_NAME* is equivalent to *site_name* above.
 
-## Finding plot ID
+### Finding plot ID
 
 We can query the API to find the identifier associated with the name of a plot. For this example
 we use the variable name of SENSOR_DATA to indicate the name of the plot.
@@ -133,7 +133,7 @@ curl -o plot.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geostre
 This creates a file named *plot.json* containing the JSON object returned by the API. The JSON object has an 
 'id' parameter. This ID parameter can be used to specify the correct data stream.
 
-## Finding stream ID within a plot
+### Finding stream ID within a plot
 
 Using the sensor ID returned in the JSON from the previous call and the id of a sensor returned previously to get
 the stream id. The names of streams are are formatted as "<Sensor Group> Datasets (<Sensor ID>)".
@@ -147,7 +147,7 @@ curl -o stream.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geost
 A file named *stream.json* will be created containing the returned JSON object. This JSON object has an 'id' parameter that
 contains the stream ID. You can use this ID parameter to get the datasets, and then datapoints, of interest.
 
-## Listing Clowder dataset IDs for that plot & sensor stream
+### Listing Clowder dataset IDs for that plot & sensor stream
 
 We now have a stream ID that we can use to list our datasets. The datasets in turn contain files of interest.
 
@@ -174,7 +174,7 @@ The datasets can also be filtered by date. The following filters out datasets th
 curl -o datasets.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}&since=2017-01-02&until=2017-06-10"
 ```
 
-## Getting file paths from dataset
+### Getting file paths from dataset
 
 Now that we know what the dataset URLs are, we can use the URLs to query the API for file IDs in addition to their names and paths.
 
@@ -209,7 +209,7 @@ of the files in the dataset with their IDs, and other data if available:
 ]
 ```
 
-## Retrieving the files
+### Retrieving the files
 
 Given that a large number of files may be contained in a dataset, it may be desireable to automate the process of pulling down files
 to the local system.
