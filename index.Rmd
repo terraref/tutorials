@@ -70,5 +70,7 @@ The TERRA REF Technical Documentation: [docs.terraref.org](docs.terraref.org)
 
 ```{r, include = FALSE}
 options(warn = -1)
+knitr::opts_chunk$set(cache = TRUE, message = FALSE)
+ggplot2::theme_set(ggthemes::theme_few())
 ```
 

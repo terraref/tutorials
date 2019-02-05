@@ -45,31 +45,53 @@ We want to standardize the units as well as part of the `met2CF.<product>` step.
 
 The key is to process each type of met data (site, reanalysis, forecast, climate scenario, etc) to the exact same standard. This way every operation after that (extract, gap fill, downscale, convert to a model, etc) will always have the exact same inputs. This will make everything else much simpler to code and allow us to avoid a lot of unnecessary data checking, tests, etc being repeated in every downstream function.
 
-### The Geostreams Database
+### Using the API to get data
 
-![Schema](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
+In order to access the data, we need to contruct a URL that links to where the 
+data is located on [Clowder](https://terraref.ncsa.illinois.edu/clowder). The data is 
+then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
+, for Clowder. 
 
-#### Querying the API
+### The structure of the Geostreams database
 
-The data can be accessed using a URL. You can find data for a particular station, 
-a certain sensor from a station, or the datapoints from a sensor. Below are
-the URLs for the UA-MAC AZMET weather station, a certain sensor at that station, 
-and datapoints from that sensor for April 2018 through to the first day of 
-August 2018. 
+The meteorological data that is collected for the TERRA REF project is contained 
+in multiple related tables, also know as a [relational database](https://datacarpentry.org/sql-socialsci/01-relational-database/index.html). 
+The first table contains data about the sensor that is collecting data. This is 
+then linked to a stream table, which contains information about a datastream 
+from the sensor. Sensors can have multiple datastreams. The actual weather data 
+is in the third table, the datapoint table. A visual representation of this 
+structure is shown below. 
 
-* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
-* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
-* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
+![](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
 
-All URLs have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
-then additional information is added for each type of data as shown below. 
+In this vignette, we will be using data from a weather station at the Maricopa 
+Agricultural Center, with datapoints for the month of January 2017 from a 
+certain sensor. These data are five minute summaries aggregated from 
+observations taken every second. 
+
+### Creating the URLs for all data table types
+
+All URLs have the same beginning 
+(https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
+then additional information is added for each type of data table as shown below. 
 
 * Station: /sensors/sensor_name=[name]
 * Sensor: /sensors/[sensor number]/streams
 * Datapoints: /datapoints?stream_id=[datapoints number]&since=[start date]&until=[end date]
 
-Possible sensor numbers for a station are found on the page for that station under
-"id:", and then datapoints numbers are found on the sensor page under "stream_id:". 
+A certain time period can be specified for the datapoints. 
+
+For example, below are the URLs for the particular data being used in this 
+vignette. These can be pasted into a browser to see how the data is stored as 
+text using JSON. 
+
+* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
+* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
+* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+
+Possible sensor numbers for a station are found on the page for that station 
+under "id:", and then datapoints numbers are found on the sensor page under 
+"stream_id:".
 
 The table belows lists the names of some stations that have available 
 meteorological data and associated stream ids. 
@@ -122,19 +144,14 @@ Here is the json representation of a single five-minute observation:
 
 The data represent 5 minute summaries aggregated from 1/s observations.
 
-#### Using Curl
+### Download data using the command line
 
-First, below is what the API looks like as a URL. Try pasting it into your browser.
-
-https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
-
-These data are for one stream within a chosen time period. They can be 
-automatically downloaded into a file on your computer by typing the following
-into the command line. This uses the URL from above and the new file is named
-spectra.json.
+Data can be downloaded from Clowder using the command line program Curl. If the 
+following is typed into the commmand line, it will download the datapoints data 
+that we're interested in as a file which we have chosen to call `spectra.json`. 
 
 ```{sh eval=FALSE}
-curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01
+curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 ```
 
 #### Using R
