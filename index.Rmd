@@ -64,7 +64,7 @@ The TERRA REF Technical Documentation: [docs.terraref.org](docs.terraref.org)
 
 ### Finding help
 
-- Slack at terra-ref.slack.com ([signup](https://terraref-slack-invite.herokuapp.com/))
+- Slack at terra-ref.slack.com ([signup](https://terraref-slack-invite.herokuapp.com/)).
 - Browse issues and repositories in GitHub: 
   - search the organization at github.com/terraref
   - questions about the tutorials in the [tutorials repository](https://github.com/terraref/tutorials/issues)
