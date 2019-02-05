@@ -12,7 +12,7 @@ You will also need to load in other packages that will be used.
 
 ```{r traits-vig-pack, message = FALSE, results = FALSE}
 
-devtools::install_github('terraref/traits', force = TRUE)
+#devtools::install_github('terraref/traits', force = TRUE)
 library(traits)
 library(ggplot2)
 library(lubridate)
