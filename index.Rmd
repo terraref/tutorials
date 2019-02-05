@@ -2,10 +2,9 @@
 title: "TERRA REF Tutorials"
 author: "David LeBauer and others"
 site: bookdown::bookdown_site
+output: bookdown::gitbook
 date: "`r Sys.Date()`"
 documentclass: book
-output:
-  bookdown::gitbook: default
 ---
 
 
