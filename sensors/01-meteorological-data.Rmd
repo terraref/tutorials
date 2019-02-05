@@ -51,7 +51,7 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 ### Using the API to get data
 
 In order to access the data, we need to contruct a URL that links to where the 
-data is located on [Clowder](https://clowder.ncsa.illinois.edu/). The data is 
+data is located on [Clowder](https://terraref.ncsa.illinois.edu/clowder). The data is 
 then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
 , for Clowder. 
 
