@@ -182,7 +182,7 @@ trait2 <- trait2 %>%
 
 ## Calculate greenness metric for each image
 
-We then want a summary statistic for the entire image data. 
+Next we are going to compare the canopy cover measurements with a summary of the image. As an example, we will compute an index of greeness for each image.
 The chosen statistic here uses the red and green bands from the image raster. 
 This metric is a way to characterize the greenness of the area where the data were taken from. 
 
