@@ -55,7 +55,7 @@ data is located on [Clowder](https://clowder.ncsa.illinois.edu/). The data is
 then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
 , for Clowder. 
 
-### The structure of the database
+### The structure of the Geostreams database
 
 The meteorological data that is collected for the TERRA REF project is contained 
 in multiple related tables, also know as a [relational database](https://datacarpentry.org/sql-socialsci/01-relational-database/index.html). 
