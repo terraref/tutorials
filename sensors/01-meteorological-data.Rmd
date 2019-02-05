@@ -222,14 +222,14 @@ spaces <- fromJSON(paste0(api_url, '/spaces'))
 print(spaces %>% select(id, name))
 ```
 
-```{r list-of-datasets, eval = F}
+```{r list-of-datasets, eval = FALSE}
 
 # Get list of (at most 20) Datasets within that Space from Clowder
 datasets <- fromJSON(paste0(api_url, '/spaces/', spaces$id, '/datasets'))
 print(datasets %>% select(id, name))
 ```
 
-```{r list-of-files, eval = F}
+```{r list-of-files, eval = FALSE}
 # Get list of Files within any EnvironmentLogger datasets and filter .nc files
 files <- fromJSON(paste0(api_url, '/datasets/', datasets$id[grepl("EnvironmentLogger", datasets$name)], '/files'))
 ncfiles <- files[grepl('environmentlogger.nc', files$filename), ]
@@ -239,7 +239,7 @@ print(ncfiles %>% select(id, filename))
 #### Download netCDF 1/s data from Clowder
 
 
-```{r nc-download, echo=FALSE, eval = F}
+```{r nc-download, echo=FALSE, eval = FALSE}
 sources <- paste0(api_url, '/files/', ncfiles$id)
 outputs <- paste0(output_dir, ncfiles$filename)
 
@@ -255,7 +255,7 @@ for (i in 1:length(sources)) {
 
 One use case getting the solar spectrum associated with a particular hyperspectral image.
 
-```{r, eval = F}
+```{r, eval = FALSE}
 time <- vector()
 vals <- vector()
 
