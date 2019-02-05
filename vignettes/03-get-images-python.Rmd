@@ -4,20 +4,35 @@
 - Show how to find plot data using Globus/Workbench
 - 
 
-## Objective: Find sensor names and retrieve files
+## Learning Objective
 
-This vignette shows how to retrieve the list of available sensor names through the API as well as retrieving files.
+In this chapter you will learn:
 
-**Requirements** 
+- Find and retrieve a list of available sensor names 
+- Retrieve files by downloading them to your system
 
-* Python 
-* the terrautils library
-    + this can be installed from pypi by running `pip install terrautils` in the terminal
+## Introduction
+
+In this chapter we will show how to use the [Python](https://www.python.org/) `terrutils` library to retrieve the list of available sensor names.
+The `terrautils` library provides a number of functions that can be used to perform different actions with data that is stored in [TerraRef](https://terraref.ncsa.illinois.edu/clowder/). 
+The names of the sensors we retrieve using  `TerraUtils` can provide information on what types of Level 1 data is available.
+
+Our examples also show how to retrieve files of interest from `TerraUtils` by using the available [API](https://clowder.ncsa.illinois.edu/swagger/?url=https://terraref.ncsa.illinois.edu/clowder/swagger) (Application Programming Interface).
+
+## Getting Started
+
+First, we will need to install the `terrautils` library into the Python environment.
+We can do this by using the `pip` utility to install the library from pypi.
+Simple run `pip install terrautils` in a terminal to install `terrautils`.
+All the `terrautils` functions are now available in Python, although we will only use a very limited number of them.
 
 ## Retrieving sensor names
 
 In this section we retrieve the names of different sensor types that are available. 
 This will allow you to understand what files may be avaialable other than just those containing RBG image data.
+
+We will first be using the `get_sensor_list` function to retrieve all the data on available sensors. 
+We will then use the `unique_sensor_names` function to extract only the sensor names from the data we just retrieved.
 
 ```{python py_get_sensor_data, eval=FALSE}
 from terrautils.products import get_sensor_list, unique_sensor_names
@@ -62,7 +77,10 @@ files = [ {"id": "5c507cb74f0c4b0cbe6705f2",
           ]
 ```
 
-The following code shows how to download the image files.
+The following code shows how to download the image files. 
+First we format the base URL for our query allowing us to reuse it for each file.
+Next we loop through our array and create a customized URL while making the call to fetch the data using the `requests` interface.
+Finally we open the output file and use a loop to write the retrieved data.
 
 ```{python py_fetch_image_files, eval=FALSE}
 import requests
