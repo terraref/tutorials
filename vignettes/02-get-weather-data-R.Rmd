@@ -61,7 +61,7 @@ We can also plot the time series for all eight of the weather variables in a sin
 We first have to rearrange the data to making plotting possible using R package `ggplot`. 
 
 ```{r}
-weather_data_long = weather_data %>% 
+weather_data_long <- weather_data %>% 
   select(-source, -source_file) %>% 
   gather(weather_variable, observation, -time)
 
