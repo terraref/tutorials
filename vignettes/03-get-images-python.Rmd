@@ -1,5 +1,105 @@
 # Get Source Image Files
 
+- Change to use a ZIP file of imaes we want - merge files with paths
+- Show how to find plot data using Globus/Workbench
+- 
+
+## Objective: Find sensor names and retrieve files
+
+This vignette shows how to retrieve the list of available sensor names through the API as well as retrieving files.
+
+**Requirements** 
+
+* Python 
+* the terrautils library
+    + this can be installed from pypi by running `pip install terrautils` in the terminal
+
+## Retrieving sensor names
+
+In this section we retrieve the names of different sensor types that are available. 
+This will allow you to understand what files may be avaialable other than just those containing RBG image data.
+
+```{python py_get_sensor_data, eval=FALSE}
+from terrautils.products import get_sensor_list, unique_sensor_names
+
+url = 'https://terraref.ncsa.illinois.edu/clowder/'
+key = ''
+
+sensors = get_sensor_list(None, url, key)
+names = unique_sensor_names(sensors)
+```
+
+The variable `names` will now contain the list of all available sensors.
+
+## Retrieving images
+
+Once we have a list of files and their IDs we can retrieve them one-by-one.
+We do this by creating a URL that identifies the file to retrieve, making the API call to retrieve the file contents, and writing the contents to disk.
+
+To create the correct URL we start with the one defined before and attach the keyword '/files/' followed by the ID of each file. 
+For example, assuming we have a file ID of '111', the final URL for retrieving the file would be: 
+
+``` {sh eval=FALSE}
+https://terraref.ncsa.illinois.edu/clowder/api/files/111
+```
+
+By looping through each of our files, and using their ID and filename, we can retrieve the files from the server and store them locally. 
+
+We are streaming the data returned from our server request (`stream=True` in the code below) due to the high probability of large file sizes.
+If the `stream=True` parameter was omitted the file's entire contents would be in the `r` variable which could then be written to the local file.
+
+To illustrate how this might work we are going to pre-populated an array of file names and their associated Clowder IDs.
+
+```{python py_sample_images_data, eval=FALSE}
+files = [ {"id": "5c507cb74f0c4b0cbe6705f2",
+           "filename": "rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_right.tif"}, 
+          {"id": "5c507cb84f0cfd2aedf5a75a",
+           "filename": "rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_left.tif"},
+          {"id": "5c507eaf4f0c4b0cbe6716cd",
+           "filename": "rgb_geotiff_L1_ua-mac_2018-05-05__11-35-13-442_left.tif"},
+          {"id": "5c507eaf4f0cfd2aedf5b680",
+           "filename": "rgb_geotiff_L1_ua-mac_2018-05-05__11-37-40-442_right.tif"}
+          ]
+```
+
+The following code shows how to download the image files.
+
+```{python py_fetch_image_files, eval=FALSE}
+import requests
+from io import open
+
+# We are using the same `url` and `key` variables declared in the previous example above.
+filesurl = url + '/files/'
+params={ 'key': key }
+
+for f in files:
+  r = requests.get(filesurl + f["id"], params=params, stream=True)
+  with open(f["filename"], 'wb') as o:
+        for chunk in r.iter_content(chunk_size=1024): 
+            if chunk:
+                o.write(chunk)
+     
+```
+
+The images are now stored on the local file system.
+
+## Sample Images
+
+Below are examples of images captured approximately one month apart [^1] [^2]
+
+| Date        | Images                                              |
+|-------------|-----------------------------------------------------|
+| May 4, 2018 | ![](https://user-images.githubusercontent.com/45463434/52152314-38d23a80-2633-11e9-99c8-983d79d7bcda.png)  ![](https://user-images.githubusercontent.com/45463434/52152386-78992200-2633-11e9-9cca-ab6e7d09614d.png) |
+| Jun 2, 2018 | ![](https://user-images.githubusercontent.com/45463434/52152360-65865200-2633-11e9-9397-14429a192868.png)  ![](https://user-images.githubusercontent.com/45463434/52152339-530c1880-2633-11e9-8b64-50ffdf8215be.png) |
+
+[^1]: May 4, 2018 - rgb_geotiff_L1_ua-mac_2018-05-04__13-07-04-077_right.tif,rgb_geotiff_L1_ua-mac_2018-05-04__13-07-04-077_left.tif
+[^2]: Jun 2, 2018 - rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_right.tif,rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_left.tif
+
+
+<!-- The following is the 'correct' way of retrieving file names and IDS based upon a site and sensor name 
+
+
+
 ## Objective: To be able to demonstrate how to locate and retrieve RGB image files
 
 This vignette shows how to locate and retrieve image files from your site for a specific date range using Python.
@@ -61,92 +161,4 @@ files = get_file_listing(None, url, key, sensor, sitename,
 The `files` variable now contains an array of all the file in the datasets that match the sensor in the plot for the month of May. 
 As with this example, when performing you own queries it's possible that there are no matches found and the `files` array would be empty.
 
-## Retrieving the images
-
-Now that we have a list of files we can retrieve them one-by-one. We do this by creating a URL
-that identifies the file to retrieve, making the API call to retrieve the file contents, and writing
-the contents to disk.
-
-To create the correct URL we start with the one defined before and attach the keyword '/files/'
-followed by the ID of each file. Assuming we have a file ID of '111', the final URL for retrieving 
-the file would be: 
-
-``` {sh eval=FALSE}
-https://terraref.ncsa.illinois.edu/clowder/api/files/111
-```
-
-By looping through each of the returned files from the previous example, and using their ID and 
-filename, we can retrieve the files from the server and store them locally. 
-
-We are streaming the data returned from our server request (`stream=True` in the code below) due to 
-the high probability of large file sizes. If the `stream=True` parameter was omitted the file's entire 
-contents would be in the `r` variable which could then be written to the local file.
-
-If you are following along using the vignette examples, and not your own data, there won't be any files to download since our search didn't return any.
-By adding the following assignment statement you will be able to download some of the publicly available images.
-If you are not using these examples verbatum, do not use the following assignment statement as it will give you incorrect (aka bad) results.
-
-```{python py_sample_images_data, eval=FALSE}
-# Use the following code *only* if you are following these examples. Otherwise you will get incorrect results
-files = [ {"id": "5c507cb74f0c4b0cbe6705f2",
-           "filename": "rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_right.tif"}, 
-          {"id": "5c507cb84f0cfd2aedf5a75a",
-           "filename": "rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_left.tif"},
-          {"id": "5c507eaf4f0c4b0cbe6716cd",
-           "filename": "rgb_geotiff_L1_ua-mac_2018-05-05__11-35-13-442_left.tif"},
-          {"id": "5c507eaf4f0cfd2aedf5b680",
-           "filename": "rgb_geotiff_L1_ua-mac_2018-05-05__11-37-40-442_right.tif"}
-          ]
-```
-
-The following shows how to download the image files.
-
-```{python py_fetch_image_files, eval=FALSE}
-# We are using the same `url` and `key` variables declared in the previous example above.
-import requests
-from io import open
-
-filesurl = url + '/files/'
-params={ 'key': key }
-
-for f in files:
-  r = requests.get(filesurl + f["id"], params=params, stream=True)
-  with open(f["filename"], 'wb') as o:
-        for chunk in r.iter_content(chunk_size=1024): 
-            if chunk:
-                o.write(chunk)
-     
-```
-
-The images are now stored on the local file system.
-
-## Retrieving sensor names
-
-In this section we retrieve the names of different sensor types that are available. This will
-allow you to retrieve files other than those containing RBG image data.
-
-```{python py_get_sensor_data, eval=FALSE}
-# We are using the same `url` and `key` variables declared in the previous example above.
-from terrautils.products import get_sensor_list, unique_sensor_names
-
-sensors = get_sensor_list(None, url, key)
-names = unique_sensor_names(sensors)
-```
-
-The variable `names` will now contain the list of all available sensors. Using these sensor
-names it's possible to use the above search to locate and then retrieve additional data files.
-Substitute the new sensor name for 'RGB GeoTIFFs Datasets' where the variable `sensor` is 
-assigned above.
-
-## Sample Images
-
-Below are examples of images captured approximately one month apart [^1] [^2]
-
-| Date        | Images                                              |
-|-------------|-----------------------------------------------------|
-| May 4, 2018 | ![](https://user-images.githubusercontent.com/45463434/52152314-38d23a80-2633-11e9-99c8-983d79d7bcda.png)  ![](https://user-images.githubusercontent.com/45463434/52152386-78992200-2633-11e9-9cca-ab6e7d09614d.png) |
-| Jun 2, 2018 | ![](https://user-images.githubusercontent.com/45463434/52152360-65865200-2633-11e9-9397-14429a192868.png)  ![](https://user-images.githubusercontent.com/45463434/52152339-530c1880-2633-11e9-8b64-50ffdf8215be.png) |
-
-[^1]: May 4, 2018 - rgb_geotiff_L1_ua-mac_2018-05-04__13-07-04-077_right.tif,rgb_geotiff_L1_ua-mac_2018-05-04__13-07-04-077_left.tif
-[^2]: Jun 2, 2018 - rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_right.tif,rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_left.tif
-
+-->
