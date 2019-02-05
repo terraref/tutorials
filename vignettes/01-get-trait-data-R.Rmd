@@ -1,90 +1,137 @@
 # Accessing trait data in R 
 
-## Objective: To be able to use the R traits package to query trait data
+## Learning Objectives
 
-This vignette will demonstrate to users how to query TERRA REF trait data using the traits package. 
-Users will be shown an example of how to query and visualize season 6 canopy height data as well as how to create a visual summary of a season's available traits and methods.
+In this chapter you will learn:
 
-## Getting Started
+- How to create a summary of available data to query from a TERRA REF season
+- How to query a specific trait
+- How to visualize query results
 
-First, you will need to install and load the traits package from github.
-You will also need to load in other packages that will be used.
+
+## Introduction
+
+In this chapter, we go over how to query TERRA REF trait data using the [`traits`](https://github.com/ropensci/traits) package. The `traits` package is a way to query for various sources of species trait data, including [BETYdb](https://www.betydb.org/), [NCBI](http://www.ncbi.nlm.nih.gov/), [Coral Traits Disease](http://coraltraits.org/) and others. In this chapter we use BETYdb as our trait source, as it contains the TERRA REF data that we are interested in.
+
+Our example will show how to query for season 6 data <!-- what is a season? need to define this for users> --> and visualize canopy height. In addition to the `traits` package we will also be using some of the [`tidyverse`](https://www.tidyverse.org/) packages, which allow us to maniupulate the data in an efficient, understandable way. If you are unfamiliar with `tidyverse` syntax, we recommend checking out some of the resources [here](https://www.tidyverse.org/learn/).
+
+
+
+## Query for available traits
+
+### Getting Started
+
+First, we will need to install and load the traits package from github, and load it into our environment, along with the other packages we will use in this tutorial.
 
 ```{r traits-vig-pack, message = FALSE, results = FALSE}
-
-#devtools::install_github('terraref/traits', force = TRUE)
+# devtools::install_github('terraref/traits', force = TRUE) # run once
 library(traits)
 library(ggplot2)
 library(lubridate)
 library(dplyr)
-
+library(knitr)
 ```
 
-## How to query trait data
+
 
 ### Setting options
 
-The function that you will be using to perform your queries is `betydb_query`.
-Options can be set to reduce the number of arguments that need to be passed into the function.
+The function that is used to query BETYdb is called `betydb_query`. To reduce the number of arguments needed to pass into this function, we can set some global options using `options`. In this case, we will set the URL used in the query, and the API version.
 
 ```{r traits-vig-bety-opt}
-
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
+```
+
+
+### Querying available traits
+
+The TERRA REF database contains trait data for many other seasons of observation, and available data may vary by season. Here, we get a visual summary of available traits and methods of measurement for a season.
+
+First we construct a general query for the Season 4 data. This returns all season 4 data. The function `betydb_query` takes as arguments `key = "value"` pairs which represent columns in the database to query. In this example, we `sitename` column for season 4 data, and set the limit to "none" to return all records. By default, the function will search all tables in the database. To specify a particular table you can use the `table` argument.
+
+```{r traits-vig-s4-summary-get-trait, message = FALSE}
+# get all of season 4 data 
+season_4 <- betydb_query(sitename  = "~Season 4",
+                         limit     =  "none")
+```
+
+The return value for the `betydb_query` function is just a `data.frame` so we can work with it like any other `data.frame` in R.
+
+Let's plot a time series of all traits returned. First you might notice that the relevant date columns in the `season_4` data.frame are returned as characters instead of a date format. Before plotting, let's get our `raw_date` column into a proper date format using functions from `dplyr` and `lubridate`.
+
+
+```{r traits-vig-s4-summary-reformat-date, message = FALSE}
+season_4 <- season_4 %>%
+  mutate(raw_date = ymd_hms(raw_date))
+```
+
+### Plot season 4 summary
+
+Now we can create a plot of all of the trait data collected during season 4, including information about the methods used.
+
+```{r traits-vig-s4-summary-plot-data, fig.height = 15, fig.width = 7}
+ggplot(data = season_4) +
+  geom_point(aes(x = raw_date, y = mean, color = method_name)) +
+  geom_line(aes(x = raw_date, y = mean, group = cultivar, color = method_name)) +
+  facet_wrap(~trait, ncol = 1, scales = "free_y") +
+  xlab("Date") + 
+  ylab("Mean trait value") + 
+  ggtitle("Season 6 data summary") +
+  guides(color = guide_legend(title="Method", ncol = 1, title.position = "top")) +
+  theme_bw() +
+  theme(legend.position = "bottom")
 
 ```
 
-### An example: Season 6 canopy height data
 
-The following is an example of how to query season 6 canopy height data. 
+We can view more information about these trait measurements by examining unique values in the trait and trait description columns.
+
+```{r traits-vig-s4-summary-get-trait-info}
+traits <- season_4 %>%
+  distinct(trait, trait_description)
+
+kable(traits)
+```
+
+## Querying a specific trait
+
+### Querying season 6 canopy height data
+
+You may find after constructing a general query as above that you want to only query a specific trait. Here, we query for the canopy height trait by adding the key-value pair `trait = "canopy_height"` to our query function. Note that the limit is also set to return only 250 records, shown here for demostration purposes.
 
 ```{r traits-vig-canopy-query, message = FALSE}
 
-canopy_height <- betydb_query(table     = "search", 
-                              trait     = "canopy_height", 
+canopy_height <- betydb_query(trait     = "canopy_height", 
                               sitename  = "~Season 6",
-                              limit     =  "none")
+                              limit     =  250)
 
 
 ```
 
-### Time series of canopy height
+### Plotting query results
 
-Here is an example of how to visualize the data that we just queried. 
+As before, we need to reformat the raw date column. 
 
-```{r traits-vig-canopy-plot, warning = FALSE, message = FALSE, results = FALSE}
+```{r traits-vig-fix-date}
+canopy_height <- canopy_height %>% 
+  mutate(raw_date = ymd_hms(raw_date))
+```
+
+And we can generate a time series plot of just the canopy height data.
+
+```{r traits-vig-canopy-plot, warning = FALSE, message = FALSE}
 
 #plot a time series of canopy height 
 ggplot(data = canopy_height,
-       aes(x = lubridate::yday(lubridate::ymd_hms(raw_date)), y = mean)) +
+       aes(x = raw_date, y = mean)) +
   geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
-  xlab("Day of Year") + ylab("Plant Height") +
-  guides(color = guide_legend(title = 'Genotype')) +
+  xlab("Date") +
+  ylab("Plant height (cm)") +
+  ggtitle("Sorghum canopy height, Season 6 TERRA REF") +
   theme_bw()
 
 ```
 
-## Season Summary
-
-The TERRA REF database contains trait data for many other seasons.
-The following chunk of code can be used to get a visual summary of available traits and methods of measurement for a season.
-Season 4 will be used as an example.
-
-```{r traits-vig-s4-summary, message = FALSE, echo = TRUE}
-
-#get all of season 4 data 
-season_4 <- betydb_query(table     = "search",
-                         sitename  = "~Season 4",
-                         limit     =  "none")
-
-#update the values of the date column
-season_4_update <- season_4 %>% mutate(date = ymd_hms(raw_date))
-
-#create facet wrap
-ggplot(data = season_4_update) +
-  geom_point(aes(date, mean, color = method_name)) +
-  geom_line(aes(date, mean, group = cultivar, color = method_name)) +
-  facet_wrap(~trait, ncol = 1)
 
 
-```
