@@ -20,7 +20,6 @@ library(jsonlite)
 library(lubridate)
 library(traits)
 library(inflection)
-
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 ```
@@ -30,17 +29,14 @@ trait <- betydb_query(table     = "search",
                       trait     = "canopy_height", 
                       date      = "~2017",
                       limit     =  "none")
-
 trait = trait %>% 
   mutate(day = as.Date(raw_date))
 ```
 
 ```{r get_weather_data}
 weather <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-01&until=2017-12-31', flatten = FALSE)
-
 weather <- weather$properties %>% 
   mutate(time = ymd_hms(weather$end_time))
-
 daily_values = weather %>% 
   mutate(day = as.Date(time), 
          air_temp_converted = air_temperature - 273.15) %>% 
@@ -49,7 +45,6 @@ daily_values = weather %>%
             max_temp = max(air_temp_converted), 
             gdd = ifelse(sum(min_temp, max_temp) / 2 > 10, 
                          (max_temp + min_temp) / 2 - 10, 0))
-
 daily_values <- daily_values %>% 
   mutate(gdd_cum = cumsum(gdd))
 ```
@@ -71,17 +66,14 @@ We are using a logistic growth model here because it is appropriate for the shap
 ```{r model_get_parameters}
 single_cultivar <- trait_weather_df %>% 
   filter(cultivar == "PI656026")
-
 cap     <- 150
 initial <- 25
 mean    <- single_cultivar$mean[67]
 gdd_cum <- single_cultivar$gdd_cum[67]
 rate    <- ((log((cap/mean) - 1)) - initial)/gdd_cum
-
 model_single_cultivar <- nls(mean ~ cap / (1 + exp(initial + rate * gdd_cum)), 
                              start = list(cap = cap, initial = initial, rate = rate),
                              data = single_cultivar, trace = TRUE)
-
 single_cultivar <- single_cultivar %>% 
   mutate(mean_predict = coef(model_single_cultivar)[1] / (1 + exp(coef(model_single_cultivar)[2] + coef(model_single_cultivar)[3] * gdd_cum)))
 ```
@@ -106,7 +98,6 @@ for(each_cultivar in unique(trait_weather_df$cultivar)){
              inf_point = ((log((model_cap / 100) - 1)) - model_initial) / model_rate)
   all_cultivars <- rbind(each_cultivar_df, all_cultivars)
 }
-
 ggplot(all_cultivars) +
   geom_point(aes(x = gdd_cum, y = mean)) +
   geom_line(aes(x = gdd_cum, y = mean_predict), color = "orange") +
@@ -127,7 +118,6 @@ ggplot(all_cultivars) +
   geom_vline(aes(xintercept = inf_point)) +
   facet_wrap(~cultivar, scales = "free_y") +
   labs(x = "Cumulative growing degree days", y = "Canopy Height")
-
 ggplot(data.frame(inf_points = unique(all_cultivars$inf_point))) +
   geom_histogram(aes(x = inf_points)) +
   xlim(min(all_cultivars$gdd_cum), max(all_cultivars$gdd_cum)) +
@@ -136,59 +126,134 @@ ggplot(data.frame(inf_points = unique(all_cultivars$inf_point))) +
 
 ## Get image data
 
-For the second analysis, we are going to put together some trait data with RGB sensor data. 
-These data are for May 2018, and are read in below. 
-The image data are in the raster format. 
+In this examnple we will extract our plot data from a series of images taken in May of Season 6, measure its "greeness" annd plot that against the plant heights from above in this vignette.
 
-```{r get_image_data}
+Below we retrieve all the available plots for a particular date, then find and convert the plot boundary JSON into tuples.
+We will use these tuples to extract the data for our plot.
+
+```{r get_plot_boundary}
+library(traits)
+
+# Function for breaking apart a corner into its Lat, Lon components
+getLatLon <- function(corner){
+  p <- strsplit(corner, ' ')
+  return (c(p[[1]][1], p[[1]][2]))
+}
+
+# Gets the bounding box of the array of points
+getBounds <-function(bounds){
+  minX <- NA
+  minY <- NA
+  maxX <- NA
+  maxY <- NA
+  for (c in unique(bounds)){
+    p = getLatLon(c)
+    if (is.na(minX) || (minX > p[2]))
+      minX = p[2]
+    if (is.na(minY) || (minY > p[1]))
+      minY = p[1]
+    if (is.na(maxX) || (maxX < p[2]))
+      maxX = p[2]
+    if (is.na(maxY) || (maxY < p[1]))
+      maxY = p[1]
+  }
+  
+  return (c(minX, minY, maxX, maxY))
+}
+
+# Setting up our options
+options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_api_version = 'v1',
+        betydb_key = readLines('.betykey'))
+
+# Makiong the query for our site
+sites <- betydb_query(table     = "sites",  
+                      sitename  = "MAC Field Scanner Season 6 Range 19 Column 1")
+
+# Assigning the geometry of the site (GeoJSON format)
+site.geom <- sites$geometry
+
+# Stripping out the extra information to get to the points
+complete_str <- str_match_all(site.geom, '(\\(\\(\\((.*)\\)\\)\\))')[[1]][, 3]
+bounds <- strsplit(complete_str, ', ')[[1]]
+
+# Getting the bounding box of the polygon
+bounding_box = getBounds(bounds[[1]])
+```
+
+These are the names of the full field RGB data for the month of May.
+We will be extracting our plot data from these files.
+A compressed file containing these images can be found on [Box]().
+
+```{r synth_filename_array}
+image_files <- 
+   c('fullfield_L1_ua-mac_2018-05-01_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-02_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-03_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-04_rgb_stereovis_ir_sensors_fullfield_sorghum6_settingstest_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-05_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-06_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-08_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-09_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-10_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_-_copy_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-12_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-13_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-14_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-15_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-17_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-18_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-19_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-20_rgb_stereovis_ir_sensors_plots_sorghum6_shade_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-21_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-22_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-23_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
+     'fullfield_L1_ua-mac_2018-05-28_rgb_stereovis_ir_sensors_plots_sorghum6_shade_rgb_eastedge_mn_thumb.tif'
+     )
+```
+
+We will loop through these images, extract our plot data, and calculate the "greeness" of each extract.
+We are using the name of the file to extract the date for later.
+
+```{r synth_get_greeness}
 library(raster)
-library(rgdal)
 library(stringr)
 
-# File downloaded from: https://terraref.ncsa.illinois.edu/clowder/datasets/5c507cb74f0c436195ba8eb4?space=5c50512a4f0c436195b9ad67
-tif_url <- "rgb_geotiff_L1_ua-mac_2018-05-04__13-04-09-888_left.tif"
+# Extract the date from the file name
+getDate <- function(file_name){
+  date <- str_match_all(file_name, '[0-9]{4}-[0-9]{2}-[0-9]{2}')[[1]][,1]
+  return(date)
+}
 
-rgb_raster_1      <- raster(tif_url, band = 1)
-rgb_raster_1_crop <- crop(rgb_raster_1, extent(rgb_raster_1, 4200, 7500, 1800, 4200))
-plot(rgb_raster_1_crop)
-cellStats(rgb_raster_1_crop, stat = "mean")
-hist(rgb_raster_1_crop)
+clip_coords <- paste(toString(bounding_box[4]),' ',toString(bounding_box[3]),
+                    ' ',toString(bounding_box[2]),' ',toString(bounding_box[1]))
 
-rgb_raster_2      <- raster(tif_url, band = 2)
-rgb_raster_2_crop <- crop(rgb_raster_2, extent(rgb_raster_2, 4200, 7500, 1800, 4200))
-plot(rgb_raster_2_crop)
-cellStats(rgb_raster_2_crop, stat = "mean")
-hist(rgb_raster_2_crop)
+
+# Returns the greeness value of the clipped image
+getGreeness <- function(file_name, clip_coords){
+  out_file <- "extract.tif"
+  
+  command = paste("gdal_translate -projwin ",clip_coords," ",file_name," ",out_file)
+  print(command)
+  system(command)
+
+  green_image   <- raster(out_file, band = 2)
+  greeness      <- cellStats(green_image, stat = "mean")
+
+  if (file.exists(out_file)) 
+    file.remove(out_file)
+
+  return(greeness)
+}
+
+# Extract all the dates from the images
+day <- sapply(image_files, getDate, USE.NAMES = FALSE)
+
+greeness <- sapply(image_files, getGreeness, clip_coords=clip_coords, USE.NAMES = FALSE)
+
+final <- data.frame(day,greeness)
 ```
 
-```{r get_trait_data_2, message = FALSE}
-trait2 <- betydb_query(table     = "search", 
-                       trait     = "canopy_cover", 
-                       date      = "~2018 May",
-                       limit     =  "none")
-
-trait2 <- trait2 %>% 
-  mutate(day = as.Date(raw_date))
-```
-
-## Calculate greenness metric for each image
-
-Next we are going to compare the canopy cover measurements with a summary of the image. As an example, we will compute an index of greeness for each image.
-The chosen statistic here uses the red and green bands from the image raster. 
-This metric is a way to characterize the greenness of the area where the data were taken from. 
-
-```{r image_calculations}
-add_rasters <- rgb_raster_2_crop + rgb_raster_1_crop
-numerator   <- cellStats(add_rasters, stat = "sum")
-
-subtract_rasters <- rgb_raster_2_crop - rgb_raster_1_crop
-denominator      <- cellStats(subtract_rasters, stat = "sum")
-
-greenness_df     <- data.frame(greenness = numerator / denominator, 
-                               day = as.Date(str_extract(tif_url, "[0-9]{4}-[0-9]{2}-[0-9]{2}")))
-```
-
-## Combine with canopy cover and plot
+We now need to add the height data to the data set to plot.
 
 We then determine the average canopy cover across the site for the day that the sensor data were collected. 
 The relationship between our greenness metric and average canopy cover are plotted. 
@@ -199,9 +264,9 @@ trait2 <- trait2 %>%
   group_by(day) %>% 
   summarise(mean_canopy_cover = mean(mean), 
             sd_canopy_cover = sd(mean))
-
 sensor_trait_df <- left_join(trait2, greenness_df, by = "day")
-
 ggplot(sensor_trait_df, aes(x = mean_canopy_cover, y = greenness)) +
   geom_point()
 ```
+
+
