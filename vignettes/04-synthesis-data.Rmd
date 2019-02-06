@@ -50,8 +50,8 @@ daily_values <- daily_values %>%
 ```
 
 ```{r combine_trait_weather}
-trait_weather_df = full_join(trait, daily_values, by = "day")
-trait_weather_df = trait_weather_df %>% 
+trait_weather_df <- full_join(trait, daily_values, by = "day")
+trait_weather_df <- trait_weather_df %>% 
   select(day, cultivar, mean, gdd_cum) %>% 
   na.omit()
 ```
