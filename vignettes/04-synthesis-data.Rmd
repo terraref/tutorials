@@ -224,6 +224,8 @@ getDate <- function(file_name){
   return(date)
 }
 
+
+# Get the clip coordinates into the correct order
 clip_coords <- paste(toString(bounding_box[4]),' ',toString(bounding_box[3]),
                     ' ',toString(bounding_box[2]),' ',toString(bounding_box[1]))
 
@@ -231,14 +233,16 @@ clip_coords <- paste(toString(bounding_box[4]),' ',toString(bounding_box[3]),
 # Returns the greeness value of the clipped image
 getGreeness <- function(file_name, clip_coords){
   out_file <- "extract.tif"
-  
+
+  # Execute the GDAL command to extract the plot  
   command = paste("gdal_translate -projwin ",clip_coords," ",file_name," ",out_file)
-  print(command)
   system(command)
 
+  # Load the green band of the image and calculate the greeness value
   green_image   <- raster(out_file, band = 2)
   greeness      <- cellStats(green_image, stat = "mean")
 
+  # Remove the temporary file
   if (file.exists(out_file)) 
     file.remove(out_file)
 
@@ -248,9 +252,11 @@ getGreeness <- function(file_name, clip_coords){
 # Extract all the dates from the images
 day <- sapply(image_files, getDate, USE.NAMES = FALSE)
 
+# Extract all the greeness for the plot
 greeness <- sapply(image_files, getGreeness, clip_coords=clip_coords, USE.NAMES = FALSE)
 
-final <- data.frame(day,greeness)
+# Build the final day and greeness
+greenness_df <- data.frame(day,greeness)
 ```
 
 We now need to add the height data to the data set to plot.
