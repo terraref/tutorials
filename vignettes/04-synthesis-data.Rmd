@@ -25,11 +25,11 @@ options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
 ```
 
 ```{r get_trait_data, message = FALSE}
-trait <- betydb_query(table     = "search", 
+trait_canopy_height <- betydb_query(table     = "search", 
                       trait     = "canopy_height", 
                       date      = "~2017",
                       limit     =  "none")
-trait = trait %>% 
+trait_canopy_height = trait_canopy_height %>% 
   mutate(day = as.Date(raw_date))
 ```
 
@@ -50,7 +50,7 @@ daily_values <- daily_values %>%
 ```
 
 ```{r combine_trait_weather}
-trait_weather_df <- full_join(trait, daily_values, by = "day")
+trait_weather_df <- full_join(trait_canopy_height, daily_values, by = "day")
 trait_weather_df <- trait_weather_df %>% 
   select(day, cultivar, mean, gdd_cum) %>% 
   na.omit()
@@ -267,11 +267,11 @@ greenness_df <- greenness_df %>%
 We then pull in the canopy data for our charting purposes.
 
 ```{r get_trait_data_2, message = FALSE}
-trait2 <- betydb_query(table     = "search", 
+trait_canopy_cover <- betydb_query(table     = "search", 
                        trait     = "canopy_cover", 
                        date      = "~2018 May",
                        limit     =  "none")
-trait2 <- trait2 %>% 
+trait_canopy_cover <- trait_canopy_cover %>% 
   mutate(day = as.Date(raw_date))
 ```
 
@@ -281,12 +281,12 @@ We then determine the average canopy cover across the site for the day that the 
 The relationship between our greenness metric and average canopy cover are plotted. 
 
 ```{r plot_sensor_trait}
-trait2 <- trait2 %>% 
+trait_canopy_cover <- trait_canopy_cover %>% 
   filter(day %in% greenness_df$day) %>% 
   group_by(day) %>% 
   summarise(mean_canopy_cover = mean(mean), 
             sd_canopy_cover = sd(mean))
-sensor_trait_df <- left_join(trait2, greenness_df, by = "day")
+sensor_trait_df <- left_join(trait_canopy_cover, greenness_df, by = "day")
 ggplot(sensor_trait_df, aes(x = mean_canopy_cover, y = greeness)) +
   geom_point()
 ```
