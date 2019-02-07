@@ -184,7 +184,8 @@ bounding_box = getBounds(bounds)
 
 These are the names of the full field RGB data for the month of May.
 We will be extracting our plot data from these files.
-A compressed file containing these images can be found on [Box]().
+A compressed file containing these images can be found on [Google Drive](https://drive.google.com/file/d/1UuVHHcyf9sxjX9fEUpD4qa9LGlBR0XnK/view?usp=sharing).
+Be sure to extract the image files into a folder that's accessible to the code below.
 
 ```{r synth_filename_array}
 image_files <- 
@@ -239,9 +240,20 @@ getGreeness <- function(file_name, clip_coords){
   command = paste("gdal_translate -projwin ",clip_coords," ",file_name," ",out_file)
   system(command)
 
-  # Load the green band of the image and calculate the greeness value
+  # Load the red & green bands of the image and calculate the greeness value
+  red_image     <- raster(out_file, band = 1)
+  cellStats(red_image, stat = "mean")
+
   green_image   <- raster(out_file, band = 2)
-  greeness      <- cellStats(green_image, stat = "mean")
+  cellStats(green_image, stat = "mean")
+
+  add_rasters      <- green_image + red_image
+  numerator        <- cellStats(add_rasters, stat = "sum")
+
+  subtract_rasters <- green_image - red_image
+  denominator      <- cellStats(subtract_rasters, stat = "sum")
+
+  greeness         <- numerator / denominator
 
   # Remove the temporary file
   if (file.exists(out_file)) 
