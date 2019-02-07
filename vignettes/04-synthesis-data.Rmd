@@ -5,6 +5,10 @@ The objective of this vignette is to walk through how to combine our several typ
 For the first analysis, we want to figure out how the number of sufficiently warm days affects the amount of canopy cover at our site. We do this by combining the canopy cover data with the meteorological data on growing degree days, then modeling and plotting their relationship. We are specifically interested in figuring out when the increase in canopy cover starts to slow down in response to warm temperature days. 
 
 The second analysis compares greenness from image data with canopy cover. 
+The second analysis uses the gdal_translate tool from the [GDAL](https://www.gdal.org/) package.
+You can use one of the prepared downloads availble on the GDAL web site to install the needed software tool.
+Alternatively, it's possible to download and build the tools on your system. 
+For example, on the Mac, the command is `brew install gdal`.
 
 ## Get and join data
 
