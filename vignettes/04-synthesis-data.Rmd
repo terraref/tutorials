@@ -165,8 +165,7 @@ getBounds <-function(bounds){
 
 # Setting up our options
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'v1',
-        betydb_key = readLines('.betykey'))
+        betydb_api_version = 'v1')
 
 # Makiong the query for our site
 sites <- betydb_query(table     = "sites",  
