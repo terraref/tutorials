@@ -1,7 +1,4 @@
----
-title: "01-meteorological-data.Rmd"
-output: html_document
----
+# Accessing meteorological data
 
 Objectives:
 
@@ -14,9 +11,9 @@ Pre-requisites:
 
 ## The Maricopa Weather Station
 
-## Meteorological data formats
+### Meteorological data formats
 
-### Dimensions:
+#### Dimensions:
 
 |CF standard-name | units |
 |:------------------------------------------|:------|
@@ -24,7 +21,7 @@ Pre-requisites:
 | longitude | degrees_east|
 | latitude |degrees_north|
 
-### Variable names and units
+#### Variable names and units
 
 | CF standard-name                          | units | bety         | isimip       | cruncep | narr  | ameriflux |
 |:------------------------------------------|:------|:-------------|:-------------|:--------|:------|:----------|
@@ -173,7 +170,13 @@ library(dplyr)
 library(ggplot2)
 library(jsonlite)
 library(lubridate)
+library(magrittr)
+library(RCurl)
+library(ncdf4)
+library(ncdf.tools)
+```
 
+```{r get-weather-fromJSON}
 weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01', flatten = FALSE)
 ```
 
@@ -181,12 +184,12 @@ The `geometries` dataframe is then pulled out from these data, which contains
 the datapoints from this stream. This is combined with a transformed version of the
 end of the time period from the stream. 
 
-```{r met-datapoints}
+```{r met-datapoints2}
 weather_data <- weather_all$properties %>% 
   mutate(time = ymd_hms(weather_all$end_time))
 ```
 
-### Weather Plots
+## Weather Plots
 
 Create time series plot for one of the eight variables, wind speed, in the 
 newly created dataframe. 
@@ -198,11 +201,11 @@ ggplot(data = weather_data) +
   labs(x = "Day", y = "Wind speed (m/s)")
 ```
 
-# High resolution data (1/s) + spectroradiometer
+### High resolution data (1/s) + spectroradiometer
 
 This higher resolution weather data can be used for VNIR calibration, for example. But at 1/s it is very large!
 
-## Lets see how data are downloaded
+#### Download data
 
 Here we will download the files using the Clowder API, but note that if you have access to the filesystem (on www.workbench.terraref.org or globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger`. Folder
 
@@ -214,35 +217,29 @@ dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 ```
 
 ```{r query-clowder}
-library(jsonlite)
-library(magrittr)
-library(dplyr)
-library(RCurl)
-library(ggplot2)
-
 # Get Spaces from Clowder - without authentication, result will be Sample Data
 spaces <- fromJSON(paste0(api_url, '/spaces'))
 print(spaces %>% select(id, name))
 ```
 
-```{r list-of-datasets}
+```{r list-of-datasets, eval = FALSE}
 
 # Get list of (at most 20) Datasets within that Space from Clowder
 datasets <- fromJSON(paste0(api_url, '/spaces/', spaces$id, '/datasets'))
 print(datasets %>% select(id, name))
 ```
 
-```{r list-of-files}
+```{r list-of-files, eval = FALSE}
 # Get list of Files within any EnvironmentLogger datasets and filter .nc files
 files <- fromJSON(paste0(api_url, '/datasets/', datasets$id[grepl("EnvironmentLogger", datasets$name)], '/files'))
 ncfiles <- files[grepl('environmentlogger.nc', files$filename), ]
 print(ncfiles %>% select(id, filename))
 ```
 
-## Download netCDF 1/s data from Clowder
+#### Download netCDF 1/s data from Clowder
 
 
-```{r nc-download, echo=FALSE}
+```{r nc-download, echo=FALSE, eval = FALSE}
 sources <- paste0(api_url, '/files/', ncfiles$id)
 outputs <- paste0(output_dir, ncfiles$filename)
 
@@ -254,15 +251,11 @@ for (i in 1:length(sources)) {
 }
 ```
 
-### Using the netCDF 1/s data
+#### Using the netCDF 1/s data
 
 One use case getting the solar spectrum associated with a particular hyperspectral image.
 
-```{r}
-library(ncdf4)
-library(ncdf.tools)
-library(lubridate)
-
+```{r, eval = FALSE}
 time <- vector()
 vals <- vector()
 

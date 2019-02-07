@@ -1,8 +1,4 @@
-# Get Source Image Files
-
-- Change to use a ZIP file of imaes we want - merge files with paths
-- Show how to find plot data using Globus/Workbench
-- 
+# Retrieve source RGB image files
 
 ## Learning Objective
 
@@ -46,7 +42,7 @@ names = unique_sensor_names(sensors)
 
 The variable `names` will now contain the list of all available sensors.
 
-## Retrieving images
+## Retrieving the images
 
 Once we have a list of files and their IDs we can retrieve them one-by-one.
 We do this by creating a URL that identifies the file to retrieve, making the API call to retrieve the file contents, and writing the contents to disk.
