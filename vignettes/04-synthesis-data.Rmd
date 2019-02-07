@@ -217,6 +217,11 @@ image_files <-
      )
 ```
 
+```{r, echo = F}
+image_files <- file.path("vignettes/", image_files)
+```
+
+
 We will loop through these images, extract our plot data, and calculate the "greeness" of each extract.
 We are using the name of the file to extract the date for later.
 
@@ -287,6 +292,7 @@ trait_canopy_cover <- betydb_query(table     = "search",
                        trait     = "canopy_cover", 
                        date      = "~2018 May",
                        limit     =  "none")
+
 trait_canopy_cover <- trait_canopy_cover %>% 
   mutate(day = as.Date(raw_date))
 ```
