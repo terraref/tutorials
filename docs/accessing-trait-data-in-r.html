@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>TERRA REF Tutorials</title>
+  <meta name="description" content="TERRA REF Tutorials">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="TERRA REF Tutorials" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="TERRA REF Tutorials" />
+  
+  
+  
+
+<meta name="author" content="David LeBauer and others">
+
+
+<meta name="date" content="2019-02-07">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="vignettes-introduction.html">
+<link rel="next" href="accessing-weather-data-in-r.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Overview</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#pre-requisites"><i class="fa fa-check"></i><b>1.1</b> Pre-requisites</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#technical-requirements"><i class="fa fa-check"></i><b>1.1.1</b> Technical Requirements</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#user-accounts-and-permission-to-access-terra-ref-data"><i class="fa fa-check"></i><b>1.1.2</b> User Accounts and permission to access TERRA REF data</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#ways-of-acessing-data"><i class="fa fa-check"></i><b>1.2</b> Ways of Acessing Data</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i><b>1.3</b> Other Resources</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#finding-help"><i class="fa fa-check"></i><b>1.3.1</b> Finding help</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>Section 1: Vignettes</b></span></li>
+<li class="chapter" data-level="2" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html"><i class="fa fa-check"></i><b>2</b> Vignettes Introduction</a></li>
+<li class="chapter" data-level="3" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html"><i class="fa fa-check"></i><b>3</b> Accessing trait data in R</a><ul>
+<li class="chapter" data-level="3.1" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#learning-objectives"><i class="fa fa-check"></i><b>3.1</b> Learning Objectives</a></li>
+<li class="chapter" data-level="3.2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#introduction"><i class="fa fa-check"></i><b>3.2</b> Introduction</a></li>
+<li class="chapter" data-level="3.3" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#query-for-available-traits"><i class="fa fa-check"></i><b>3.3</b> Query for available traits</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#getting-started"><i class="fa fa-check"></i><b>3.3.1</b> Getting Started</a></li>
+<li class="chapter" data-level="3.3.2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#setting-options"><i class="fa fa-check"></i><b>3.3.2</b> Setting options</a></li>
+<li class="chapter" data-level="3.3.3" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#querying-available-traits"><i class="fa fa-check"></i><b>3.3.3</b> Querying available traits</a></li>
+<li class="chapter" data-level="3.3.4" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#plot-season-4-summary"><i class="fa fa-check"></i><b>3.3.4</b> Plot season 4 summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#querying-a-specific-trait"><i class="fa fa-check"></i><b>3.4</b> Querying a specific trait</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#querying-season-6-canopy-height-data"><i class="fa fa-check"></i><b>3.4.1</b> Querying season 6 canopy height data</a></li>
+<li class="chapter" data-level="3.4.2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#plotting-query-results"><i class="fa fa-check"></i><b>3.4.2</b> Plotting query results</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html"><i class="fa fa-check"></i><b>4</b> Accessing weather data in R</a><ul>
+<li class="chapter" data-level="4.1" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html#objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data"><i class="fa fa-check"></i><b>4.1</b> Objective: To be able to demonstrate how to get TERRA REF meteorological data</a></li>
+<li class="chapter" data-level="4.2" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html#read-in-data-using-r"><i class="fa fa-check"></i><b>4.2</b> Read in data using R</a></li>
+<li class="chapter" data-level="4.3" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html#plot-data-using-r"><i class="fa fa-check"></i><b>4.3</b> Plot data using R</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html"><i class="fa fa-check"></i><b>5</b> Retrieve source RGB image files</a><ul>
+<li class="chapter" data-level="5.1" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#learning-objective"><i class="fa fa-check"></i><b>5.1</b> Learning Objective</a></li>
+<li class="chapter" data-level="5.2" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#introduction-1"><i class="fa fa-check"></i><b>5.2</b> Introduction</a></li>
+<li class="chapter" data-level="5.3" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#getting-started-1"><i class="fa fa-check"></i><b>5.3</b> Getting Started</a></li>
+<li class="chapter" data-level="5.4" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#retrieving-sensor-names"><i class="fa fa-check"></i><b>5.4</b> Retrieving sensor names</a></li>
+<li class="chapter" data-level="5.5" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#retrieving-the-images"><i class="fa fa-check"></i><b>5.5</b> Retrieving the images</a></li>
+<li class="chapter" data-level="5.6" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#sample-images"><i class="fa fa-check"></i><b>5.6</b> Sample Images</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html"><i class="fa fa-check"></i><b>6</b> Combining trait, weather, and image datasets</a><ul>
+<li class="chapter" data-level="6.1" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#get-and-join-data"><i class="fa fa-check"></i><b>6.1</b> Get and join data</a></li>
+<li class="chapter" data-level="6.2" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#plot-and-model-relationship-between-gdd-and-canopy-cover-for-each-cultivar"><i class="fa fa-check"></i><b>6.2</b> Plot and model relationship between GDD and canopy cover for each cultivar</a></li>
+<li class="chapter" data-level="6.3" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#create-histogram-of-growth-rate-for-all-cultivars"><i class="fa fa-check"></i><b>6.3</b> Create histogram of growth rate for all cultivars</a></li>
+<li class="chapter" data-level="6.4" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#get-image-data"><i class="fa fa-check"></i><b>6.4</b> Get image data</a></li>
+</ul></li>
+<li class="part"><span><b>Section 2: Tutorials</b></span></li>
+<li class="chapter" data-level="7" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html"><i class="fa fa-check"></i><b>7</b> Accessing Trait Data in R</a><ul>
+<li class="chapter" data-level="7.1" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html#using-the-r-traits-package-to-query-the-database"><i class="fa fa-check"></i><b>7.1</b> Using the R traits package to query the database</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html#setup"><i class="fa fa-check"></i><b>7.1.1</b> Setup</a></li>
+<li class="chapter" data-level="7.1.2" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html#example-time-series-of-height"><i class="fa fa-check"></i><b>7.1.2</b> Example: Time series of height</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html"><i class="fa fa-check"></i><b>8</b> Accessing meteorological data</a><ul>
+<li class="chapter" data-level="8.1" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#the-maricopa-weather-station"><i class="fa fa-check"></i><b>8.1</b> The Maricopa Weather Station</a><ul>
+<li class="chapter" data-level="8.1.1" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#meteorological-data-formats"><i class="fa fa-check"></i><b>8.1.1</b> Meteorological data formats</a></li>
+<li class="chapter" data-level="8.1.2" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#using-the-api-to-get-data"><i class="fa fa-check"></i><b>8.1.2</b> Using the API to get data</a></li>
+<li class="chapter" data-level="8.1.3" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#the-structure-of-the-geostreams-database"><i class="fa fa-check"></i><b>8.1.3</b> The structure of the Geostreams database</a></li>
+<li class="chapter" data-level="8.1.4" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#creating-the-urls-for-all-data-table-types"><i class="fa fa-check"></i><b>8.1.4</b> Creating the URLs for all data table types</a></li>
+<li class="chapter" data-level="8.1.5" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#querying-weather-sensor-data-stream"><i class="fa fa-check"></i><b>8.1.5</b> Querying weather sensor data stream</a></li>
+<li class="chapter" data-level="8.1.6" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#download-data-using-the-command-line"><i class="fa fa-check"></i><b>8.1.6</b> Download data using the command line</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#weather-plots"><i class="fa fa-check"></i><b>8.2</b> Weather Plots</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#high-resolution-data-1s-spectroradiometer"><i class="fa fa-check"></i><b>8.2.1</b> High resolution data (1/s) + spectroradiometer</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html"><i class="fa fa-check"></i><b>9</b> Generating file lists by plot</a><ul>
+<li class="chapter" data-level="9.1" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#pre-requisites-1"><i class="fa fa-check"></i><b>9.1</b> Pre-requisites:</a></li>
+<li class="chapter" data-level="9.2" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-started-2"><i class="fa fa-check"></i><b>9.2</b> Getting started</a></li>
+<li class="chapter" data-level="9.3" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-the-sensor-list"><i class="fa fa-check"></i><b>9.3</b> Getting the sensor list</a></li>
+<li class="chapter" data-level="9.4" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-a-list-of-files"><i class="fa fa-check"></i><b>9.4</b> Getting a list of files</a></li>
+<li class="chapter" data-level="9.5" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#querying-the-api"><i class="fa fa-check"></i><b>9.5</b> Querying the API</a><ul>
+<li class="chapter" data-level="9.5.1" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#a-word-of-caution"><i class="fa fa-check"></i><b>9.5.1</b> A Word of Caution</a></li>
+<li class="chapter" data-level="9.5.2" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#finding-plot-id"><i class="fa fa-check"></i><b>9.5.2</b> Finding plot ID</a></li>
+<li class="chapter" data-level="9.5.3" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#finding-stream-id-within-a-plot"><i class="fa fa-check"></i><b>9.5.3</b> Finding stream ID within a plot</a></li>
+<li class="chapter" data-level="9.5.4" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#listing-clowder-dataset-ids-for-that-plot-sensor-stream"><i class="fa fa-check"></i><b>9.5.4</b> Listing Clowder dataset IDs for that plot &amp; sensor stream</a></li>
+<li class="chapter" data-level="9.5.5" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-file-paths-from-dataset"><i class="fa fa-check"></i><b>9.5.5</b> Getting file paths from dataset</a></li>
+<li class="chapter" data-level="9.5.6" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#retrieving-the-files"><i class="fa fa-check"></i><b>9.5.6</b> Retrieving the files</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">TERRA REF Tutorials</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="accessing-trait-data-in-r" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Accessing trait data in R</h1>
+<div id="learning-objectives" class="section level2">
+<h2><span class="header-section-number">3.1</span> Learning Objectives</h2>
+<p>In this chapter you will learn:</p>
+<ul>
+<li>How to create a summary of available data to query from a TERRA REF season</li>
+<li>How to query a specific trait</li>
+<li>How to visualize query results</li>
+</ul>
+</div>
+<div id="introduction" class="section level2">
+<h2><span class="header-section-number">3.2</span> Introduction</h2>
+<p>In this chapter, we go over how to query TERRA REF trait data using the <a href="https://github.com/ropensci/traits"><code>traits</code></a> package. The <code>traits</code> package is a way to query for various sources of species trait data, including <a href="https://www.betydb.org/">BETYdb</a>, <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>, <a href="http://coraltraits.org/">Coral Traits Disease</a> and others. In this chapter we use BETYdb as our trait source, as it contains the TERRA REF data that we are interested in.</p>
+<p>Our example will show how to query for season 6 data <!-- what is a season? need to define this for users> --> and visualize canopy height. In addition to the <code>traits</code> package we will also be using some of the <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> packages, which allow us to maniupulate the data in an efficient, understandable way. If you are unfamiliar with <code>tidyverse</code> syntax, we recommend checking out some of the resources <a href="https://www.tidyverse.org/learn/">here</a>.</p>
+</div>
+<div id="query-for-available-traits" class="section level2">
+<h2><span class="header-section-number">3.3</span> Query for available traits</h2>
+<div id="getting-started" class="section level3">
+<h3><span class="header-section-number">3.3.1</span> Getting Started</h3>
+<p>First, we will need to install and load the traits package from github, and load it into our environment, along with the other packages we will use in this tutorial.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># devtools::install_github(&#39;terraref/traits&#39;, force = TRUE) # run once</span>
+<span class="kw">library</span>(traits)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(lubridate)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(knitr)</code></pre></div>
+</div>
+<div id="setting-options" class="section level3">
+<h3><span class="header-section-number">3.3.2</span> Setting options</h3>
+<p>The function that is used to query BETYdb is called <code>betydb_query</code>. To reduce the number of arguments needed to pass into this function, we can set some global options using <code>options</code>. In this case, we will set the URL used in the query, and the API version.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/bety/&quot;</span>,
+        <span class="dt">betydb_api_version =</span> <span class="st">&#39;v1&#39;</span>)</code></pre></div>
+</div>
+<div id="querying-available-traits" class="section level3">
+<h3><span class="header-section-number">3.3.3</span> Querying available traits</h3>
+<p>The TERRA REF database contains trait data for many other seasons of observation, and available data may vary by season. Here, we get a visual summary of available traits and methods of measurement for a season.</p>
+<p>First we construct a general query for the Season 4 data. This returns all season 4 data. The function <code>betydb_query</code> takes as arguments <code>key = &quot;value&quot;</code> pairs which represent columns in the database to query. In this example, we <code>sitename</code> column for season 4 data, and set the limit to “none” to return all records. By default, the function will search all tables in the database. To specify a particular table you can use the <code>table</code> argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all of season 4 data </span>
+season_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">sitename  =</span> <span class="st">&quot;~Season 4&quot;</span>,
+                         <span class="dt">limit     =</span>  <span class="st">&quot;none&quot;</span>)</code></pre></div>
+<p>The return value for the <code>betydb_query</code> function is just a <code>data.frame</code> so we can work with it like any other <code>data.frame</code> in R.</p>
+<p>Let’s plot a time series of all traits returned. First you might notice that the relevant date columns in the <code>season_4</code> data.frame are returned as characters instead of a date format. Before plotting, let’s get our <code>raw_date</code> column into a proper date format using functions from <code>dplyr</code> and <code>lubridate</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">season_<span class="dv">4</span> &lt;-<span class="st"> </span>season_<span class="dv">4</span> <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">raw_date =</span> <span class="kw">ymd_hms</span>(raw_date))</code></pre></div>
+</div>
+<div id="plot-season-4-summary" class="section level3">
+<h3><span class="header-section-number">3.3.4</span> Plot season 4 summary</h3>
+<p>Now we can create a plot of all of the trait data collected during season 4, including information about the methods used.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> season_<span class="dv">4</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> raw_date, <span class="dt">y =</span> mean, <span class="dt">color =</span> method_name)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> raw_date, <span class="dt">y =</span> mean, <span class="dt">group =</span> cultivar, <span class="dt">color =</span> method_name)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>trait, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Date&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Mean trait value&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Season 6 data summary&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">guides</span>(<span class="dt">color =</span> <span class="kw">guide_legend</span>(<span class="dt">title=</span><span class="st">&quot;Method&quot;</span>, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">title.position =</span> <span class="st">&quot;top&quot;</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</code></pre></div>
+<p><img src="terraref-tutorials_files/figure-html/traits-vig-s4-summary-plot-data-1.png" width="672" /></p>
+<p>We can view more information about these trait measurements by examining unique values in the trait and trait description columns.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">traits &lt;-<span class="st"> </span>season_<span class="dv">4</span> <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">distinct</span>(trait, trait_description)
+
+<span class="kw">kable</span>(traits)</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">trait</th>
+<th align="left">trait_description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">canopy_height</td>
+<td align="left">top of the general canopy of the plant, discounting any exceptional branches, leaves or photosynthetic portions of the inflorescence.</td>
+</tr>
+<tr class="even">
+<td align="left">canopy_cover</td>
+<td align="left">Fraction of ground covered by plant</td>
+</tr>
+<tr class="odd">
+<td align="left">leaf_desiccation_present</td>
+<td align="left">Visual assessment of presence or absence of leaves showing desiccation. 1 = present, 0 = absent</td>
+</tr>
+<tr class="even">
+<td align="left">leaf_length</td>
+<td align="left">Length of leaf from tip to stem along the midrib.</td>
+</tr>
+<tr class="odd">
+<td align="left">leaf_width</td>
+<td align="left">width of leaf at widest point along leaf</td>
+</tr>
+<tr class="even">
+<td align="left">lodging_present</td>
+<td align="left">Visual assessment of presence or absence of lodging or severe leaning within a plot. 1 = present, 0 = absent</td>
+</tr>
+<tr class="odd">
+<td align="left">surface_temperature_leaf</td>
+<td align="left">Leaf surface temperature estimates of an individual haphazardly selected sunlit leaf in the upper canopy, targeting fully expanded leaves when possible, using hand-held instruments</td>
+</tr>
+<tr class="even">
+<td align="left">panicle_height</td>
+<td align="left">height to top of panicle</td>
+</tr>
+<tr class="odd">
+<td align="left">stand_count</td>
+<td align="left">Number of plants per subplot or plot, counted after thinning</td>
+</tr>
+<tr class="even">
+<td align="left">absorbance_730</td>
+<td align="left">Absorbance at 730 nm</td>
+</tr>
+<tr class="odd">
+<td align="left">relative_chlorophyll</td>
+<td align="left">Relative value describing the concentration of chlorophyll in the leaf, ranges from 0 to 80</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="querying-a-specific-trait" class="section level2">
+<h2><span class="header-section-number">3.4</span> Querying a specific trait</h2>
+<div id="querying-season-6-canopy-height-data" class="section level3">
+<h3><span class="header-section-number">3.4.1</span> Querying season 6 canopy height data</h3>
+<p>You may find after constructing a general query as above that you want to only query a specific trait. Here, we query for the canopy height trait by adding the key-value pair <code>trait = &quot;canopy_height&quot;</code> to our query function. Note that the limit is also set to return only 250 records, shown here for demostration purposes.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">canopy_height &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">trait     =</span> <span class="st">&quot;canopy_height&quot;</span>, 
+                              <span class="dt">sitename  =</span> <span class="st">&quot;~Season 6&quot;</span>,
+                              <span class="dt">limit     =</span>  <span class="dv">250</span>)</code></pre></div>
+</div>
+<div id="plotting-query-results" class="section level3">
+<h3><span class="header-section-number">3.4.2</span> Plotting query results</h3>
+<p>As before, we need to reformat the raw date column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">canopy_height &lt;-<span class="st"> </span>canopy_height <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">raw_date =</span> <span class="kw">ymd_hms</span>(raw_date))</code></pre></div>
+<p>And we can generate a time series plot of just the canopy height data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot a time series of canopy height </span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> canopy_height,
+       <span class="kw">aes</span>(<span class="dt">x =</span> raw_date, <span class="dt">y =</span> mean)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>, <span class="dt">position =</span> <span class="kw">position_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Date&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Plant height (cm)&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Sorghum canopy height, Season 6 TERRA REF&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_bw</span>()</code></pre></div>
+<p><img src="terraref-tutorials_files/figure-html/traits-vig-canopy-plot-1.png" width="672" /></p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="vignettes-introduction.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="accessing-weather-data-in-r.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
