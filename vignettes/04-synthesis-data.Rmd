@@ -14,7 +14,6 @@ The second is the cumulative growing degree days for all of 2017, which were cal
 They are combined by their common column, the date. 
 
 ```{r synth_setup}
-library(raster)
 library(dplyr)
 library(ggplot2)
 library(jsonlite)
@@ -130,6 +129,7 @@ ggplot(data.frame(inf_points = unique(all_cultivars$inf_point))) +
 ## Get image data
 
 In this examnple we will extract our plot data from a series of images taken in May of Season 6, measure its "greeness" annd plot that against the plant heights from above in this vignette.
+
 The chosen statistic here is the normalised green-red difference index, NGRDI=(R-G)/(R+G) (Rasmussen et al., 2016), which uses the red and green bands from the image raster.
 
 Below we retrieve all the available plots for a particular date, then find and convert the plot boundary JSON into tuples.
@@ -148,9 +148,9 @@ sites <- betydb_query(table     = "sites",
 site.geom <- sites$geometry
 
 # Convert the polygon to something we can clip with. CRS value represents WGS84 Lat/Long
-site.shape = st_as_sfc(site.geom,crs = 4326)
-site.poly = st_cast(site.shape, "POINT")
-site.clip = as(site.poly,"Spatial")
+site.shape <- st_as_sfc(site.geom,crs = 4326)
+site.poly <- st_cast(site.shape, "POINT")
+site.clip <- as(site.poly,"Spatial")
 ```
 
 These are the names of the full field RGB data for the month of May.
@@ -163,7 +163,6 @@ image_files <-
    c('fullfield_L1_ua-mac_2018-05-01_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-02_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-03_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-04_rgb_stereovis_ir_sensors_fullfield_sorghum6_settingstest_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-05_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-06_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-08_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
@@ -175,7 +174,6 @@ image_files <-
      'fullfield_L1_ua-mac_2018-05-15_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-17_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-18_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-19_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-20_rgb_stereovis_ir_sensors_plots_sorghum6_shade_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-21_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-22_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
@@ -192,6 +190,8 @@ We will loop through these images, extract our plot data, and calculate the "gre
 We are using the name of the file to extract the date for later.
 
 ```{r synth_get_greeness}
+library(raster)
+
 # Extract the date from the file name
 getDate <- function(file_name){
   date <- str_match_all(file_name, '[0-9]{4}-[0-9]{2}-[0-9]{2}')[[1]][,1]
@@ -200,11 +200,12 @@ getDate <- function(file_name){
 
 # Returns the greeness value of the plot in the specified file
 getGreeness <- function(file_name, clip_coords){
-  band_image = raster(file_name, band = 1)
-  red_crop = crop(band_image, clip_coords)
+  
+  band_image       <- raster(file_name, band = 1)
+  red_crop         <- crop(band_image, clip_coords)
 
-  band_image = raster(file_name, band = 2)
-  green_crop = crop(band_image, clip_coords)
+  band_image       <- raster(file_name, band = 2)
+  green_crop       <- crop(band_image, clip_coords)
 
   add_rasters      <- green_crop + red_crop
   numerator        <- cellStats(add_rasters, stat = "sum")
@@ -213,12 +214,7 @@ getGreeness <- function(file_name, clip_coords){
   denominator      <- cellStats(subtract_rasters, stat = "sum")
 
   greeness         <- numerator / denominator
-  
-  # If we can't get a greeness value we return zero
-  if (is.nan(greeness)) {
-    greeness = 0;
-  }
-  
+
   return(greeness)
 }
 
