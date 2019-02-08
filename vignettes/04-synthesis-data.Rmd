@@ -138,8 +138,7 @@ We will use these tuples to extract the data for our plot.
 ```{r get_plot_boundary}
 # Setting up our options
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'v1',
-        betydb_key = readLines('.betykey'))
+        betydb_api_version = 'v1')
 
 # Making the query for our site
 sites <- betydb_query(table     = "sites",  
@@ -183,6 +182,10 @@ image_files <-
      'fullfield_L1_ua-mac_2018-05-23_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
      'fullfield_L1_ua-mac_2018-05-28_rgb_stereovis_ir_sensors_plots_sorghum6_shade_rgb_eastedge_mn_thumb.tif'
      )
+```
+
+```{r, echo = F}
+image_files <- file.path("vignettes/", image_files)
 ```
 
 We will loop through these images, extract our plot data, and calculate the "greeness" of each extract.
@@ -240,6 +243,7 @@ trait_canopy_cover <- betydb_query(table     = "search",
                        trait     = "canopy_cover", 
                        date      = "~2018 May",
                        limit     =  "none")
+                       
 trait_canopy_cover <- trait_canopy_cover %>% 
   mutate(day = as.Date(raw_date))
 ```
