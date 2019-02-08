@@ -23,6 +23,7 @@ library(traits)
 library(inflection)
 library(sf)
 library(stringr)
+library(googledrive)
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 ```
@@ -159,32 +160,10 @@ A compressed file containing these images can be found on [Google Drive](https:/
 Be sure to extract the image files into a folder that's accessible to the code below.
 
 ```{r synth_filename_array}
-image_files <- 
-   c('fullfield_L1_ua-mac_2018-05-01_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-02_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-03_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-04_rgb_stereovis_ir_sensors_fullfield_sorghum6_settingstest_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-05_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-06_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-08_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-09_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-10_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_-_copy_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-12_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-13_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-14_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-15_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-17_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-18_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-19_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-20_rgb_stereovis_ir_sensors_plots_sorghum6_shade_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-21_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-22_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-23_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-28_rgb_stereovis_ir_sensors_plots_sorghum6_shade_rgb_eastedge_mn_thumb.tif'
-     )
-```
-
-```{r, echo = F}
+google_file_id <- "1UuVHHcyf9sxjX9fEUpD4qa9LGlBR0XnK"
+drive_download(as_id(google_file_id), "vignettes/rgb_images.zip")
+unzip("vignettes/rgb_images.zip", exdir = "vignettes/")
+image_files <- list.files("vignettes/", pattern = "*.tif")
 image_files <- file.path("vignettes/", image_files)
 ```
 
