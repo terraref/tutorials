@@ -31,7 +31,7 @@ trait_canopy_height <- betydb_query(table     = "search",
                       trait     = "canopy_height", 
                       date      = "~2017",
                       limit     =  "none")
-trait_canopy_height2 = trait_canopy_height %>% 
+trait_canopy_height_day = trait_canopy_height %>% 
   mutate(day = as.Date(raw_date))
 ```
 
@@ -52,7 +52,7 @@ daily_values <- daily_values %>%
 ```
 
 ```{r combine_trait_weather}
-trait_weather_df <- full_join(trait_canopy_height2, daily_values, by = "day") %>% 
+trait_weather_df <- full_join(trait_canopy_height_day, daily_values, by = "day") %>% 
   select(day, cultivar, mean, gdd_cum) %>% 
   na.omit()
 ```
@@ -69,8 +69,8 @@ single_cultivar <- trait_weather_df %>%
   filter(cultivar == "PI656026")
 cap     <- 150
 initial <- 25
-mean    <- single_cultivar$mean[67]
-gdd_cum <- single_cultivar$gdd_cum[67]
+mean    <- single_cultivar$mean[15]
+gdd_cum <- single_cultivar$gdd_cum[15]
 rate    <- ((log((cap/mean) - 1)) - initial)/gdd_cum
 model_single_cultivar <- nls(mean ~ cap / (1 + exp(initial + rate * gdd_cum)), 
                              start = list(cap = cap, initial = initial, rate = rate),
@@ -236,7 +236,7 @@ trait_canopy_cover <- betydb_query(table     = "search",
                        date      = "~2018 May",
                        limit     =  "none")
                        
-trait_canopy_cover2 <- trait_canopy_cover %>% 
+trait_canopy_cover_day <- trait_canopy_cover %>% 
   mutate(day = as.Date(raw_date))
 ```
 
@@ -246,12 +246,12 @@ We then determine the average canopy cover across the site for the day that the 
 The relationship between our greenness metric and average canopy cover are plotted. 
 
 ```{r plot_sensor_trait}
-trait_canopy_cover3 <- trait_canopy_cover2 %>% 
+trait_canopy_cover_daily <- trait_canopy_cover_day %>% 
   filter(day %in% greenness_df$day) %>% 
   group_by(day) %>% 
   summarise(mean_canopy_cover = mean(mean), 
             sd_canopy_cover = sd(mean))
-sensor_trait_df <- left_join(trait_canopy_cover3, greenness_df, by = "day")
+sensor_trait_df <- left_join(trait_canopy_cover_daily, greenness_df, by = "day")
 ggplot(sensor_trait_df, aes(x = mean_canopy_cover, y = greeness)) +
   geom_point()
 ```
