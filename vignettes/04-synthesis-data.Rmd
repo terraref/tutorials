@@ -31,7 +31,7 @@ trait_canopy_height <- betydb_query(table     = "search",
                       trait     = "canopy_height", 
                       date      = "~2017",
                       limit     =  "none")
-trait_canopy_height = trait_canopy_height %>% 
+trait_canopy_height_day = trait_canopy_height %>% 
   mutate(day = as.Date(raw_date))
 ```
 
@@ -52,8 +52,7 @@ daily_values <- daily_values %>%
 ```
 
 ```{r combine_trait_weather}
-trait_weather_df <- full_join(trait_canopy_height, daily_values, by = "day")
-trait_weather_df <- trait_weather_df %>% 
+trait_weather_df <- full_join(trait_canopy_height_day, daily_values, by = "day") %>% 
   select(day, cultivar, mean, gdd_cum) %>% 
   na.omit()
 ```
@@ -70,8 +69,8 @@ single_cultivar <- trait_weather_df %>%
   filter(cultivar == "PI656026")
 cap     <- 150
 initial <- 25
-mean    <- single_cultivar$mean[67]
-gdd_cum <- single_cultivar$gdd_cum[67]
+mean    <- single_cultivar$mean[15]
+gdd_cum <- single_cultivar$gdd_cum[15]
 rate    <- ((log((cap/mean) - 1)) - initial)/gdd_cum
 model_single_cultivar <- nls(mean ~ cap / (1 + exp(initial + rate * gdd_cum)), 
                              start = list(cap = cap, initial = initial, rate = rate),
@@ -183,7 +182,7 @@ image_files <-
 ```
 
 ```{r, echo = F}
-image_files <- file.path("vignettes/", image_files)
+image_files_paths <- file.path("vignettes/", image_files)
 ```
 
 We will loop through these images, extract our plot data, and calculate the "greeness" of each extract.
@@ -201,11 +200,11 @@ getDate <- function(file_name){
 # Returns the greeness value of the plot in the specified file
 getGreeness <- function(file_name, clip_coords){
   
-  band_image       <- raster(file_name, band = 1)
-  red_crop         <- crop(band_image, clip_coords)
+  band_image_red   <- raster(file_name, band = 1)
+  red_crop         <- crop(band_image_red, clip_coords)
 
-  band_image       <- raster(file_name, band = 2)
-  green_crop       <- crop(band_image, clip_coords)
+  band_image_green <- raster(file_name, band = 2)
+  green_crop       <- crop(band_image_green, clip_coords)
 
   add_rasters      <- green_crop + red_crop
   numerator        <- cellStats(add_rasters, stat = "sum")
@@ -219,18 +218,15 @@ getGreeness <- function(file_name, clip_coords){
 }
 
 # Extract all the dates from the images
-day <- sapply(image_files, getDate, USE.NAMES = FALSE)
+date <- sapply(image_files_paths, getDate, USE.NAMES = FALSE)
 
 # Extract all the greeness for the plot
-greeness <- sapply(image_files, getGreeness, clip_coords=site.clip, USE.NAMES = FALSE)
+greeness <- sapply(image_files_paths, getGreeness, clip_coords=site.clip, USE.NAMES = FALSE)
 
 # Build the final day and greeness
-greenness_df <- data.frame(day,greeness)
-
-# Convert to tibble for later joining
-greenness_df <- as_tibble(greenness_df)
-greenness_df <- greenness_df %>%  
-  mutate(day = as.Date(day))
+greenness_df <- data.frame(date, greeness) %>% 
+  as_tibble() %>% 
+  mutate(day = as.Date(date))
 ```
 We then pull in the canopy data for our charting purposes.
 
@@ -240,7 +236,7 @@ trait_canopy_cover <- betydb_query(table     = "search",
                        date      = "~2018 May",
                        limit     =  "none")
                        
-trait_canopy_cover <- trait_canopy_cover %>% 
+trait_canopy_cover_day <- trait_canopy_cover %>% 
   mutate(day = as.Date(raw_date))
 ```
 
@@ -250,12 +246,12 @@ We then determine the average canopy cover across the site for the day that the 
 The relationship between our greenness metric and average canopy cover are plotted. 
 
 ```{r plot_sensor_trait}
-trait_canopy_cover <- trait_canopy_cover %>% 
+trait_canopy_cover_daily <- trait_canopy_cover_day %>% 
   filter(day %in% greenness_df$day) %>% 
   group_by(day) %>% 
   summarise(mean_canopy_cover = mean(mean), 
             sd_canopy_cover = sd(mean))
-sensor_trait_df <- left_join(trait_canopy_cover, greenness_df, by = "day")
+sensor_trait_df <- left_join(trait_canopy_cover_daily, greenness_df, by = "day")
 ggplot(sensor_trait_df, aes(x = mean_canopy_cover, y = greeness)) +
   geom_point()
 ```
