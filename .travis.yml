@@ -6,3 +6,11 @@ cache: packages
 
 script:
   - Rscript -e 'bookdown::render_book("index.rmd")'
+  
+deploy: 
+  provider: pages
+  skip_clean: true
+  #github_token: 
+  keep-history: true
+  on: 
+    branch: master
