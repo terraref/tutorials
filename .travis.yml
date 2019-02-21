@@ -1,0 +1,16 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: R
+sudo: false
+cache: packages
+
+script:
+  - Rscript -e 'bookdown::render_book("index.rmd")'
+  
+deploy: 
+  provider: pages
+  skip_clean: true
+  github_token: $GITHUB_TOKEN
+  keep-history: true
+  on: 
+    branch: master
