@@ -10,7 +10,7 @@ script:
 deploy: 
   provider: pages
   skip_clean: true
-  #github_token: 
+  github_token: $GITHUB_TOKEN
   keep-history: true
   on: 
     branch: master
