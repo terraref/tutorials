@@ -16,7 +16,5 @@ Imports:
   raster, 
   ggthemes, 
   magrittr, 
-  RCurl, 
-  ncdf4, 
-  ncdf.tools
+  RCurl
 Remotes: rstudio/bookdown
