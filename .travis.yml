@@ -4,6 +4,9 @@ language: R
 sudo: false
 cache: packages
 
+before_install: 
+  - sudo apt-get install libudunits2-dev
+
 script:
   - Rscript -e 'bookdown::render_book("index.rmd")'
   
