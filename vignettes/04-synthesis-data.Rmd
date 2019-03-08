@@ -23,7 +23,6 @@ library(traits)
 library(inflection)
 library(sf)
 library(stringr)
-library(googledrive)
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
         betydb_api_version = 'v1')
 ```
@@ -156,12 +155,11 @@ site.clip = as(site.poly,"Spatial")
 
 These are the names of the full field RGB data for the month of May.
 We will be extracting our plot data from these files.
-A compressed file containing these images can be found on [Google Drive](https://drive.google.com/file/d/1UuVHHcyf9sxjX9fEUpD4qa9LGlBR0XnK/view?usp=sharing).
+A compressed file containing these images can be found on [Clowder](https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870?dataset=5c81709a4f0c78f6486d686c&space=).
 Be sure to extract the image files into a folder that's accessible to the code below.
 
 ```{r synth_filename_array}
-google_file_id <- "1UuVHHcyf9sxjX9fEUpD4qa9LGlBR0XnK"
-drive_download(as_id(google_file_id), "vignettes/rgb_images.zip")
+download.file("https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870/blob", destfile = "vignettes/rgb_images.zip")
 unzip("vignettes/rgb_images.zip", exdir = "vignettes/")
 image_files <- list.files("vignettes/", pattern = "*.tif")
 image_files <- file.path("vignettes/", image_files)
