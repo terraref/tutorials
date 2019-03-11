@@ -13,4 +13,3 @@ rmd_files: ["index.Rmd",
 "traits/03-access-r-traits.Rmd",
 "sensors/01-meteorological-data.Rmd",
 "sensors/06-list-datasets-by-plot.Rmd"]
-
