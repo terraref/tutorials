@@ -5,7 +5,7 @@ output: html_document
 
 The objective of this tutorial is to demonstrate how to upload a season's metadata to BETY. 
 Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
-Users will need to copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1Fr_8xYOucyCQ9WH5_1bfPTMpm3IhKX5oqW4UOMvPoSY/edit#gid=0) and publish to the web.
+Users will need to copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1Fr_8xYOucyCQ9WH5_1bfPTMpm3IhKX5oqW4UOMvPoSY/edit#gid=0) and publish to the web as a `Microsoft Excel .xlsx` file.
 Instructions on how to fill out the template can be found under the README.
 Note: Database connection parameters should also be filled out in the template under the 'db_connection' sheet.
 
