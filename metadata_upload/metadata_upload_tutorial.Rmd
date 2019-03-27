@@ -12,13 +12,8 @@ Note: Database connection parameters should also be filled out in the template u
 Set up
 ```{r set-up}
 
-## user will need to pass in arguments at command line 
-# args[1] : dbname "bety"
-# args[2] : password "bety"
-# args[3] : host "localhost"
-# args[4] : user "bety"
-# args[5] : port 5432
-# args[6] : google sheet URL #https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=0
+## user will need to pass in google sheet URL at command line 
+# args[1] : google sheet URL #https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=0
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -30,14 +25,6 @@ library(dplyr)
 ## disable scientific notation
 options(scipen = 999)
 
-## create database connection
-dbcon <- dbConnect(RPostgres::Postgres(),
-                   dbname = args[1],
-                   password = args[2],
-                   host = args[3],
-                   user = args[4],
-                   port = args[5])
-
 ```
 
 Use URL provided by user to download complete metadata excel workbook 
@@ -45,8 +32,12 @@ Use URL provided by user to download complete metadata excel workbook
 ```{r download-excel}
 
 meta_file <- 'complete_metadata.xlsx'
-download.file(args[6], 
+download.file(args[1], 
               meta_file) 
+
+## db_connection sheet
+db_connection <- read_excel(meta_file,
+                            sheet = 'db_connection')
 
 ## users sheet
 users <- read_excel(meta_file, 
@@ -76,6 +67,20 @@ citations <- read_excel(meta_file,
 ## change format of experiments$start_date, experiments$end_date to date (yyyy-mm-dd)
 experiments$start_date <- as.Date(experiments$start_date)
 experiments$end_date <- as.Date(experiments$end_date)
+
+```
+
+Create database connection
+
+```{r create-dbcon}
+
+## create database connection using parameters from db_connection sheet
+dbcon <- dbConnect(RPostgres::Postgres(),
+                   dbname = db_connection$name,
+                   password = db_connection$password,
+                   host = db_connection$host,
+                   user = db_connection$user,
+                   port = db_connection$port)
 
 ```
 
