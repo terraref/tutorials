@@ -39,40 +39,29 @@ url <- args[1]
 ## get key from URL
 key <- extract_key_from_url(url)
 
+## register sheet # create google sheet object
+gs_obj <- key %>% gs_key(lookup = FALSE)
+
 ## db_connection sheet
-db_connection <- key %>%
-  gs_key(lookup = FALSE) %>%
-  gs_read(ws = 'db_connection')
+db_connection <- gs_obj %>% gs_read(ws = 'db_connection')
 
 ## users sheet
-users <- key %>%
-  gs_key(lookup = FALSE) %>%
-  gs_read(ws = 'users')
+users <- gs_obj %>% gs_read(ws = 'users')
 
 ## experiments sheet
-experiments <- key %>%
-  gs_key(lookup = FALSE) %>%
-  gs_read(ws = 'experiments')
+experiments <- gs_obj %>% gs_read(ws = 'experiments')
 
 ## sites sheet
-sites <- key %>%
-  gs_key(lookup = FALSE) %>%
-  gs_read(ws = 'sites')
+sites <- gs_obj %>% gs_read(ws = 'sites')
 
 ## treatments sheet
-treatments <- key %>%
-  gs_key(lookup = FALSE) %>%
-  gs_read(ws = 'treatments')
+treatments <- gs_obj %>% gs_read(ws = 'treatments')
 
 ## cultivars sheet
-cultivars <- key %>%
-  gs_key(lookup = FALSE) %>%
-  gs_read(ws = 'cultivars')
+cultivars <- gs_obj %>% gs_read(ws = 'cultivars')
 
 ## citations sheet
-citations <- key %>%
-  gs_key(lookup = FALSE) %>%
-  gs_read(ws = 'citations')
+citations <- gs_obj %>% gs_read(ws = 'citations')
 
 ###########################################
 ## change format of experiments$start_date, experiments$end_date to date (yyyy-mm-dd)
