@@ -21,6 +21,7 @@ args <- commandArgs(trailingOnly = TRUE)
 library(RPostgres)
 library(readxl)
 library(dplyr)
+library(googlesheets)
 
 ## disable scientific notation
 options(scipen = 999)
@@ -31,37 +32,46 @@ Use URL provided by user to download complete metadata excel workbook
 
 ```{r download-excel}
 
-meta_file <- 'complete_metadata.xlsx'
-download.file(args[1], 
-              meta_file) 
+## read in google sheet URL
+url <- args[1]
+
+## get key from URL
+key <- extract_key_from_url(url)
 
 ## db_connection sheet
-db_connection <- read_excel(meta_file,
-                            sheet = 'db_connection')
+db_connection <- key %>%
+  gs_key(lookup = FALSE) %>%
+  gs_read(ws = 'db_connection')
 
 ## users sheet
-users <- read_excel(meta_file, 
-                    sheet = 'users')
+users <- key %>%
+  gs_key(lookup = FALSE) %>%
+  gs_read(ws = 'users')
 
 ## experiments sheet
-experiments <- read_excel(meta_file, 
-                          sheet = 'experiments')
+experiments <- key %>%
+  gs_key(lookup = FALSE) %>%
+  gs_read(ws = 'experiments')
 
 ## sites sheet
-sites <- read_excel(meta_file, 
-                    sheet = 'sites')
+sites <- key %>%
+  gs_key(lookup = FALSE) %>%
+  gs_read(ws = 'sites')
 
 ## treatments sheet
-treatments <- read_excel(meta_file,
-                         sheet = 'treatments')
+treatments <- key %>%
+  gs_key(lookup = FALSE) %>%
+  gs_read(ws = 'treatments')
 
 ## cultivars sheet
-cultivars <- read_excel(meta_file,
-                        sheet = 'cultivars')
+cultivars <- key %>%
+  gs_key(lookup = FALSE) %>%
+  gs_read(ws = 'cultivars')
 
 ## citations sheet
-citations <- read_excel(meta_file,
-                        sheet = 'citations')
+citations <- key %>%
+  gs_key(lookup = FALSE) %>%
+  gs_read(ws = 'citations')
 
 ###########################################
 ## change format of experiments$start_date, experiments$end_date to date (yyyy-mm-dd)
