@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Get Weather Data</title>
+  <meta name="description" content="Get Weather Data">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Get Weather Data" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Get Weather Data" />
+  
+  
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="how-to-query-other-seasons-traits-and-dates.html">
+<link rel="next" href="objective-to-be-able-to-demonstrate-how-to-locate-and-retrieve-rgb-image-files.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="part"><span><b>Secton 1: Vignettes</b></span></li>
+<li class="chapter" data-level="1" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html"><i class="fa fa-check"></i><b>1</b> Vignettes Introduction</a></li>
+<li class="chapter" data-level="2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html"><i class="fa fa-check"></i><b>2</b> Accessing trait data in R</a></li>
+<li class="chapter" data-level="3" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>3</b> Introduction</a></li>
+<li class="chapter" data-level="4" data-path="getting-started.html"><a href="getting-started.html"><i class="fa fa-check"></i><b>4</b> Getting Started</a></li>
+<li class="chapter" data-level="5" data-path="how-to-query-trait-data.html"><a href="how-to-query-trait-data.html"><i class="fa fa-check"></i><b>5</b> How to query trait data</a><ul>
+<li class="chapter" data-level="5.1" data-path="how-to-query-trait-data.html"><a href="how-to-query-trait-data.html#setting-options"><i class="fa fa-check"></i><b>5.1</b> Setting options</a></li>
+<li class="chapter" data-level="5.2" data-path="how-to-query-trait-data.html"><a href="how-to-query-trait-data.html#an-example-season-6-canopy-height-data"><i class="fa fa-check"></i><b>5.2</b> An example: Season 6 canopy height data</a></li>
+<li class="chapter" data-level="5.3" data-path="how-to-query-trait-data.html"><a href="how-to-query-trait-data.html#time-series-of-canopy-height"><i class="fa fa-check"></i><b>5.3</b> Time series of canopy height</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="may-2018-season-6-summary.html"><a href="may-2018-season-6-summary.html"><i class="fa fa-check"></i><b>6</b> May 2018 Season 6 Summary</a></li>
+<li class="chapter" data-level="7" data-path="how-to-query-other-seasons-traits-and-dates.html"><a href="how-to-query-other-seasons-traits-and-dates.html"><i class="fa fa-check"></i><b>7</b> How to query other seasons, traits, and dates</a></li>
+<li class="chapter" data-level="8" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><i class="fa fa-check"></i><b>8</b> Objective: To be able to demonstrate how to get TERRA REF meteorological data</a><ul>
+<li class="chapter" data-level="8.0.1" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html#using-the-api-to-get-data"><i class="fa fa-check"></i><b>8.0.1</b> Using the API to get data</a></li>
+<li class="chapter" data-level="8.0.2" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html#the-structure-of-the-database"><i class="fa fa-check"></i><b>8.0.2</b> The structure of the database</a></li>
+<li class="chapter" data-level="8.0.3" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html#creating-the-urls-for-all-data-table-types"><i class="fa fa-check"></i><b>8.0.3</b> Creating the URLs for all data table types</a></li>
+<li class="chapter" data-level="8.0.4" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html#download-data-using-the-command-line"><i class="fa fa-check"></i><b>8.0.4</b> Download data using the command line</a></li>
+<li class="chapter" data-level="8.0.5" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html#read-in-data-using-r"><i class="fa fa-check"></i><b>8.0.5</b> Read in data using R</a></li>
+<li class="chapter" data-level="8.0.6" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html#plot-data-using-r"><i class="fa fa-check"></i><b>8.0.6</b> Plot data using R</a></li>
+<li class="chapter" data-level="8.0.7" data-path="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html"><a href="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data.html#get-all-available-weather-variables"><i class="fa fa-check"></i><b>8.0.7</b> Get all available weather variables</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="objective-to-be-able-to-demonstrate-how-to-locate-and-retrieve-rgb-image-files.html"><a href="objective-to-be-able-to-demonstrate-how-to-locate-and-retrieve-rgb-image-files.html"><i class="fa fa-check"></i><b>9</b> Objective: To be able to demonstrate how to locate and retrieve RGB image files</a><ul>
+<li class="chapter" data-level="9.1" data-path="objective-to-be-able-to-demonstrate-how-to-locate-and-retrieve-rgb-image-files.html"><a href="objective-to-be-able-to-demonstrate-how-to-locate-and-retrieve-rgb-image-files.html#locating-the-images"><i class="fa fa-check"></i><b>9.1</b> Locating the images</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="retrieving-the-images.html"><a href="retrieving-the-images.html"><i class="fa fa-check"></i><b>10</b> Retrieving the images</a></li>
+<li class="chapter" data-level="11" data-path="retrieving-sensor-names.html"><a href="retrieving-sensor-names.html"><i class="fa fa-check"></i><b>11</b> Retrieving sensor names</a></li>
+<li class="chapter" data-level="12" data-path="synthesis-vignette.html"><a href="synthesis-vignette.html"><i class="fa fa-check"></i><b>12</b> Synthesis Vignette</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Get Weather Data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data" class="section level1">
+<h1><span class="header-section-number">8</span> Objective: To be able to demonstrate how to get TERRA REF meteorological data</h1>
+<p>This vignette shows how to read weather data for the month of January 2017 from the <a href="https://cals-mac.arizona.edu/weather-station">weather station</a> at the University of Arizona’s <a href="http://cals-mac.arizona.edu/">Maricopa Agricultural Center</a> into R. These data are stored online on the data management system Clowder, which is accessed using an API. Data across time for two of the weather variables, temperature and precipitation, are plotted in R. Lastly, how to get the list of all possible weather variables is demonstrated.</p>
+<div id="using-the-api-to-get-data" class="section level3">
+<h3><span class="header-section-number">8.0.1</span> Using the API to get data</h3>
+<p>In order to access the data, we need to contruct a URL that links to where the data is located on <a href="https://clowder.ncsa.illinois.edu/">Clowder</a>. The data is then pulled down using the API, which <a href="https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82">“receives requests and sends responses”</a> , for Clowder.</p>
+</div>
+<div id="the-structure-of-the-database" class="section level3">
+<h3><span class="header-section-number">8.0.2</span> The structure of the database</h3>
+<p>The meteorological data that is collected for the TERRA REF project is contained in multiple related tables, also know as a <a href="https://datacarpentry.org/sql-socialsci/01-relational-database/index.html">relational database</a>. The first table contains data about the sensor that is collecting data. This is then linked to a stream table, which contains information about a datastream from the sensor. Sensors can have multiple datastreams. The actual weather data is in the third table, the datapoint table. A visual representation of this structure is shown below.</p>
+<div class="figure">
+<img src="https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg" />
+
+</div>
+<p>In this vignette, we will be using data from a weather station at the Maricopa Agricultural Center, with datapoints for the month of January 2017 from a certain sensor. These data are five minute summaries aggregated from observations taken every second.</p>
+</div>
+<div id="creating-the-urls-for-all-data-table-types" class="section level3">
+<h3><span class="header-section-number">8.0.3</span> Creating the URLs for all data table types</h3>
+<p>All URLs have the same beginning (<a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams</a>), then additional information is added for each type of data table as shown below.</p>
+<ul>
+<li>Station: /sensors/sensor_name=[name]</li>
+<li>Sensor: /sensors/[sensor number]/streams</li>
+<li>Datapoints: /datapoints?stream_id=[datapoints number]&amp;since=[start date]&amp;until=[end date]</li>
+</ul>
+<p>A certain time period can be specified for the datapoints.</p>
+<p>For example, below are the URLs for the particular data being used in this vignette. These can be pasted into a browser to see how the data is stored as text using JSON.</p>
+<ul>
+<li>Station: <a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station</a></li>
+<li>Sensor: <a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams</a></li>
+<li>Datapoints: <a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31</a></li>
+</ul>
+<p>Possible sensor numbers for a station are found on the page for that station under “id:”, and then datapoints numbers are found on the sensor page under “stream_id:”.</p>
+</div>
+<div id="download-data-using-the-command-line" class="section level3">
+<h3><span class="header-section-number">8.0.4</span> Download data using the command line</h3>
+<p>Data can be downloaded from Clowder using the command line program Curl. If the following is typed into the commmand line, it will download the datapoints data that we’re interested in as a file which we have chosen to call <code>spectra.json</code>.</p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">curl</span> -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431<span class="kw">&amp;</span><span class="va">since=</span>2017-01-02<span class="kw">&amp;</span><span class="va">until=</span>2017-01-31</code></pre></div>
+</div>
+<div id="read-in-data-using-r" class="section level3">
+<h3><span class="header-section-number">8.0.5</span> Read in data using R</h3>
+<p>The same data can be accessed with the URL using the R package <code>jsonlite</code>. We are calling that library along with several others that will be used to clean and plot the data. The data is read in by the <code>fromJSON</code> function as a dataframe that also has two nested dataframes, called <code>properties</code> and <code>geometries</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(jsonlite)
+<span class="kw">library</span>(lubridate)
+
+weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p>The <code>geometries</code> dataframe is then pulled out from these data, which contains the datapoints from this stream. This is combined with a transformed version of the end of the time period from the stream.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">weather_data &lt;-<span class="st"> </span>weather_all<span class="op">$</span>properties <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">ymd_hms</span>(weather_all<span class="op">$</span>end_time))</code></pre></div>
+<p>The temperature data, which is five minute averages for the entire month of January 2017, is used to calculate the growing degree days for each day. Growing degree days is a measurement that is used to predict when certain plant developmental phases happen. This new dataframe will be used in the last vignette to synthesize the trait, weather, and image data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">daily_values =<span class="st"> </span>weather_data <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date =</span> <span class="kw">as.Date</span>(time), 
+         <span class="dt">air_temp_converted =</span> air_temperature <span class="op">-</span><span class="st"> </span><span class="fl">273.15</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(date) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">min_temp =</span> <span class="kw">min</span>(air_temp_converted), 
+            <span class="dt">max_temp =</span> <span class="kw">max</span>(air_temp_converted), 
+            <span class="dt">gdd =</span> <span class="kw">ifelse</span>(<span class="kw">sum</span>(min_temp, max_temp) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">10</span>, 
+                         (max_temp <span class="op">+</span><span class="st"> </span>min_temp) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">10</span>, <span class="dv">0</span>))</code></pre></div>
+</div>
+<div id="plot-data-using-r" class="section level3">
+<h3><span class="header-section-number">8.0.6</span> Plot data using R</h3>
+<p>The five minute summary weather variables in the <code>weather_data</code> dataframe can be plotted across time, as shown below for temperature and precipitation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">theme_set</span>(ggthemes<span class="op">::</span><span class="kw">theme_few</span>())
+<span class="kw">ggplot</span>(<span class="dt">data =</span> weather_data) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time, <span class="dt">y =</span> air_temperature), <span class="dt">size =</span> <span class="fl">0.1</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Date&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Temperature (K)&quot;</span>)</code></pre></div>
+<p><img src="_main_files/figure-html/temp-plot-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> weather_data) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time, <span class="dt">y =</span> precipitation_rate), <span class="dt">size =</span> <span class="fl">0.1</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Date&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Precipitation (kg/m2s)&quot;</span>)</code></pre></div>
+<p><img src="_main_files/figure-html/precip-plot-1.png" width="672" /></p>
+</div>
+<div id="get-all-available-weather-variables" class="section level3">
+<h3><span class="header-section-number">8.0.7</span> Get all available weather variables</h3>
+<p>The weather variables that are available from these datapoints data are extracted below from the column names of the dataframe that we read in earlier. Any of these variables that are of interest can be analyzed and plotted.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cols =<span class="st"> </span><span class="kw">colnames</span>(weather_data)
+cols[<span class="op">!</span>cols <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;source&quot;</span>, <span class="st">&quot;source_file&quot;</span>, <span class="st">&quot;time&quot;</span>)]</code></pre></div>
+<pre><code>## [1] &quot;wind_speed&quot;                                           
+## [2] &quot;eastward_wind&quot;                                        
+## [3] &quot;northward_wind&quot;                                       
+## [4] &quot;air_temperature&quot;                                      
+## [5] &quot;relative_humidity&quot;                                    
+## [6] &quot;precipitation_rate&quot;                                   
+## [7] &quot;surface_downwelling_shortwave_flux_in_air&quot;            
+## [8] &quot;surface_downwelling_photosynthetic_photon_flux_in_air&quot;</code></pre>
+<p>You should now be able to find, get, and use weather data from the TERRA REF project via Clowder.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="how-to-query-other-seasons-traits-and-dates.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="objective-to-be-able-to-demonstrate-how-to-locate-and-retrieve-rgb-image-files.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
