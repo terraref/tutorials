@@ -18,6 +18,8 @@ This book is intended to quickly introduce users to TERRA REF data through a ser
 
 The first section walks the user through the steps of downloading and combining three different types of data: plot level phenotypes, meteorological data, and images. Subesquent sections provide more detailed examples that show how to access a larger variety of data and meta-data.
 
+For those who are eager to see what is on deck, there are additional tutorials under development in the [tutorials repository](https://github.com/terraref/tutorials) on GitHub. These can be found in the traits, sensors, and genomics subfolders. Users are encouraged to revise and contribute new content.
+
 ## Pre-requisites
 
 While we assume that readers will have some familiarity with the nature of the problem - remote sensing of crop plants - for the most part, these tutorials assume that the user will bring their own scientific questions and a sense of curiosity and are eager to learn. 
