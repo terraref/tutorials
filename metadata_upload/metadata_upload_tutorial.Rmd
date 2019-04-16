@@ -538,9 +538,179 @@ fetch_query(con = dbcon,
 ```
 
 
+## Step 6: Add new id fields to experiments, sites, and treatments for association steps
 
+_this step can only be run once all new experiments, sites, treatments, and cultivars have been added to test database_
 
+```{r add-id-fields}
 
+# add experiment_id and treatment_id fields to treatments
+treatments$experiment_id <- vector('numeric', length = nrow(treatments))
+treatments$treatment_id <- vector('numeric', length = nrow(treatments))
+
+# reference bety experiments table
+bety_experiments <- tbl(dbcon, 'experiments') %>% collect()
+
+# reference bety treatments table
+bety_treatments <- tbl(dbcon, 'treatments') %>% collect()
+
+# change type of id columns
+bety_experiments$id <- as.double(bety_experiments$id)
+bety_treatments$id <- as.double(bety_treatments$id)
+
+for(i in 1:nrow(treatments)){
+  exp <- treatments$experiment[i]
+  treat <- treatments$name[i]
+  exp_id <- bety_experiments %>%
+    filter(name == exp) %>%
+    select(id)
+  treat_id <- bety_treatments %>%
+    filter(name == treat) %>%
+    select(id)
+  treatments$experiment_id[i] <- exp_id$id
+  treatments$treatment_id[i] <- treat_id$id
+}
+
+##########
+
+# add site_id, cultivar_id, and experiment_id fields to sites
+
+sites$site_id <- vector('numeric', length = nrow(sites))
+sites$cultivar_id <- vector('numeric', length = nrow(sites))
+sites$experiment_id <- vector('numeric', length = nrow(sites))
+
+# refer to bety sites table
+bety_sites <- tbl(dbcon, 'sites') %>% collect()
+
+# refer to bety cultivars table
+bety_cultivars <- tbl(dbcon, 'cultivars') %>% collect()
+
+# change type of id columns
+bety_cultivars$id <- as.double(bety_cultivars$id)
+bety_sites$id <- as.double(bety_sites$id)
+
+for(i in 1:nrow(sites)){
+  site <- sites$sitename[i]
+  site_id <- bety_sites %>%
+    filter(sitename == site) %>%
+    select(id)
+  cultivar <- sites$cultivar[i]
+  spp_id <- sites$specie_id[i]
+  cultivar_id <- bety_cultivars %>%
+    filter(name == cultivar & specie_id == spp_id) %>%
+    select(id)
+  exp <- sites$experiment[i]
+  exp_id <- bety_experiments %>%
+    filter(name == exp) %>%
+    select(id)
+  sites$site_id[i] <- site_id$id
+  sites$cultivar_id[i] <- cultivar_id$id
+  sites$experiment_id[i] <- exp_id$id
+  
+}
+
+```
+
+## Step 7: Associate experiments with treatments
+
+Run this chunk to associate experiments with treatments
+
+```{r associate-exp-treat}
+
+expTreat_fields <- c('experiment_id',
+                     'treatment_id')
+
+expTreat_state <- paste0("insert into experiments_treatments ",
+                         "(experiment_id, treatment_id) ",
+                         "values ($1, $2)")
+
+# loop through each row of treatments
+for(i in 1:nrow(treatments)){
+  row <- treatments %>% slice(i)
+  params <- get_params(row = row,
+                       fields = expTreat_fields)
+  prepared_statement(con = dbcon,
+                     query = expTreat_state,
+                     params = params)
+}
+
+```
+
+## Step 8: Associate experiments with sites
+
+Run this chunk to associate experiments with sites
+
+```{r associate-exp-site}
+
+expSite_fields <- c('experiment_id',
+                    'site_id')
+
+expSite_state <- paste0("insert into experiments_sites ",
+                        "(experiment_id, site_id) ",
+                        "values ($1, $2)")
+
+# loop through each row of sites
+for(i in 1:nrow(sites)){
+  row <- sites %>% slice(i)
+  params <- get_params(row = row,
+                       fields = expSite_fields)
+  prepared_statement(con = dbcon,
+                     query = expSite_state,
+                     params = params)
+}
+
+```
+
+## Step 9: Associate sites with cultivars
+
+Run this chunk to associate sites with cultivars
+
+```{r associate-site-cultivar}
+
+siteCultivar_fields <- c('site_id',
+                         'cultivar_id')
+
+siteCultivar_state <- paste0("insert into sites_cultivars ",
+                             "(site_id, cultivar_id) ",
+                             "values ($1, $2)")
+
+# loop through each row of sites
+for(i in 1:nrow(sites)){
+  row <- sites %>% slice(i)
+  params <- get_params(row = row,
+                       fields = siteCultivar_fields)
+  prepared_statement(con = dbcon,
+                     query = siteCultivar_state,
+                     params = params)
+}
+
+```
+
+## Step 10: Associate sites with citation
+
+```{r associate-site-citation}
+
+# refer to bety citations table
+bety_citations <- tbl(dbcon, 'citations') %>% collect()
+
+citation_id <- bety_citations %>%
+  filter(author == citations$author & year == citations$year & title == citations$title) %>%
+  select(id)
+
+citationSite_state <- paste0("insert into citations_sites ",
+                             "(citation_id, site_id) ",
+                             "values ($1, $2)")
+
+# loop through each row of sites
+for(i in 1:nrow(sites)){
+  site_id <- sites$site_id[i]
+  params <- list(citation_id$id, site_id)
+  prepared_statement(con = dbcon,
+                     query = citationSite_state,
+                     params = params)
+}
+
+```
 
 Close database connection
 
