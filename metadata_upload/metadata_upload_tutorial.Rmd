@@ -124,7 +124,7 @@ dbcon <- dbConnect(RPostgres::Postgres(),
 # a sample URL has been provided for google sheet containing MAC season 8 metadata
 # please replace sample URL with your own
 
-url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=606795573' 
+url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=1849349866' 
 
 ```
 
@@ -159,38 +159,34 @@ citations <- gs_obj %>% gs_read(ws = 'citations')
 
 ```
 
-## Reformat of data / Field Additions to Google Sheets 
+## Reformat of data / Field addition
 
-```{r reformat}
+```{r reformat-data}
 
-###########################################
-## change format of experiments$start_date, experiments$end_date to date (yyyy-mm-dd)
+# change format of start_date and end_date of experiments to yyyy-mm-dd
 experiments$start_date <- as.Date(experiments$start_date)
 experiments$end_date <- as.Date(experiments$end_date)
 
-```
+# add user_id field to experiments
+# get user id from user login
 
-Get bety user id from user login
-
-```{r get-user-id}
-
-## get login from 'users' sheet
+# login provided by user
 user_login <- users$login
 
-## reference bety users table
-users_bety <- tbl(dbcon,
-                  'users')
+# reference bety users table to get id
+users_bety <- tbl(dbcon, 'users') %>% collect()
 
-## get user id
 user_id <- users_bety %>%
-  filter(login == user_login) %>% 
-  select(id) %>% collect
+  filter(login == user_login) %>%
+  select(id)
 
-## add user id field to experiments 
-experiments$user_id <- rep(user_id$id, 
-                           nrow(experiments))
+# add user_id field to experiments
+# user_id is required when adding a new experiment
+
+experiments$user_id <- rep(user_id$id, nrow(experiments))
 
 ```
+
 
 Next: Add new experiments, sites, treatments, cultivars, and citations to BETY.
 
