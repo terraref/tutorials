@@ -6,6 +6,8 @@ output: html_document
 The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database. 
 Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
 
+For this tutorial, data will be uploaded to a local instance of a test database. Instructions on how to set up a local instance of a test database can be found below.
+
 ## Inputs:
 
 * URL to a public published google sheet
