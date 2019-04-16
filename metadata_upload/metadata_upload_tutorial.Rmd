@@ -79,6 +79,7 @@ On a new line, enter the database connection parameters for the local instance o
 # Section 4: Set up for metadata upload
 
 **YOU WILL NEED TO UPDATE DATABASE CONNECTION PARAMETERS IN THIS SECTION ON LINES 112-115**
+
 **YOU WILL NEED TO PASS IN THE URL TO YOUR GOOGLE SHEET IN THIS SECTION ON LINE 127**
 
 ## Load in packages
@@ -112,7 +113,7 @@ dbcon <- dbConnect(RPostgres::Postgres(),
                    dbname = 'bety',
                    host = 'localhost',
                    user = 'bety',
-                   port = 5432)
+                   port = 5433)
 
 ```
 
