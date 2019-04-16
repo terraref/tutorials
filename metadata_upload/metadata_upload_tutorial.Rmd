@@ -3,7 +3,7 @@ title: "How to upload metadata to BETY"
 output: html_document
 ---
 
-The objective of this tutorial is to demonstrate how to upload a season's metadata to BETY. 
+The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database. 
 Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
 
 ## Inputs:
@@ -13,7 +13,8 @@ Each season should have metadata for experiments, sites, treatments, cultivars, 
   * make the google sheet public (to anyone with link) and publish to the web.
   * Instructions on how to fill out the template can be found under the README worksheet.
 * Database connection parameters 
-  * provided in the template under the 'db_connection' sheet.
+  * save in a .pgpass file in the home directory
+  * see more information on how to create this file below
 
 Set up
 
