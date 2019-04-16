@@ -3,10 +3,12 @@ title: "How to upload metadata to BETY"
 output: html_document
 ---
 
+# Section 1: Overview
+
 The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database. 
 Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
 
-For this tutorial, data will be uploaded to a local instance of a test database. Instructions on how to set up a local instance of a test database can be found below.
+For this tutorial, data will be uploaded to a local instance of a test database. Instructions on how to set up a local instance of a test database can be found below in section 2.
 
 ## Inputs:
 
@@ -17,6 +19,48 @@ For this tutorial, data will be uploaded to a local instance of a test database.
 * Database connection parameters 
   * save in a .pgpass file in the home directory
   * see more information on how to create this file below
+
+# Section 2: Setting up local instance of test database
+
+## Install Docker
+
+To run a local instance of the BETY test database, you will need to have Docker installed on your computer. 
+
+Visit [https://www.docker.com/](https://www.docker.com/) to download Docker for MAC or Windows. You will need to create a docker account.
+
+## Clone bety github repository
+
+In a directory of your choice, clone the bety repository from github:
+
+`git clone git@github.com:pecanproject/bety`
+
+Then cd to the bety directory:
+
+`cd bety`
+
+## Start up and run docker container
+
+Mount postgres container to port 5432 in docker-compose.override file:
+
+`wget https://gist.githubusercontent.com/dlebauer/a2cd7fec09280e5a01e208e91806694f/raw/7fd122055c1c7995ac2d606ec67b25402d2ae9de/docker-compose.override.yml`
+
+Start postgres:
+
+`docker-compose -p bety up -d postgres`
+
+Initialize BETY database:
+
+`docker run -ti --rm --network bety_bety -e BETY_INITIALIZE_URL='-w https://terraref.ncsa.illinois.edu/bety/dump/bety0/bety.tar.gz' pecan/bety:terra initialize`
+
+Sync with server 6 only:
+
+`docker run -ti --rm --network bety_bety -e REMOTE_SERVERS='6' pecan/bety:terra sync`
+
+Bring up full stack:
+
+`docker-compose up`
+
+# Section 3: Metadata Upload
 
 Set up
 
