@@ -18,7 +18,7 @@ For this tutorial, data will be uploaded to a local instance of a test database.
   * Instructions on how to fill out the template can be found under the README worksheet.
 * Database connection parameters 
   * save in a .pgpass file in the home directory
-  * see more information on how to create this file below
+  * see more information on how to create this file below in section 3.
 
 # Section 2: Setting up local instance of test database
 
@@ -60,7 +60,22 @@ Bring up full stack:
 
 `docker-compose up`
 
-# Section 3: Metadata Upload
+# Section 3: Setting up .pgpass file
+
+A .pgpass file will be used to pass in database connection parameters to the BETY test database.
+
+In your home directory, create a `.pgpass` file and change the permissions to 600.
+
+```sh
+touch ~/.pgpass
+chmod 0600 ~/.pgpass
+```
+
+On a new line, enter the database connection parameters for the local instance of the BETY test database in the format:  
+
+`host:port:database:username:password`
+
+# Section 4: Metadata Upload
 
 Set up
 
