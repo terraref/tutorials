@@ -76,43 +76,67 @@ On a new line, enter the database connection parameters for the local instance o
 
 `host:port:database:username:password`
 
-# Section 4: Metadata Upload
+# Section 4: Set up for metadata upload
 
-Set up
+**YOU WILL NEED TO UPDATE DATABASE CONNECTION PARAMETERS IN THIS SECTION ON LINES 112-115**
+**YOU WILL NEED TO PASS IN THE URL TO YOUR GOOGLE SHEET IN THIS SECTION ON LINE 127**
 
-```{r set-up}
+## Load in packages
 
-## user will need to pass in google sheet URL at command line 
-# args[1] : google sheet URL #https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=0
+```{r load-pack}
 
-args <- commandArgs(trailingOnly = TRUE)
-
-## load in packages
+# load in packages
 library(RPostgres)
 library(readxl)
 library(dplyr)
 library(googlesheets)
 
-## disable scientific notation
+```
+
+## Set options
+
+```{r set-option}
+
 options(scipen = 999)
 
 ```
 
-Use URL provided by user to download complete metadata excel workbook 
+## Connect to database; Provide connection parameters here (REQUIRED)
 
-```{r download-excel}
+_Please make sure the following database connection parameters (lines 112-115) match those that you have inputted in your .pgpass file. Make any needed changes._
 
-## read in google sheet URL
-url <- args[1]
+```{r create-dbcon}
 
-## get key from URL
+# create database connection using parameters in .pgpass file
+dbcon <- dbConnect(RPostgres::Postgres(),
+                   dbname = 'bety',
+                   host = 'localhost',
+                   user = 'bety',
+                   port = 5432)
+
+```
+
+## Provide URL to google sheet here (REQUIRED)
+
+```{r user-url}
+
+# please provide URL to google sheet below on line 127
+# a sample URL has been provided for google sheet containing MAC season 8 metadata
+# please replace sample URL with your own
+
+url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=606795573' 
+
+```
+
+Use URL provided by user to read directly from google sheets
+
+```{r read-gs}
+
+# get key from URL
 key <- extract_key_from_url(url)
 
-## register sheet # create google sheet object
+# register sheet 
 gs_obj <- key %>% gs_key(lookup = FALSE)
-
-## db_connection sheet
-db_connection <- gs_obj %>% gs_read(ws = 'db_connection')
 
 ## users sheet
 users <- gs_obj %>% gs_read(ws = 'users')
@@ -132,24 +156,17 @@ cultivars <- gs_obj %>% gs_read(ws = 'cultivars')
 ## citations sheet
 citations <- gs_obj %>% gs_read(ws = 'citations')
 
+
+```
+
+## Reformat of data / Field Additions to Google Sheets 
+
+```{r reformat}
+
 ###########################################
 ## change format of experiments$start_date, experiments$end_date to date (yyyy-mm-dd)
 experiments$start_date <- as.Date(experiments$start_date)
 experiments$end_date <- as.Date(experiments$end_date)
-
-```
-
-Create database connection
-
-```{r create-dbcon}
-
-## create database connection using parameters from db_connection sheet
-dbcon <- dbConnect(RPostgres::Postgres(),
-                   dbname = db_connection$name,
-                   password = db_connection$password,
-                   host = db_connection$host,
-                   user = db_connection$user,
-                   port = db_connection$port)
 
 ```
 
