@@ -16,9 +16,9 @@ For this tutorial, data will be uploaded to a local instance of a test database.
 * URL to a public published google sheet
   * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1Fr_8xYOucyCQ9WH5_1bfPTMpm3IhKX5oqW4UOMvPoSY/edit#gid=0).
   * make the google sheet public (to anyone with link) and publish to the web.
-  * Instructions on how to fill out the template can be found under the README worksheet.
+  * instructions on how to fill out the template can be found under the README worksheet.
 * Database connection parameters 
-  * save in a .pgpass file in the home directory
+  * save in a .pgpass file in your home directory.
   * see more information on how to create this file below in section 3.
 
 # Section 2: Setting up local instance of test database
@@ -78,9 +78,11 @@ On a new line, enter the database connection parameters for the local instance o
 
 # Section 4: Set up for metadata upload
 
-**YOU WILL NEED TO UPDATE DATABASE CONNECTION PARAMETERS IN THIS SECTION ON LINES 112-115**
+When running this tutorial interactively:
 
-**YOU WILL NEED TO PASS IN THE URL TO YOUR GOOGLE SHEET IN THIS SECTION ON LINE 127**
+**You will need to update database connection parameters in this section on lines 117-120 to match those in your .pgpass file**
+
+**You will need to pass in the url to your google sheet in this section on line 138**
 
 ## Load in packages
 
@@ -104,7 +106,9 @@ options(scipen = 999)
 
 ## Connect to database; Provide connection parameters here (REQUIRED)
 
-_Please make sure the following database connection parameters (lines 112-115) match those that you have inputted in your .pgpass file. Make any needed changes._
+_Please make sure the following database connection parameters (lines 117-120) match those that you have inputted in your .pgpass file. Make any needed changes._
+
+_The following connection parameters will be used when running this Rmd file from command line_
 
 ```{r create-dbcon}
 
@@ -113,19 +117,37 @@ dbcon <- dbConnect(RPostgres::Postgres(),
                    dbname = 'bety',
                    host = 'localhost',
                    user = 'bety',
-                   port = 5433)
+                   port = 5432)
 
 ```
 
 ## Provide URL to google sheet here (REQUIRED)
 
+_this code chunk needs to be altered based on whether user is running tutorial interactively or Rmd file is run from command line_
+
 ```{r user-url}
 
-# please provide URL to google sheet below on line 127
+# if user is running tutorial interactively :
+
+# leave lines 148 and 150 commented out
+
+# please provide URL to google sheet below on line 138
 # a sample URL has been provided for google sheet containing MAC season 8 metadata
 # please replace sample URL with your own
 
 url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=1849349866' 
+
+########################################################
+
+# if Rmd file will be run from command line :
+
+# comment out line 138 above
+# uncomment lines 148 and 150
+
+# URL to google sheet must be passed in as command line arugment
+#args <- commandArgs(trailingOnly = TRUE)
+
+#url <- args[1]
 
 ```
 
@@ -192,7 +214,7 @@ experiments$user_id <- rep(user_id$id, nrow(experiments))
 # add specie_id field to sites and cultivars
 # get specie id from species name provided by user
 
-# will there generally only be one species per season????
+# will there generally only be one species per season?
 
 spp <- unique(cultivars$species)
 
@@ -261,7 +283,7 @@ get_statement <- function(row, fields, tbl_name){
 }
 
 # get_params
-# this function will return an unnamed list of parameter values for a row
+# this function will return an unnamed list of parameter values for a row according to field names passed in
 
 get_params <- function(row, fields){
   params <- unname(as.list(row[fields]))
