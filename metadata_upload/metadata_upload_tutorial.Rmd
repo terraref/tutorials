@@ -135,7 +135,7 @@ _this code chunk needs to be altered based on whether user is running tutorial i
 # a sample URL has been provided for google sheet containing MAC season 8 metadata
 # please replace sample URL with your own
 
-url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=1849349866' 
+url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=0' 
 
 ########################################################
 
