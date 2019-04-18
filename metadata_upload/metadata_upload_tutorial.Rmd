@@ -1,0 +1,623 @@
+---
+title: "How to upload metadata to BETY"
+output: html_document
+---
+
+# Section 1: Overview
+
+The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database. 
+
+Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
+
+For this tutorial, data will be uploaded to a local instance of a test database. Instructions on how to set up a local instance of a test database can be found below in section 2.
+
+## Inputs:
+
+* URL to a public published google sheet
+  * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1Fr_8xYOucyCQ9WH5_1bfPTMpm3IhKX5oqW4UOMvPoSY/edit#gid=0).
+  * make the google sheet public (to anyone with link) and publish to the web.
+  * instructions on how to fill out the template can be found under the README worksheet.
+* Database connection parameters 
+  * save in a .pgpass file in your home directory.
+  * see more information on how to create this file below in section 3.
+
+# Section 2: Setting up local instance of test database
+
+## Install Docker
+
+To run a local instance of the BETY test database, you will need to have Docker installed on your computer. 
+
+Visit [https://www.docker.com/](https://www.docker.com/) to download Docker for MAC or Windows. You will need to create a docker account.
+
+## Clone bety github repository
+
+In a directory of your choice, clone the bety repository from github:
+
+`git clone git@github.com:pecanproject/bety`
+
+Then cd to the bety directory:
+
+`cd bety`
+
+## Start up and run docker container
+
+Mount postgres container to port 5432 in docker-compose.override file:
+
+`wget https://gist.githubusercontent.com/dlebauer/a2cd7fec09280e5a01e208e91806694f/raw/7fd122055c1c7995ac2d606ec67b25402d2ae9de/docker-compose.override.yml`
+
+Start postgres:
+
+`docker-compose -p bety up -d postgres`
+
+Initialize BETY database:
+
+`docker run -ti --rm --network bety_bety -e BETY_INITIALIZE_URL='-w https://terraref.ncsa.illinois.edu/bety/dump/bety0/bety.tar.gz' pecan/bety:terra initialize`
+
+Sync with server 6 only:
+
+`docker run -ti --rm --network bety_bety -e REMOTE_SERVERS='6' pecan/bety:terra sync`
+
+Bring up full stack:
+
+`docker-compose up`
+
+# Section 3: Setting up .pgpass file
+
+A .pgpass file will be used to pass in database connection parameters to the BETY test database.
+
+In your home directory, create a `.pgpass` file and change the permissions to 600.
+
+```sh
+touch ~/.pgpass
+chmod 0600 ~/.pgpass
+```
+
+On a new line, enter the database connection parameters for the local instance of the BETY test database in the format:  
+
+`host:port:database:username:password`
+
+# Section 4: Set up for metadata upload
+
+When running this tutorial interactively:
+
+**You will need to update database connection parameters in this section on lines 117-120 to match those in your .pgpass file**
+
+**You will need to pass in the url to your google sheet in this section on line 138**
+
+## Load in packages
+
+```{r load-pack}
+# load in packages
+library(RPostgres)
+library(readxl)
+library(dplyr)
+library(googlesheets)
+```
+
+## Set options
+
+```{r set-option}
+options(scipen = 999)
+```
+
+## Connect to database; Provide connection parameters here (REQUIRED)
+
+_Please make sure the following database connection parameters (lines 117-120) match those that you have inputted in your .pgpass file. Make any needed changes._
+
+_The following connection parameters will be used when running this Rmd file from command line_
+
+```{r create-dbcon}
+# create database connection using parameters in .pgpass file
+dbcon <- dbConnect(RPostgres::Postgres(),
+                   dbname = 'bety',
+                   host = 'localhost',
+                   user = 'bety',
+                   port = 5432)
+```
+
+## Provide URL to google sheet here (REQUIRED)
+
+_this code chunk needs to be altered based on whether user is running tutorial interactively or Rmd file is run from command line_
+
+```{r user-url}
+# if user is running tutorial interactively :
+# leave lines 148 and 150 commented out
+# please provide URL to google sheet below on line 138
+# a sample URL has been provided for google sheet containing MAC season 8 metadata
+# please replace sample URL with your own
+url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=0' 
+########################################################
+# if Rmd file will be run from command line :
+# comment out line 138 above
+# uncomment lines 148 and 150
+# URL to google sheet must be passed in as command line arugment
+#args <- commandArgs(trailingOnly = TRUE)
+#url <- args[1]
+```
+
+Use URL provided by user to read directly from google sheets
+
+```{r read-gs}
+# get key from URL
+key <- extract_key_from_url(url)
+# register sheet 
+gs_obj <- key %>% gs_key(lookup = FALSE)
+## users sheet
+users <- gs_obj %>% gs_read(ws = 'users')
+## experiments sheet
+experiments <- gs_obj %>% gs_read(ws = 'experiments')
+## sites sheet
+sites <- gs_obj %>% gs_read(ws = 'sites')
+## treatments sheet
+treatments <- gs_obj %>% gs_read(ws = 'treatments')
+## cultivars sheet
+cultivars <- gs_obj %>% gs_read(ws = 'cultivars')
+## citations sheet
+citations <- gs_obj %>% gs_read(ws = 'citations')
+```
+
+## Reformat of data / Field additions
+
+```{r reformat-data}
+# change format of start_date and end_date of experiments to yyyy-mm-dd
+experiments$start_date <- as.Date(experiments$start_date)
+experiments$end_date <- as.Date(experiments$end_date)
+#########
+# add user_id field to experiments
+# get user id from user login
+# login provided by user
+user_login <- users$login
+# reference bety users table to get id
+users_bety <- tbl(dbcon, 'users') %>% collect()
+user_id <- users_bety %>%
+  filter(login == user_login) %>%
+  select(id)
+# add user_id field to experiments
+# user_id is required when adding a new experiment
+experiments$user_id <- rep(user_id$id, nrow(experiments))
+#########
+# add specie_id field to sites and cultivars
+# get specie id from species name provided by user
+# will there generally only be one species per season?
+spp <- unique(cultivars$species)
+# refer to bety species table
+bety_species <- tbl(dbcon, 'species') %>% collect()
+spp_id <- bety_species %>%
+  filter(scientificname == spp) %>%
+  select(id)
+# add specie_id field to sites
+sites$specie_id <- rep(spp_id$id, nrow(sites))
+# add specie_id field to cultivars
+cultivars$specie_id <- rep(spp_id$id, nrow(cultivars))
+```
+
+# Section 5: Upload metadata
+
+## Functions to be used in metadata upload
+
+```{r metadata-upload-functions}
+# prepared_statement from pecanapi package
+# use this function to upload a parameterized query to database
+prepared_statement <- function(con, query, params) {
+  stopifnot(
+    class(con) == "PqConnection",
+    is.character(query),
+    length(query) == 1,
+    is.list(params)
+  )
+  qry <- DBI::dbSendStatement(con, query)
+  res <- DBI::dbBind(qry, params)
+  on.exit(DBI::dbClearResult(res))
+}
+# get_fields
+# this function will be run on a row of a google sheet (experiments, sites, treatments, etc.) 
+# will return a vector containing names of user completed fields that are also a field in a bety table
+# this output will be needed to generate parameterized queries
+get_fields <- function(row, tbl_fields){
+  ind <- which(!is.na(row))
+  field <- names(row)[ind]
+  bety_field <- field[field %in% tbl_fields]
+  return(bety_field)
+}
+# get_statement
+# this function will generate a parameterized insert statement for a row
+get_statement <- function(row, fields, tbl_name){
+  position_params <- sapply(1:length(fields),
+                       function(x) paste0('$', x),
+                       USE.NAMES = FALSE)
+  statement <- paste0("insert into ",
+                  tbl_name,
+                  " (",
+                  paste(fields, collapse = ', '),
+                  ") values (",
+                  paste(position_params, collapse = ', '),
+                  ")")
+  return(statement)
+}
+# get_params
+# this function will return an unnamed list of parameter values for a row according to field names passed in
+get_params <- function(row, fields){
+  params <- unname(as.list(row[fields]))
+  return(params)
+}
+# fetch_query
+# will be used to fetch metadata from test database 
+# this function can be used to check success of metadata upload
+fetch_query <- function(con, query){
+  qry <- DBI::dbSendQuery(con, query)
+  on.exit(DBI::dbClearResult(qry))
+  DBI::dbFetch(qry)
+}
+```
+
+## Step 1: Add experiments
+
+Run the following chunk to add new experiments
+
+```{r add-new-exp}
+exp_fields <- c('name',
+                'start_date',
+                'end_date',
+                'description',
+                'design',
+                'user_id')
+# loop through each row of experiments 
+for(i in 1:nrow(experiments)){
+  row <- experiments %>% slice(i)
+  fields <- get_fields(row = row,
+                       tbl_fields = exp_fields)
+  statement <- get_statement(row = row,
+                             fields = fields,
+                             tbl_name = 'experiments')
+  params <- get_params(row = row,
+                       fields = fields)
+  prepared_statement(con = dbcon,
+                     query = statement,
+                     params = params)
+}
+```
+
+### Check if new experiments have been successfully uploaded
+
+Run this chunk to see if your new experiments have been successfully added to the test database
+
+```{r new-exp-check}
+exp_query <- glue::glue_sql("select * from experiments where name in 
+                            ({experiments$name*})",
+                            .con = dbcon)
+fetch_query(con = dbcon,
+            query = exp_query)
+```
+
+## Step 2: Add sites
+
+Run the following chunk to add new sites
+
+```{r add-new-site}
+site_fields <- c('city',
+                 'state',
+                 'country',
+                 'notes',
+                 'sitename',
+                 'greenhouse',
+                 'geometry',
+                 'time_zone')
+# loop through each row of sites 
+for(i in 1:nrow(sites)){
+  row <- sites %>% slice(i)
+  fields <- get_fields(row = row,
+                       tbl_fields = site_fields)
+  statement <- get_statement(row = row,
+                             fields = fields,
+                             tbl_name = 'sites')
+  params <- get_params(row = row,
+                       fields = fields)
+  prepared_statement(con = dbcon,
+                     query = statement,
+                     params = params)
+}
+```
+
+### Check if new sites have been successfully uploaded
+
+Run this chunk to see if your new sites have been successfully added to the test database
+
+```{r new-site-check}
+site_query <- glue::glue_sql("select * from sites where sitename in 
+                            ({sites$sitename*})",
+                            .con = dbcon)
+fetch_query(con = dbcon,
+            query = site_query)
+```
+
+## Step 3: Add treatments
+
+Run the following chunk to add new treatments
+
+```{r add-new-treat}
+treat_fields <- c('name',
+                  'definition',
+                  'control')
+# will keep track of treatment names already added
+# users may reuse a treatment name for multiple experiments
+# only want to add treatment name once
+added_treat <- c()
+# loop through each row of treatments 
+for(i in 1:nrow(treatments)){
+  row <- treatments %>% slice(i)
+  if(row$name %in% added_treat) next
+  fields <- get_fields(row = row,
+                       tbl_fields = treat_fields)
+  statement <- get_statement(row = row,
+                             fields = fields,
+                             tbl_name = 'treatments')
+  params <- get_params(row = row,
+                       fields = fields)
+  prepared_statement(con = dbcon,
+                     query = statement,
+                     params = params)
+  added_treat <- append(added_treat, row$name)
+}
+```
+
+### Check if new treatments have been successfully uploaded
+
+Run this chunk to see if your new treatments have been successfully added to the test database
+
+```{r new-treat-check}
+treat_query <- glue::glue_sql("select * from treatments where name in
+                              ({unique(treatments$name)*})",
+                              .con = dbcon)
+fetch_query(con = dbcon,
+            query = treat_query)
+```
+
+## Step 4: Add cultivars
+
+_only combinations of cultivar + specie id that are not yet present in BETY will be uploaded_
+
+Run the following chunk to get cultivar + specie id combinations that will be uploaded
+
+```{r get-new-cultivar}
+# bety cultivars table
+bety_cultivars <- tbl(dbcon, 'cultivars') %>% collect()
+#subset of table only containing columns 'name' and 'specie_id'
+bety_cultivars_sub <- bety_cultivars %>%
+  select(name, specie_id)
+#get subset of new cultivars
+new_cultivars <- anti_join(cultivars[, c('name', 'specie_id')],   
+                           bety_cultivars_sub,
+                           by = c('name', 'specie_id'))
+```
+
+Run the following chunk to add new cultivars
+
+```{r add-new-cultivar}
+cultivar_fields <- c('name',
+                     'specie_id',
+                     'ecotype',
+                     'notes')
+# loop through each row of new_cultivars generated in above chunk 
+for(i in 1:nrow(new_cultivars)){
+  row <- new_cultivars %>% slice(i)
+  fields <- get_fields(row = row,
+                       tbl_fields = cultivar_fields)
+  statement <- get_statement(row = row,
+                             fields = fields,
+                             tbl_name = 'cultivars')
+  params <- get_params(row = row,
+                       fields = fields)
+  prepared_statement(con = dbcon,
+                     query = statement,
+                     params = params)
+}
+```
+
+### Check if new cultivars have been successfully uploaded
+
+Run this chunk to see if your new cultivars have been successfully added to the test database
+
+```{r new-cultivar-check}
+cultivar_query <- glue::glue_sql("select * from cultivars where name in
+                                 ({new_cultivars$name*}) and specie_id = {spp_id$id}",
+                              .con = dbcon)
+fetch_query(con = dbcon,
+            query = cultivar_query)
+```
+
+## Step 5: Add citations
+
+Run the following chunk to add new citations
+
+```{r add-new-citation}
+citation_fields <- c('author',
+                     'year',
+                     'title',
+                     'journal',
+                     'volume',
+                     'page',
+                     'url',
+                     'pdf',
+                     'doi')
+# loop through each row of citations
+for(i in 1:nrow(citations)){
+  row <- citations %>% slice(i)
+  fields <- get_fields(row = row,
+                       tbl_fields = citation_fields)
+  statement <- get_statement(row = row,
+                             fields = fields,
+                             tbl_name = 'citations')
+  params <- get_params(row = row,
+                       fields = fields)
+  prepared_statement(con = dbcon,
+                     query = statement,
+                     params = params)
+}
+```
+
+### Check if new citations have been successfully uploaded
+
+Run this chunk to see if your new citations have been successfully added to the test database
+
+```{r new-citation-check}
+# will there only be one citation for each season?
+# will need to revise this if more than one
+citation_query <- glue::glue_sql("select * from citations where
+                                 author = {citations$author} and
+                                 year = {citations$year} and
+                                 title = {citations$title}",
+                                 .con = dbcon)
+fetch_query(con = dbcon,
+            query = citation_query)
+```
+
+
+## Step 6: Add new id fields to experiments, sites, and treatments for association steps
+
+_this step can only be run once all new experiments, sites, treatments, and cultivars have been added to test database_
+
+```{r add-id-fields}
+# add experiment_id and treatment_id fields to treatments
+treatments$experiment_id <- vector('numeric', length = nrow(treatments))
+treatments$treatment_id <- vector('numeric', length = nrow(treatments))
+# reference bety experiments table
+bety_experiments <- tbl(dbcon, 'experiments') %>% collect()
+# reference bety treatments table
+bety_treatments <- tbl(dbcon, 'treatments') %>% collect()
+# change type of id columns
+bety_experiments$id <- as.double(bety_experiments$id)
+bety_treatments$id <- as.double(bety_treatments$id)
+for(i in 1:nrow(treatments)){
+  exp <- treatments$experiment[i]
+  treat <- treatments$name[i]
+  exp_id <- bety_experiments %>%
+    filter(name == exp) %>%
+    select(id)
+  treat_id <- bety_treatments %>%
+    filter(name == treat) %>%
+    select(id)
+  treatments$experiment_id[i] <- exp_id$id
+  treatments$treatment_id[i] <- treat_id$id
+}
+##########
+# add site_id, cultivar_id, and experiment_id fields to sites
+sites$site_id <- vector('numeric', length = nrow(sites))
+sites$cultivar_id <- vector('numeric', length = nrow(sites))
+sites$experiment_id <- vector('numeric', length = nrow(sites))
+# refer to bety sites table
+bety_sites <- tbl(dbcon, 'sites') %>% collect()
+# refer to bety cultivars table
+bety_cultivars <- tbl(dbcon, 'cultivars') %>% collect()
+# change type of id columns
+bety_cultivars$id <- as.double(bety_cultivars$id)
+bety_sites$id <- as.double(bety_sites$id)
+for(i in 1:nrow(sites)){
+  site <- sites$sitename[i]
+  site_id <- bety_sites %>%
+    filter(sitename == site) %>%
+    select(id)
+  cultivar <- sites$cultivar[i]
+  spp_id <- sites$specie_id[i]
+  cultivar_id <- bety_cultivars %>%
+    filter(name == cultivar & specie_id == spp_id) %>%
+    select(id)
+  exp <- sites$experiment[i]
+  exp_id <- bety_experiments %>%
+    filter(name == exp) %>%
+    select(id)
+  sites$site_id[i] <- site_id$id
+  sites$cultivar_id[i] <- cultivar_id$id
+  sites$experiment_id[i] <- exp_id$id
+  
+}
+```
+
+## Step 7: Associate experiments with treatments
+
+Run this chunk to associate experiments with treatments
+
+```{r associate-exp-treat}
+expTreat_fields <- c('experiment_id',
+                     'treatment_id')
+expTreat_state <- paste0("insert into experiments_treatments ",
+                         "(experiment_id, treatment_id) ",
+                         "values ($1, $2)")
+# loop through each row of treatments
+for(i in 1:nrow(treatments)){
+  row <- treatments %>% slice(i)
+  params <- get_params(row = row,
+                       fields = expTreat_fields)
+  prepared_statement(con = dbcon,
+                     query = expTreat_state,
+                     params = params)
+}
+```
+
+## Step 8: Associate experiments with sites
+
+Run this chunk to associate experiments with sites
+
+```{r associate-exp-site}
+expSite_fields <- c('experiment_id',
+                    'site_id')
+expSite_state <- paste0("insert into experiments_sites ",
+                        "(experiment_id, site_id) ",
+                        "values ($1, $2)")
+# loop through each row of sites
+for(i in 1:nrow(sites)){
+  row <- sites %>% slice(i)
+  params <- get_params(row = row,
+                       fields = expSite_fields)
+  prepared_statement(con = dbcon,
+                     query = expSite_state,
+                     params = params)
+}
+```
+
+## Step 9: Associate sites with cultivars
+
+Run this chunk to associate sites with cultivars
+
+```{r associate-site-cultivar}
+siteCultivar_fields <- c('site_id',
+                         'cultivar_id')
+siteCultivar_state <- paste0("insert into sites_cultivars ",
+                             "(site_id, cultivar_id) ",
+                             "values ($1, $2)")
+# loop through each row of sites
+for(i in 1:nrow(sites)){
+  row <- sites %>% slice(i)
+  params <- get_params(row = row,
+                       fields = siteCultivar_fields)
+  prepared_statement(con = dbcon,
+                     query = siteCultivar_state,
+                     params = params)
+}
+```
+
+## Step 10: Associate sites with citation
+
+```{r associate-site-citation}
+# refer to bety citations table
+bety_citations <- tbl(dbcon, 'citations') %>% collect()
+citation_id <- bety_citations %>%
+  filter(author == citations$author & year == citations$year & title == citations$title) %>%
+  select(id)
+citationSite_state <- paste0("insert into citations_sites ",
+                             "(citation_id, site_id) ",
+                             "values ($1, $2)")
+# loop through each row of sites
+for(i in 1:nrow(sites)){
+  site_id <- sites$site_id[i]
+  params <- list(citation_id$id, site_id)
+  prepared_statement(con = dbcon,
+                     query = citationSite_state,
+                     params = params)
+}
+```
+
+Close database connection
+
+```{r disconnect}
+dbDisconnect(dbcon)
+```
