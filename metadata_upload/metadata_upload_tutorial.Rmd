@@ -49,7 +49,7 @@ library(googlesheets)
 
 ```
 
-Create database connection 
+Create database connection (make sure you have test database running)
 
 ```{r create-dbcon}
 
@@ -428,7 +428,7 @@ for(site in new_site){
 for(treat in new_treat){
   row <- treatments %>% filter(name == treat)
   
-  treat_id <- bety_treat %>%
+  treat_id <- bety_treatments %>%
       filter(name == treat) %>%
       select(id)
   
