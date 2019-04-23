@@ -369,7 +369,7 @@ for(i in 1:nrow(citations)){
 
 ```
 
-#### Association steps
+### Association steps
 
 Read in updated bety experiments, sites, cultivars, treatments, and citations tables after new additions have been made
 
@@ -414,7 +414,7 @@ for(site in new_site){
 
 ```
 
-### Step 7: Associate experiments with treatments
+#### Step 7: Associate experiments with treatments
 
 ```{r associate-exp-treat}
 
@@ -449,7 +449,7 @@ for(treat in new_treat){
 
 ```
 
-### Step 8: Associate sites with cultivars
+#### Step 8: Associate sites with cultivars
 
 ```{r associate-site-cultivar}
 
@@ -482,7 +482,7 @@ for(site in new_site){
 
 ```
 
-### Step 9: Associate citations with sites
+#### Step 9: Associate citations with sites
 
 ```{r associate-citation-site}
 
