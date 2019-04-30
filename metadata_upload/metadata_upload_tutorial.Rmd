@@ -179,7 +179,7 @@ associateRow <- function(tbl_name,
 
 ```
 
-Read in metadata from google sheets
+Read in metadata from google sheets. Each sheet of your google sheet will be read in directly as a R object.
 
 ```{r read-user-gs}
 
