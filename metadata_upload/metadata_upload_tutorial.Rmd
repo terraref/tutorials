@@ -293,7 +293,11 @@ for(treat in new_treat){
 
 Only rows that contain a combination of cultivar name and specie id that is not yet present in BETYdb will be uploaded.
 
-First, must make sure all species present in cultivars sheet have been added to BETY species table.
+First, we must make sure that all species present in cultivars sheet have been added to the BETY species table. 
+
+If not, new records will be added to the species table. 
+
+This needs to be done since specie ids in the cultivar table must reference an existing record in the species table.
 
 ```{r check-spp}
 
@@ -315,7 +319,7 @@ if(length(spp_to_add) != 0){
 
 ```
 
-Now, create specie_id column in cultivars.
+Now, create specie_id column in cultivars. The specie_id will be needed to add new records to the cultivars table.
 
 ```{r add-spp-id}
 
@@ -332,7 +336,7 @@ for(i in 1:nrow(cultivars)){
   
 ```
 
-Determine which combinations of cultivar name and species id should be uploaded to bety
+Determine which combinations of cultivar name and species id should be uploaded to bety.
 
 ```{r get-new-cultivars}
 
