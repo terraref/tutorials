@@ -1,0 +1,217 @@
+---
+title: 'Metadata Upload Tutorial Part 2: Associations'
+author: "Kimberly Huynh"
+date: "4/30/2019"
+output: html_document
+---
+
+# Section 1: Overview
+
+The objective of this tutorial is to demonstrate how to associate metadata that you have added to the traits database. 
+
+This tutorial should be completed after `Metadata Upload Tutorial Part 1: Additions`.
+
+For this tutorial, make sure that you have a local instance of a test database running and that all new experiments, sites, treatments, cultivars, and citations have been added.
+
+## Notes on Associating Data
+
+Knitting this markdown file will not associate any data in the test database. Being able to knit this file means that you will be able to successfully associate experiments with sites, experiments with treatments, sites with cultivars, and citations with sites.
+
+To make associations in the test database, you will need to make edits to this markdown file. 
+
+`commit = TRUE` needs to be set in calls to `associateRow`.
+
+The following lines should be uncommented if you would like to upload data to the database:
+
+236 (add experiments), 259 (add sites), 282 (add treatments), 361 (add cultivars), 379 (add citations), 424 (associate experiments with sites), 460 (associate experiments with treatments), 494 (associate sites with cultivars), and 526 (associate citations with sites).
+
+Note: Errors will occur if you try to associate your metadata more than once. If you would like to refresh the test database, re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
+
+# Section 2: Required input
+
+URL to a public published google sheet 
+
+_this should be the same URL that you used for the `Metadata Upload Tutorial Part 1: Addition` tutorial_
+
+# Section 3: Metadata association
+
+## Set up
+
+Please provide the URL to your google sheet below. 
+
+A sample URL has been provided for a google sheet containing MAC season 8 metadata. Replace the sample URL with your own.
+
+```{r url}
+
+url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEqMupckGZAbo8/edit#gid=0' 
+
+```
+
+The following packages will need to be loaded: RPostgres, readxl, dplyr, and googlesheets
+
+```{r load-pack}
+
+library(RPostgres)
+library(readxl)
+library(dplyr)
+library(googlesheets)
+
+```
+
+Create database connection 
+
+_make sure that you have the test database running and your new metadata has been added_
+
+The port number should be the same as the one indicated in docker-compose.override.yml.
+
+```{r create-dbcon}
+
+# no password required 
+dbcon <- dbConnect(RPostgres::Postgres(),
+                   host = 'localhost',
+                   user = 'bety',
+                   port = 5433)
+
+```
+
+Functions to include in package
+
+```{r pack-fx}
+
+# preparedStatement
+# uploads parameterized query to database
+preparedStatement <- function(con, query, params) {
+  stopifnot(
+    class(con) == "PqConnection",
+    is.character(query),
+    length(query) == 1,
+    is.list(params)
+  )
+  qry <- DBI::dbSendStatement(con, query)
+  res <- DBI::dbBind(qry, params)
+  on.exit(DBI::dbClearResult(res))
+}
+
+# getFields
+# returns column names of row that have a value and is included in tbl_fields
+getFields <- function(tbl_fields,
+                      row){
+  com_ind <- which(!is.na(row))
+  com_fields <- names(row)[com_ind]
+  com_tbl_fields <- tbl_fields[tbl_fields %in% com_fields]
+  return(com_tbl_fields)
+}
+
+# getParams
+# returns an unnamed list of parameter values for a row that is subsetted according to fields
+getParams <- function(row,
+                      fields){
+  params <- unname(as.list(row[fields]))
+  return(params)
+}
+
+# getPositParams
+# returns something like '$1, $2, $3' to be used for parameterized queries; number of params depends on length of fields
+getPositParams <- function(fields){
+  posit_params <- sapply(1:length(fields),
+                         function(x) paste0('$', x))
+  return(posit_params)
+}
+
+# getStatement
+# returns a parameterized insert statement 
+getStatement <- function(dbcon,
+                         tbl_name,
+                         fields){
+  posit_params <- sapply(1:length(fields),
+                         function(x) paste0('$', x))
+  statement <- glue::glue_sql("insert into {DBI::SQL(tbl_name)} 
+                              ({DBI::SQL(paste(fields, collapse = ', '))}) 
+                              values 
+                              ({DBI::SQL(paste(posit_params, collapse = ', '))})",
+                              .con = dbcon)
+  return(statement)
+}
+
+# addRow
+# uploads insert statement 
+# to be used to add new experiments, sites, treatments, cultivars, and citations
+addRow <- function(row,
+                   dbcon,
+                   tbl_name,
+                   tbl_fields,
+                   user_id = NULL, 
+                   commit = FALSE){ #user_id only required for experiment upload
+  fields <- getFields(tbl_fields,
+                      row)
+  params <- getParams(row,
+                      fields)
+  # extra addition needed to insert data into experiments 
+  if(tbl_name == 'experiments'){
+    fields <- append(fields, 'user_id')
+    params <- append(params, as.double(user_id)) #need to create this in experiments chunk
+  }
+  statement <- getStatement(dbcon,
+                            tbl_name,
+                            fields)
+  dbBegin(dbcon)            
+  preparedStatement(dbcon,
+                    statement,
+                    params)
+  ifelse(commit == TRUE, dbCommit(dbcon), dbRollback(dbcon))
+}
+
+# associateRow
+# uploads insert statement
+# to be used to associate experiments with sites, experiments with treatments, sites with cultivars, and sites with citations
+associateRow <- function(tbl_name,
+                         col_1,
+                         col_2,
+                         val_1,
+                         val_2,
+                         commit = FALSE){
+    statement <- glue::glue_sql("insert into {DBI::SQL(tbl_name)} 
+                                ({DBI::SQL(paste(c(col_1, col_2), collapse = ', '))}) 
+                                values ($1, $2)",
+                                .con = dbcon)
+    params <- list(val_1, val_2)
+    dbBegin(dbcon)
+    preparedStatement(dbcon,
+                      statement,
+                      params)
+    ifelse(commit == TRUE, dbCommit(dbcon), dbRollback(dbcon))                    
+}
+
+```
+
+Read in metadata from google sheets. Each sheet of your google sheet will be read in directly as a R object.
+
+The experiments, sites, and treatments sheet contain important information on which metadata should be associated.
+
+```{r read-user-gs}
+
+# get key from URL
+key <- extract_key_from_url(url)
+
+# register sheet 
+gs_obj <- key %>% gs_key(lookup = FALSE)
+
+# experiments sheet
+experiments <- gs_obj %>% gs_read(ws = 'experiments')
+
+# sites sheet
+sites <- gs_obj %>% gs_read(ws = 'sites')
+
+# treatments sheet
+treatments <- gs_obj %>% gs_read(ws = 'treatments')
+
+# cultivars sheet
+cultivars <- gs_obj %>% gs_read(ws = 'cultivars')
+
+# citations sheet
+citations <- gs_obj %>% gs_read(ws = 'citations')
+
+```
+
+
+
