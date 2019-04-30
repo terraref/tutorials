@@ -216,10 +216,10 @@ citations <- gs_obj %>% gs_read(ws = 'citations')
 
 #### Step 1: Add new experiments
 
+A user id will be needed to insert data into the experiments table. Your user id will be determined based on your provided user login (username for bety account). 
+
 ```{r add-exp}
 
-# need user id to insert data into experiments table
-# refer to bety users table to get user id from user login (provided by user)
 bety_users <- tbl(dbcon, 'users') %>% collect()
  
 user_id <- bety_users %>%
