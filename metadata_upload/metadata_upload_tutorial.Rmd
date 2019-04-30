@@ -15,6 +15,13 @@ For this tutorial, data will be uploaded to a test database. Instructions on how
 
 **need to update location of setting up local instance of test db tutorial**
 
+Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will be able to upload all of your metadata successfully.
+
+To upload your data to the test database, you will need to make edits to this markdown file. `commit = TRUE` needs to be set in calls to `addRow` and  `associateRow`. The following lines should be uncommented if you would like to upload data to the database: 236 (add experiments), 259 (add sites), 282 (add treatments), 361 (add cultivars), 379 (add citations), 424 (associate experiments with sites), 460 (associate experiments with treatments), 494 (associate sites with cultivars), and 526 (associate citations with sites).
+
+Note: Errors will occur if you try to insert your metadata more than once. If you would like to refresh the test database (remove additions that you have made), re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
+
+
 # Section 2: Required input
 
 URL to a public published google sheet
@@ -228,6 +235,7 @@ for(exp in new_exp){
   row <- experiments %>% filter(name == exp)
   addRow(row = row,
          dbcon = dbcon,
+         #commit = TRUE,
          tbl_name = 'experiments',
          tbl_fields = c('name', 'start_date', 'end_date',
                         'description', 'design'),
@@ -250,6 +258,7 @@ for(site in new_site){
   row <- sites %>% filter(sitename == site)
   addRow(row = row,
          dbcon = dbcon,
+         #commit = TRUE,
          tbl_name = 'sites',
          tbl_fields = c('city', 'state', 'country',
                         'notes', 'sitename', 'greenhouse',
@@ -272,6 +281,7 @@ for(treat in new_treat){
   row <- treatments %>% filter(name == treat)
   addRow(row = row,
          dbcon = dbcon,
+         #commit = TRUE,
          tbl_name = 'treatments',
          tbl_fields = c('name', 'defintion', 'control'))
 }
@@ -350,6 +360,7 @@ for(i in 1:nrow(new_cultivars)){
   row <- new_cultivars %>% slice(i)
   addRow(row = row,
          dbcon = dbcon,
+         #commit = TRUE,
          tbl_name = 'cultivars',
          tbl_fields = c('name', 'specie_id', 'ecotype', 'notes'))
 }
@@ -367,6 +378,7 @@ for(i in 1:nrow(citations)){
   row <- citations %>% slice(i)
   addRow(row = row,
          dbcon = dbcon,
+         #commit = TRUE,
          tbl_name = 'citations',
          tbl_fields = c('author', 'year', 'title',
                         'journal', 'volume', 'page',
@@ -411,6 +423,7 @@ for(site in new_site){
     select(id)
   
   associateRow(tbl_name = 'experiments_sites',
+               #commit = TRUE,
                col_1 = 'experiment_id',
                col_2 = 'site_id',
                val_1 = as.double(exp_id$id),
@@ -446,6 +459,7 @@ for(treat in new_treat){
       select(id)
     
     associateRow(tbl_name = 'experiments_treatments',
+               #commit = TRUE, 
                col_1 = 'experiment_id',
                col_2 = 'treatment_id',
                val_1 = as.double(exp_id$id),
@@ -479,6 +493,7 @@ for(site in new_site){
     select(id)
   
   associateRow(tbl_name = 'sites_cultivars',
+               #commit = TRUE,
                col_1 = 'site_id',
                col_2 = 'cultivar_id',
                val_1 = as.double(site_id$id),
@@ -510,6 +525,7 @@ for(site in new_site){
     select(id)
   
   associateRow(tbl_name = 'citations_sites',
+               #commit = TRUE,
                col_1 = 'citation_id',
                col_2 = 'site_id',
                val_1 = as.double(citation_id$id),
