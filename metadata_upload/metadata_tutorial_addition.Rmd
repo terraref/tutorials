@@ -25,7 +25,7 @@ Knitting this markdown file will not upload any data to the test database. Being
 
 To upload your data to the test database, you will need to make edits to this markdown file. 
 
-`commit = TRUE` needs to be set in calls to `addRow` and  `associateRow`.
+`commit = TRUE` needs to be set in calls to `addRow`.
 
 The following lines should be uncommented if you would like to upload data to the database:
 
