@@ -127,7 +127,8 @@ addRow <- function(row,
                    dbcon,
                    tbl_name,
                    tbl_fields,
-                   user_id = NULL){ #user_id only required for experiment upload
+                   user_id = NULL, 
+                   commit = FALSE){ #user_id only required for experiment upload
   fields <- getFields(tbl_fields,
                       row)
   params <- getParams(row,
@@ -140,9 +141,11 @@ addRow <- function(row,
   statement <- getStatement(dbcon,
                             tbl_name,
                             fields)
+  dbBegin(dbcon)            
   preparedStatement(dbcon,
                     statement,
                     params)
+  ifelse(commit == TRUE, dbCommit(dbcon), dbRollback(dbcon))
 }
 
 # associateRow
@@ -152,15 +155,18 @@ associateRow <- function(tbl_name,
                          col_1,
                          col_2,
                          val_1,
-                         val_2){
+                         val_2,
+                         commit = FALSE){
     statement <- glue::glue_sql("insert into {DBI::SQL(tbl_name)} 
                                 ({DBI::SQL(paste(c(col_1, col_2), collapse = ', '))}) 
                                 values ($1, $2)",
                                 .con = dbcon)
     params <- list(val_1, val_2)
+    dbBegin(dbcon)
     preparedStatement(dbcon,
                       statement,
                       params)
+    ifelse(commit == TRUE, dbCommit(dbcon), dbRollback(dbcon))                    
 }
 
 ```
