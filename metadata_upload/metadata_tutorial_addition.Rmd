@@ -17,7 +17,7 @@ For this tutorial, data will be uploaded to a test database. Instructions on how
 
 This tutorial will only cover how to add new experiments, sites, treamtments, cultivars, and citations. 
 
-The `Metadata Upload Tutorial Part 2: Associations` tutorial should be run after completing this tutorial and all new metadata has been added (see below for more details). The tutorial will cover how to associate the metadata that you add.
+The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed after completing this tutorial and when all new metadata has been added (see below for more details). The second tutorial will cover how to associate the metadata that you add.
 
 ## Notes on Running this Rmd
 
