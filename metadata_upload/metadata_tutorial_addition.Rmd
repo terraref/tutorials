@@ -223,9 +223,7 @@ citations <- gs_obj %>% gs_read(ws = 'citations')
 
 ## Upload data
 
-### Addition steps
-
-#### Step 1: Add new experiments
+### Step 1: Add new experiments
 
 A user id will be needed to insert data into the experiments table. Your user id will be determined based on your provided user login (username for bety account). 
 
@@ -256,7 +254,7 @@ for(exp in new_exp){
 
 ```
 
-#### Step 2: Add new sites
+### Step 2: Add new sites
 
 ```{r add-site}
 
@@ -279,7 +277,7 @@ for(site in new_site){
 
 ```
 
-#### Step 3: Add new treatments
+### Step 3: Add new treatments
 
 ```{r add-treat}
 
@@ -300,7 +298,7 @@ for(treat in new_treat){
 
 ```
 
-#### Step 4: Add new cultivars
+### Step 4: Add new cultivars
 
 Only rows that contain a combination of cultivar name and specie id that is not yet present in BETYdb will be uploaded.
 
@@ -383,7 +381,7 @@ for(i in 1:nrow(new_cultivars)){
 
 ```
 
-#### Step 5: Add new citation
+### Step 5: Add new citation
 
 ```{r add-citation}
 
