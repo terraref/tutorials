@@ -53,7 +53,7 @@ url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEq
 
 The following packages will need to be loaded: RPostgres, readxl, dplyr, and googlesheets
 
-```{r load-pack}
+```{r load-pack, results = 'hide'}
 
 library(RPostgres)
 library(readxl)
@@ -192,7 +192,7 @@ Read in the treatments, sites, and citations sheets.
 
 These sheets contain information about which metadata to associate.
 
-```{r read-user-gs}
+```{r read-user-gs, message = FALSE}
 
 # get key from URL
 key <- extract_key_from_url(url)
