@@ -17,13 +17,17 @@ For this tutorial, make sure that you have a local instance of a test database r
 
 Knitting this markdown file will not associate any data in the test database. Being able to knit this file means that you will be able to successfully associate experiments with sites, experiments with treatments, sites with cultivars, and citations with sites.
 
-To make associations in the test database, you will need to make edits to this markdown file. 
+To make associations in the test database, you will need to make an edit to this markdown file. 
 
 `commit = TRUE` needs to be set in calls to `associateRow`.
 
-The following lines should be uncommented when you are done testing:
+When you are done testing, change the value of commit from `FALSE` to `TRUE` in the following chunk:
 
-250 (associate experiments with sites), 288 (associate experiments with treatments), 322 (associate sites with cultivars), 354 (associate citations with sites)
+```{r commit-param}
+
+commit <- FALSE
+
+```
 
 Note: Errors will occur if you try to associate your metadata more than once. If you would like to refresh the test database, re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
 
