@@ -184,9 +184,9 @@ associateRow <- function(tbl_name,
 
 ```
 
-Read in metadata from google sheets. Each sheet of your google sheet will be read in directly as a R object.
+Read in the treatments and sites sheets. 
 
-The experiments, sites, and treatments sheet contain important information on which metadata should be associated.
+These sheets contain information about which metadata to associate.
 
 ```{r read-user-gs}
 
@@ -196,22 +196,168 @@ key <- extract_key_from_url(url)
 # register sheet 
 gs_obj <- key %>% gs_key(lookup = FALSE)
 
-# experiments sheet
-experiments <- gs_obj %>% gs_read(ws = 'experiments')
-
 # sites sheet
 sites <- gs_obj %>% gs_read(ws = 'sites')
 
 # treatments sheet
 treatments <- gs_obj %>% gs_read(ws = 'treatments')
 
-# cultivars sheet
-cultivars <- gs_obj %>% gs_read(ws = 'cultivars')
+```
 
-# citations sheet
-citations <- gs_obj %>% gs_read(ws = 'citations')
+## Associate data
+
+Read in bety experiments, sites, cultivars, treatments, and citations tables. 
+
+We will refer to these tables to get ids for experiments, sites, treatments, cultivars, and citations.
+
+```{r read-bety-update}
+
+bety_experiments <- tbl(dbcon, 'experiments') %>% collect()
+bety_sites <- tbl(dbcon, 'sites') %>% collect()
+bety_cultivars <- tbl(dbcon, 'cultivars') %>% collect()
+bety_treatments <- tbl(dbcon, 'treatments') %>% collect()
+bety_citations <- tbl(dbcon, 'citations') %>% collect()
+bety_species <- tbl(dbcon, 'species') %>% collect()
 
 ```
 
+### Step 1: Associate experiments with sites
+
+```{r associate-exp-site}
+
+# loop through new sites added
+# filter for row with sitename
+# get site id from sitename
+# get experiment id from associated experiment name
+
+for(site in new_site){
+  row <- sites %>% filter(sitename == site)
+  
+  site_id <- bety_sites %>%
+    filter(sitename == row$sitename) %>%
+    select(id)
+  
+  exp_id <- bety_experiments %>%
+    filter(name == row$experiment) %>%
+    select(id)
+  
+  associateRow(tbl_name = 'experiments_sites',
+               #commit = TRUE,
+               col_1 = 'experiment_id',
+               col_2 = 'site_id',
+               val_1 = as.double(exp_id$id),
+               val_2 = as.double(site_id$id))
+}
 
 
+```
+
+### Step 2: Associate experiments with treatments
+
+```{r associate-exp-treat}
+
+# loop through new treatments added
+# filter for row with treatment name
+# get treatment id
+# get vector of associated experiment name
+# loop through vector of exp names
+# get experiment id
+
+for(treat in new_treat){
+  row <- treatments %>% filter(name == treat)
+  
+  treat_id <- bety_treatments %>%
+      filter(name == treat) %>%
+      select(id)
+  
+  associate_exp <- strsplit(row$experiment, split = ', ')[[1]]
+  
+  for(exp in associate_exp){
+    exp_id <- bety_experiments %>%
+      filter(name == exp) %>%
+      select(id)
+    
+    associateRow(tbl_name = 'experiments_treatments',
+               #commit = TRUE, 
+               col_1 = 'experiment_id',
+               col_2 = 'treatment_id',
+               val_1 = as.double(exp_id$id),
+               val_2 = as.double(treat_id$id))
+  }
+}
+
+```
+
+## Step 3: Associate sites with cultivars
+
+```{r associate-site-cultivar}
+
+# loop through new sites added
+# filter for row with sitename
+# get site_id
+# get associated cultivar_id (need specie_id for this)
+for(site in new_site){
+  row <- sites %>% filter(sitename == site)
+   
+  site_id <- bety_sites %>%
+    filter(sitename == row$sitename) %>%
+    select(id)
+  
+  spp_id <- bety_species %>%
+    filter(scientificname == row$species) %>%
+    select(id)
+  
+  cultivar_id <- bety_cultivars %>%
+    filter(name == row$cultivar & specie_id == as.double(spp_id$id)) %>%
+    select(id)
+  
+  associateRow(tbl_name = 'sites_cultivars',
+               #commit = TRUE,
+               col_1 = 'site_id',
+               col_2 = 'cultivar_id',
+               val_1 = as.double(site_id$id),
+               val_2 = as.double(cultivar_id$id))
+}
+
+
+```
+
+## Step 4: Associate citations with sites
+
+```{r associate-citation-site}
+
+# get citation id
+citation_id <- bety_citations %>%
+  filter(author == citations$author & year == citations$year & title == citations$title) %>%
+  select(id)
+
+# loop through new sites added
+# filter for row with sitename
+# get site id
+# associate with above citation id
+
+for(site in new_site){
+  row <- sites %>% filter(sitename == site)
+  
+  site_id <- bety_sites %>%
+    filter(sitename == row$sitename) %>%
+    select(id)
+  
+  associateRow(tbl_name = 'citations_sites',
+               #commit = TRUE,
+               col_1 = 'citation_id',
+               col_2 = 'site_id',
+               val_1 = as.double(citation_id$id),
+               val_2 = as.double(site_id$id))
+  
+}
+
+```
+
+Close database connection
+
+```{r close-dbcon}
+
+dbDisconnect(dbcon)
+
+```
