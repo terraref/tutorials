@@ -27,9 +27,13 @@ To upload your data to the test database, you will need to make edits to this ma
 
 `commit = TRUE` needs to be set in calls to `addRow`.
 
-The following lines should be uncommented when you are ready to upload data to the database:
+When you are done testing and are ready to upload your data to the test database, change the value of commit from `FALSE` to `TRUE` on line 34:
 
-263 (add experiments), 286 (add sites), 309 (add treatments), 337 (add species), 388 (add cultivars), 406 (add citations)
+```{r commit-param}
+
+commit <- FALSE
+
+```
 
 Note: Errors will occur if you try to insert your metadata more than once. If you would like to refresh the test database (remove additions that you have made), re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
 
@@ -260,7 +264,7 @@ for(exp in new_exp){
   row <- experiments %>% filter(name == exp)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = commit,
          tbl_name = 'experiments',
          tbl_fields = c('name', 'start_date', 'end_date',
                         'description', 'design'),
@@ -283,7 +287,7 @@ for(site in new_site){
   row <- sites %>% filter(sitename == site)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = commit,
          tbl_name = 'sites',
          tbl_fields = c('city', 'state', 'country',
                         'notes', 'sitename', 'greenhouse',
@@ -306,7 +310,7 @@ for(treat in new_treat){
   row <- treatments %>% filter(name == treat)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = commit,
          tbl_name = 'treatments',
          tbl_fields = c('name', 'defintion', 'control'))
 }
@@ -334,7 +338,7 @@ unq_spp <- unique(cultivars$species)
 # get species to add
 spp_to_add <- unq_spp[!unq_spp %in% bety_species$scientificname]
 
-addSpecie(#commit = FALSE,
+addSpecie(commit = commit,
           specie_to_add  = spp_to_add)
 
 ```
@@ -385,7 +389,7 @@ for(i in 1:nrow(new_cultivars)){
   row <- new_cultivars %>% slice(i)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = commit,
          tbl_name = 'cultivars',
          tbl_fields = c('name', 'specie_id', 'ecotype', 'notes'))
 }
@@ -403,7 +407,7 @@ for(i in 1:nrow(citations)){
   row <- citations %>% slice(i)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = commit,
          tbl_name = 'citations',
          tbl_fields = c('author', 'year', 'title',
                         'journal', 'volume', 'page',
