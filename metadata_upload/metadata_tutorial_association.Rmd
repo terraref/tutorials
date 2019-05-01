@@ -230,6 +230,8 @@ bety_species <- tbl(dbcon, 'species') %>% collect()
 # get site id from sitename
 # get experiment id from associated experiment name
 
+new_site <- sites$sitename
+
 for(site in new_site){
   row <- sites %>% filter(sitename == site)
   
@@ -262,6 +264,8 @@ for(site in new_site){
 # get vector of associated experiment name
 # loop through vector of exp names
 # get experiment id
+
+new_treat <- treatments$name
 
 for(treat in new_treat){
   row <- treatments %>% filter(name == treat)
