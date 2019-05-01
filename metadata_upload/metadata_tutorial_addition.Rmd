@@ -17,7 +17,7 @@ For this tutorial, data will be uploaded to a test database. Instructions on how
 
 This tutorial will only cover how to add new experiments, sites, treamtments, cultivars, and citations. 
 
-The `Metadata Upload Tutorial Part 2: Associations` tutorial should be run after completing this tutorial. The tutorial will cover how to associate the metadata that you add.
+The `Metadata Upload Tutorial Part 2: Associations` tutorial should be run after completing this tutorial and all new metadata has been added (see below for more details). The tutorial will cover how to associate the metadata that you add.
 
 ## Notes on Uploading Data
 
@@ -27,7 +27,7 @@ To upload your data to the test database, you will need to make edits to this ma
 
 `commit = TRUE` needs to be set in calls to `addRow`.
 
-The following lines should be uncommented if you would like to upload data to the database:
+The following lines should be uncommented when you are ready to upload data to the database:
 
 236 (add experiments), 259 (add sites), 282 (add treatments), 361 (add cultivars), 379 (add citations), 424 (associate experiments with sites), 460 (associate experiments with treatments), 494 (associate sites with cultivars), and 526 (associate citations with sites).
 
@@ -245,7 +245,7 @@ for(exp in new_exp){
   row <- experiments %>% filter(name == exp)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = TRUE,
          tbl_name = 'experiments',
          tbl_fields = c('name', 'start_date', 'end_date',
                         'description', 'design'),
@@ -268,7 +268,7 @@ for(site in new_site){
   row <- sites %>% filter(sitename == site)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = TRUE,
          tbl_name = 'sites',
          tbl_fields = c('city', 'state', 'country',
                         'notes', 'sitename', 'greenhouse',
@@ -291,7 +291,7 @@ for(treat in new_treat){
   row <- treatments %>% filter(name == treat)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = TRUE,
          tbl_name = 'treatments',
          tbl_fields = c('name', 'defintion', 'control'))
 }
@@ -374,7 +374,7 @@ for(i in 1:nrow(new_cultivars)){
   row <- new_cultivars %>% slice(i)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = TRUE,
          tbl_name = 'cultivars',
          tbl_fields = c('name', 'specie_id', 'ecotype', 'notes'))
 }
@@ -392,7 +392,7 @@ for(i in 1:nrow(citations)){
   row <- citations %>% slice(i)
   addRow(row = row,
          dbcon = dbcon,
-         #commit = TRUE,
+         commit = TRUE,
          tbl_name = 'citations',
          tbl_fields = c('author', 'year', 'title',
                         'journal', 'volume', 'page',
@@ -404,5 +404,5 @@ for(i in 1:nrow(citations)){
 Close database connection
 
 ```{r close-dbcon}
-dbDisonnect(dbcon)
+dbDisconnect(dbcon)
 ```
