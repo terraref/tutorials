@@ -15,9 +15,9 @@ For this tutorial, data will be uploaded to a test database. Instructions on how
 
 **need to update location of setting up local instance of test db tutorial**
 
-This tutorial will only cover how to add new experiments, sites, treamtments, cultivars, and citations. 
+This tutorial will only cover how to add new experiments, sites, treatments, cultivars, and citations. 
 
-The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed after completing this tutorial and when all new metadata has been added (see below for more details). The second tutorial will cover how to associate the metadata that you add.
+The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed after completing this tutorial and when all new metadata have been added (see below for more details). The second tutorial will cover how to associate the metadata that you add.
 
 ## Notes on Running this Rmd
 
@@ -61,7 +61,7 @@ url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEq
 
 The following packages will need to be loaded: RPostgres, readxl, dplyr, and googlesheets
 
-```{r load-pack, results = 'hide'}
+```{r load-pack, message = FALSE}
 
 library(RPostgres)
 library(readxl)
