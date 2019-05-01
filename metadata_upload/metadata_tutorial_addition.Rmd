@@ -19,7 +19,7 @@ This tutorial will only cover how to add new experiments, sites, treamtments, cu
 
 The `Metadata Upload Tutorial Part 2: Associations` tutorial should be run after completing this tutorial and all new metadata has been added (see below for more details). The tutorial will cover how to associate the metadata that you add.
 
-## Notes on Uploading Data
+## Notes on Running this Rmd
 
 Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will be able to upload all of your new experiments, sites, treatments, cultivars, and citations metadata successfully.
 
