@@ -184,7 +184,7 @@ associateRow <- function(tbl_name,
 
 ```
 
-Read in the treatments and sites sheets. 
+Read in the treatments, sites, and citations sheets. 
 
 These sheets contain information about which metadata to associate.
 
@@ -201,6 +201,9 @@ sites <- gs_obj %>% gs_read(ws = 'sites')
 
 # treatments sheet
 treatments <- gs_obj %>% gs_read(ws = 'treatments')
+
+# citations sheet
+citations <- gs_obj %>% gs_read(ws = 'citations')
 
 ```
 
