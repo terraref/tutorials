@@ -13,21 +13,25 @@ Each season should have metadata for experiments, sites, treatments, cultivars, 
 
 For this tutorial, data will be uploaded to a test database. Instructions on how to set up a local instance of a test database can be found [here](https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d).
 
-**need to update location of setting up local instance of test db tutorial**
-
 This tutorial will only cover how to add new experiments, sites, treatments, cultivars, and citations. 
 
 The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed after completing this tutorial and when all new metadata have been added (see below for more details). The second tutorial will cover how to associate the metadata that you add.
 
-## Notes on Running this Rmd
+# Section 2: Required input
+
+URL to a public published google sheet (please provide in setup of section 3)
+
+   * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1Fr_8xYOucyCQ9WH5_1bfPTMpm3IhKX5oqW4UOMvPoSY/edit?usp=sharing).
+   * instructions on how to fill out the template can be found under the README worksheet.
+   * make the google sheet public (to anyone with link) and publish to the web.
+
+# Section 3: How to Run this Rmd
 
 Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will be able to upload all of your new experiments, sites, treatments, cultivars, and citations metadata successfully.
 
-To upload your data to the test database, you will need to make an edit to this markdown file. 
+To actually upload your data to the test database, you will need to make an edit to this markdown file. 
 
-`commit = TRUE` needs to be set in calls to `addRow`.
-
-When you are done testing and are ready to upload your data to the test database, change the value of commit from `FALSE` to `TRUE` in the following chunk:
+`commit = TRUE` needs to be set in calls to `addRow`. The value of `commit` needs to be changed from `FALSE` to `TRUE` in the following chunk:
 
 ```{r commit-param}
 
@@ -35,17 +39,11 @@ commit <- FALSE
 
 ```
 
-Note: Errors will occur if you try to insert your metadata more than once. If you would like to refresh the test database (remove additions that you have made), re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
+NOTE: You will get errors if you try to insert your metadata more than once. 
 
-# Section 2: Required input
+If you would like to refresh the test database (remove additions that you have made), re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
 
-URL to a public published google sheet
-
-   * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1Fr_8xYOucyCQ9WH5_1bfPTMpm3IhKX5oqW4UOMvPoSY/edit?usp=sharing).
-   * instructions on how to fill out the template can be found under the README worksheet.
-   * make the google sheet public (to anyone with link) and publish to the web.
-
-# Section 3: Metadata upload
+# Section 4: Metadata upload
 
 ## Set up
 
@@ -59,7 +57,7 @@ url <- 'https://docs.google.com/spreadsheets/d/1c_5j7q3TO6gQ24KSopE-_LXA5HhfsUEq
 
 ```
 
-The following packages will need to be loaded: RPostgres, readxl, dplyr, and googlesheets
+The following packages will need to be loaded: `RPostgres`, `readxl`, `dplyr`, and `googlesheets`
 
 ```{r load-pack, message = FALSE}
 
