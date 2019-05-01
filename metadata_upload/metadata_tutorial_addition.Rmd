@@ -339,7 +339,7 @@ unq_spp <- unique(cultivars$species)
 spp_to_add <- unq_spp[!unq_spp %in% bety_species$scientificname]
 
 addSpecie(commit = commit,
-          specie_to_add  = spp_to_add)
+          species_to_add  = spp_to_add)
 
 ```
 
