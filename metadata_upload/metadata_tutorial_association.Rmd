@@ -251,7 +251,7 @@ for(site in new_site){
     select(id)
   
   associateRow(tbl_name = 'experiments_sites',
-               #commit = TRUE,
+               commit = commit,
                col_1 = 'experiment_id',
                col_2 = 'site_id',
                val_1 = as.double(exp_id$id),
@@ -289,11 +289,11 @@ for(treat in new_treat){
       select(id)
     
     associateRow(tbl_name = 'experiments_treatments',
-               #commit = TRUE, 
-               col_1 = 'experiment_id',
-               col_2 = 'treatment_id',
-               val_1 = as.double(exp_id$id),
-               val_2 = as.double(treat_id$id))
+                 commit = commit,
+                 col_1 = 'experiment_id',
+                 col_2 = 'treatment_id',
+                 val_1 = as.double(exp_id$id),
+                 val_2 = as.double(treat_id$id))
   }
 }
 
@@ -323,7 +323,7 @@ for(site in new_site){
     select(id)
   
   associateRow(tbl_name = 'sites_cultivars',
-               #commit = TRUE,
+               commit = commit,
                col_1 = 'site_id',
                col_2 = 'cultivar_id',
                val_1 = as.double(site_id$id),
@@ -355,7 +355,7 @@ for(site in new_site){
     select(id)
   
   associateRow(tbl_name = 'citations_sites',
-               #commit = TRUE,
+               commit = commit,
                col_1 = 'citation_id',
                col_2 = 'site_id',
                val_1 = as.double(citation_id$id),
