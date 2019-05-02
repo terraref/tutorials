@@ -101,9 +101,7 @@ Functions to include in package
 
 ```{r pack-fx}
 
-# preparedStatement
-# uploads parameterized query to database
-preparedStatement <- function(con, query, params) {
+prepared_statement <- function(con, query, params) {
   stopifnot(
     class(con) == "PqConnection",
     is.character(query),
@@ -115,108 +113,65 @@ preparedStatement <- function(con, query, params) {
   on.exit(DBI::dbClearResult(res))
 }
 
-# getFields
-# returns column names of row that have a value and is included in tbl_fields
-getFields <- function(tbl_fields,
-                      row){
+get_fields <- function(tbl_fields, row){
   com_ind <- which(!is.na(row))
   com_fields <- names(row)[com_ind]
   com_tbl_fields <- tbl_fields[tbl_fields %in% com_fields]
   return(com_tbl_fields)
 }
 
-# getParams
-# returns an unnamed list of parameter values for a row that is subsetted according to fields
-getParams <- function(row,
-                      fields){
+get_params <- function(row, fields){
   params <- unname(as.list(row[fields]))
   return(params)
 }
 
-# getPositParams
-# returns something like '$1, $2, $3' to be used for parameterized queries; number of params depends on length of fields
-getPositParams <- function(fields){
-  posit_params <- sapply(1:length(fields),
-                         function(x) paste0('$', x))
-  return(posit_params)
-}
-
-# getStatement
-# returns a parameterized insert statement 
-getStatement <- function(dbcon,
-                         tbl_name,
-                         fields){
-  posit_params <- sapply(1:length(fields),
-                         function(x) paste0('$', x))
-  statement <- glue_sql("insert into {DBI::SQL(tbl_name)}
-                        ({DBI::SQL(paste(fields, collapse = ', '))})
-                        values ({DBI::SQL(paste(posit_params, collapse = ', '))})",
-                        .con = dbcon)
+get_statement <- function(dbcon, tbl_name, fields){
+  num_params <- length(fields)
+  posit_params <- sapply(1:num_params, function(x) paste0('$', x))
+  statement <- glue::glue_sql("insert into {DBI::SQL(tbl_name)}
+                              ({DBI::SQL(paste(fields, collapse = ', '))})
+                              values ({DBI::SQL(paste(posit_params, collapse = ', '))})",
+                              .con = dbcon)
   return(statement)
 }
 
-# addSpecie
-# species_to_add should be character vector of specie names that need to be added to db
-addSpecie <- function(species_to_add,
-                      commit = FALSE){ 
+add_specie <- function(species_to_add, dbcon, commit = FALSE){
   if(length(species_to_add) != 0){
     for(spp in species_to_add){
-      dbBegin(dbcon)
-      spp_insert <- glue_sql("insert into species (scientificname) values ({spp})",
-                             .con = dbcon)
-      ifelse(commit == TRUE, dbCommit(dbcon), dbRollback(dbcon))
+      DBI::dbBegin(dbcon)
+      spp_insert <- glue::glue_sql("insert into species (scientificname) values ({spp})",
+                                   .con = dbcon)
+      ifelse(commit == TRUE, DBI::dbCommit(dbcon), DBI::dbRollback(dbcon))
     }
   }
 }
 
 
-# addRow
-# uploads insert statement 
-# to be used to add new experiments, sites, treatments, cultivars, and citations
-addRow <- function(row,
-                   dbcon,
-                   tbl_name,
-                   tbl_fields,
-                   user_id = NULL, 
-                   commit = FALSE){ #user_id only required for experiment upload
-  fields <- getFields(tbl_fields,
-                      row)
-  params <- getParams(row,
-                      fields)
-  # extra addition needed to insert data into experiments 
+add_row <- function(row, dbcon, tbl_name, tbl_fields, user_id = NULL, commit = FALSE){
+  #user_id only required for experiment upload
+
+  fields <- get_fields(tbl_fields, row)
+  params <- get_params(row, fields)
+  # extra addition needed to insert data into experiments
   if(tbl_name == 'experiments'){
     fields <- append(fields, 'user_id')
     params <- append(params, as.double(user_id)) #need to create this in experiments chunk
   }
-  statement <- getStatement(dbcon,
-                            tbl_name,
-                            fields)
-  dbBegin(dbcon)            
-  preparedStatement(dbcon,
-                    statement,
-                    params)
-  ifelse(commit == TRUE, dbCommit(dbcon), dbRollback(dbcon))
+  statement <- get_statement(dbcon, tbl_name, fields)
+  DBI::dbBegin(dbcon)
+  prepared_statement(dbcon, statement, params)
+  ifelse(commit == TRUE, DBI::dbCommit(dbcon), DBI::dbRollback(dbcon))
 }
 
-# associateRow
-# uploads insert statement
-# to be used to associate experiments with sites, experiments with treatments, sites with cultivars, and sites with citations
-associateRow <- function(tbl_name,
-                         col_1,
-                         col_2,
-                         val_1,
-                         val_2,
-                         commit = FALSE){
-    statement <- glue_sql("insert into {DBI::SQL(tbl_name)}
-                          ({DBI::SQL(paste(c(col_1, col_2), collapse = ', '))})
-                          values ($1, $2)",
-                          .con = dbcon)
-    params <- list(val_1, val_2)
-    dbBegin(dbcon)
-    preparedStatement(dbcon,
-                      statement,
-                      params)
-    ifelse(commit == TRUE, dbCommit(dbcon), dbRollback(dbcon))                    
+associate_vals <- function(tbl_name, col_1, col_2, val_1, val_2, dbcon, commit = FALSE){
+  statement <- glue::glue_sql("insert into {DBI::SQL(tbl_name)}
+                              ({DBI::SQL(paste(c(col_1, col_2), collapse = ', '))})
+                              values ($1, $2)",
+                              .con = dbcon)
+  params <- list(val_1, val_2)
+  DBI::dbBegin(dbcon)
+  prepared_statement(dbcon, statement, params)
+  ifelse(commit == TRUE, DBI::dbCommit(dbcon), DBI::dbRollback(dbcon))
 }
 
 ```
@@ -274,13 +229,13 @@ new_exp <- experiments$name # assuming that each row of experiments sheet descri
 # upload data for row using addRow
 for(exp in new_exp){
   row <- experiments %>% filter(name == exp)
-  addRow(row = row,
-         dbcon = dbcon,
-         commit = commit,
-         tbl_name = 'experiments',
-         tbl_fields = c('name', 'start_date', 'end_date',
+  add_row(row = row,
+          dbcon = dbcon,
+          commit = commit,
+          tbl_name = 'experiments',
+          tbl_fields = c('name', 'start_date', 'end_date',
                         'description', 'design'),
-         user_id = user_id$id) #need to specify user_id since adding experiment
+          user_id = user_id$id) #need to specify user_id since adding experiment
 }
 
 ```
@@ -297,13 +252,13 @@ new_site <- sites$sitename # assuming that each row of sites sheet describes a u
 # upload data for row using addRow
 for(site in new_site){
   row <- sites %>% filter(sitename == site)
-  addRow(row = row,
-         dbcon = dbcon,
-         commit = commit,
-         tbl_name = 'sites',
-         tbl_fields = c('city', 'state', 'country',
-                        'notes', 'sitename', 'greenhouse',
-                        'geometry', 'time_zone'))
+  add_row(row = row,
+          dbcon = dbcon,
+          commit = commit,
+          tbl_name = 'sites',
+          tbl_fields = c('city', 'state', 'country',
+                         'notes', 'sitename', 'greenhouse',
+                         'geometry', 'time_zone'))
 }
 
 ```
@@ -320,11 +275,11 @@ new_treat <- treatments$name # assuming that each row of treatments sheet descri
 # upload data for row using addRow
 for(treat in new_treat){
   row <- treatments %>% filter(name == treat)
-  addRow(row = row,
-         dbcon = dbcon,
-         commit = commit,
-         tbl_name = 'treatments',
-         tbl_fields = c('name', 'defintion', 'control'))
+  add_row(row = row,
+          dbcon = dbcon,
+          commit = commit,
+          tbl_name = 'treatments',
+          tbl_fields = c('name', 'defintion', 'control'))
 }
 
 ```
@@ -350,8 +305,8 @@ unq_spp <- unique(cultivars$species)
 # get species to add
 spp_to_add <- unq_spp[!unq_spp %in% bety_species$scientificname]
 
-addSpecie(commit = commit,
-          species_to_add  = spp_to_add)
+add_specie(commit = commit,
+           species_to_add  = spp_to_add)
 
 ```
 
@@ -399,11 +354,11 @@ Add new cultivars
 # upload data for row using addRow
 for(i in 1:nrow(new_cultivars)){
   row <- new_cultivars %>% slice(i)
-  addRow(row = row,
-         dbcon = dbcon,
-         commit = commit,
-         tbl_name = 'cultivars',
-         tbl_fields = c('name', 'specie_id', 'ecotype', 'notes'))
+  add_row(row = row,
+          dbcon = dbcon,
+          commit = commit,
+          tbl_name = 'cultivars',
+          tbl_fields = c('name', 'specie_id', 'ecotype', 'notes'))
 }
 
 ```
@@ -417,13 +372,13 @@ for(i in 1:nrow(new_cultivars)){
 
 for(i in 1:nrow(citations)){
   row <- citations %>% slice(i)
-  addRow(row = row,
-         dbcon = dbcon,
-         commit = commit,
-         tbl_name = 'citations',
-         tbl_fields = c('author', 'year', 'title',
-                        'journal', 'volume', 'page',
-                        'url', 'pdf', 'doi'))
+  add_row(row = row,
+          dbcon = dbcon,
+          commit = commit,
+          tbl_name = 'citations',
+          tbl_fields = c('author', 'year', 'title',
+                         'journal', 'volume', 'page',
+                         'url', 'pdf', 'doi'))
 }
 
 ```
