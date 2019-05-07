@@ -43,7 +43,7 @@ commit <- TRUE
 
 NOTE: You will get errors if you try to insert your metadata more than once. 
 
-If you would like to refresh the test database (remove additions that you have made), re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
+If you would like to restart the test database (remove additions that you have made), run step 4 of the `How to set up local instance of BETY test database` tutorial.
 
 ## Check uploaded data
 
