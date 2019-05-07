@@ -29,7 +29,7 @@ commit <- FALSE
 
 ```
 
-Note: Errors will occur if you try to associate your metadata more than once. If you would like to refresh the test database, re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
+Note: Errors will occur if you try to associate your metadata more than once. If you would like to restart the test database, run step 4 of the `How to set up local instance of BETY test database` tutorial.
 
 # Section 2: Required input
 
