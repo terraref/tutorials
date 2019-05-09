@@ -37,7 +37,7 @@ The value of `commit` needs to be changed from `FALSE` to `TRUE` in the followin
 
 ```{r commit-param}
 
-commit <- TRUE
+commit <- FALSE
 
 ```
 
