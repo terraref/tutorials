@@ -15,13 +15,11 @@ For this tutorial, make sure that you have a local instance of a test database r
 
 ## Notes on Running this Rmd
 
-Knitting this markdown file will not associate any data in the test database. Being able to knit this file means that you will be able to successfully associate experiments with sites, experiments with treatments, sites with cultivars, and citations with sites.
+Knitting this markdown file will not associate any data in the test database. Being able to knit this file means that you will not encounter any errors when associating experiments with sites, experiments with treatments, sites with cultivars, and citations with sites.
 
 To make associations in the test database, you will need to make an edit to this markdown file. 
 
-`commit = TRUE` needs to be set in calls to `associateRow`.
-
-When you are done testing, change the value of commit from `FALSE` to `TRUE` in the following chunk:
+`commit = TRUE` needs to be set in the following chunk.
 
 ```{r commit-param}
 
@@ -29,11 +27,9 @@ commit <- FALSE
 
 ```
 
-Note: Errors will occur if you try to associate your metadata more than once. If you would like to restart the test database, run step 4 of the `How to set up local instance of BETY test database` tutorial.
-
 # Section 2: Required input
 
-URL to a public published google sheet 
+URL to a public published google sheet (please provide in section 3)
 
 _this should be the same URL that you used for the `Metadata Upload Tutorial Part 1: Addition` tutorial_
 
@@ -78,7 +74,7 @@ dbcon <- dbConnect(RPostgres::Postgres(),
 
 ```
 
-Functions to include in package
+The following functions will be included in the package.
 
 ```{r pack-fx}
 
@@ -196,8 +192,8 @@ add_citations <- function(citations, dbcon, commit = FALSE){
 
 # associate_experiments_sites
 associate_experiments_sites <- function(sites, dbcon, commit){
-  bety_sites <- tbl(dbcon, 'sites') # bety sites table
-  bety_experiments <- tbl(dbcon, 'experiments') # bety experiments table
+  bety_sites <- tbl(dbcon, 'sites') %>% collect() # bety sites table
+  bety_experiments <- tbl(dbcon, 'experiments') %>% collect() # bety experiments table
   new_site <- sites$sitename # new sites added
   for(site in new_site){
     row <- sites %>% filter(sitename == site)
@@ -219,8 +215,8 @@ associate_experiments_sites <- function(sites, dbcon, commit){
 
 # associate_experiments_treatments
 associate_experiments_treatments <- function(treatments, dbcon, commit){
-  bety_treatments <- tbl(dbcon, 'treatments') # bety treatments table
-  bety_experiments <- tbl(dbcon, 'experiments') # bety experiments table
+  bety_treatments <- tbl(dbcon, 'treatments') %>% collect() # bety treatments table
+  bety_experiments <- tbl(dbcon, 'experiments') %>% collect() # bety experiments table
   new_treat <- treatments$name # new treatments
   for(treat in new_treat){
     row <- treatments %>% filter(name == treat)
@@ -233,21 +229,21 @@ associate_experiments_treatments <- function(treatments, dbcon, commit){
         filter(name == exp) %>%
         select(id)
       associate_vals(tbl_name = 'experiments_treatments',
-                   col_1 = 'experiment_id',
-                   col_2 = 'treatment_id',
-                   val_1 = as.double(exp_id$id),
-                   val_2 = as.double(treat_id$id), 
-                   dbcon = dbcon,
-                   commit = commit)
+                     col_1 = 'experiment_id',
+                     col_2 = 'treatment_id',
+                     val_1 = as.double(exp_id$id),
+                     val_2 = as.double(treat_id$id), 
+                     dbcon = dbcon,
+                     commit = commit)
     }
   }
 }
 
 # associate_sites_cultivars
 associate_sites_cultivars <- function(sites, dbcon, commit){
-  bety_sites <- tbl(dbcon, 'sites') # bety sites table
-  bety_species <- tbl(dbcon, 'species') # bety species table
-  bety_cultivars <- tbl(dbcon, 'cultivars') # bety cultivars table
+  bety_sites <- tbl(dbcon, 'sites') %>% collect() # bety sites table
+  bety_species <- tbl(dbcon, 'species') %>% collect() # bety species table
+  bety_cultivars <- tbl(dbcon, 'cultivars') %>% collect() # bety cultivars table
   new_site <- sites$sitename
   for(site in new_site){
     row <- sites %>% filter(sitename == site)
@@ -272,8 +268,8 @@ associate_sites_cultivars <- function(sites, dbcon, commit){
 
 #associate_citations_sites
 associate_citations_sites <- function(citations, sites, dbcon, commit){
-  bety_citations <- tbl(dbcon, 'citations')
-  bety_sites <- tbl(dbcon, 'sites')
+  bety_citations <- tbl(dbcon, 'citations') %>% collect()
+  bety_sites <- tbl(dbcon, 'sites') %>% collect()
   # get citation id (assuming only one citation)
   citation_id <- bety_citations %>%
     filter(author == citations$author & year == citations$year & title == citations$title) %>%
@@ -406,7 +402,7 @@ associate_experiments_treatments(treatments, dbcon, commit)
 
 ```
 
-## Step 3: Associate sites with cultivars
+### Step 3: Associate sites with cultivars
 
 To associate sites with cultivars, run `associate_sites_cultivars`. The sites google sheet object will need to be passed in.
 
@@ -416,16 +412,17 @@ associate_sites_cultivars(sites, dbcon, commit)
 
 ```
 
-## Step 4: Associate citations with sites
+### Step 4: Associate citations with sites
 
 To associate citations with sites, run `associate_citations_sites`. The citations and sites google sheet objects will need to be passed in.
 
 ```{r associate-citation-site}
 
 associate_citations_sites(citations, sites, dbcon, commit)
+
 ```
 
-Close database connection
+## Close database connection
 
 ```{r close-dbcon}
 

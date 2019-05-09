@@ -220,8 +220,8 @@ add_citations <- function(citations, user_id, dbcon, commit){
 
 # associate_experiments_sites
 associate_experiments_sites <- function(sites, dbcon, commit){
-  bety_sites <- tbl(dbcon, 'sites') # bety sites table
-  bety_experiments <- tbl(dbcon, 'experiments') # bety experiments table
+  bety_sites <- tbl(dbcon, 'sites') %>% collect() # bety sites table
+  bety_experiments <- tbl(dbcon, 'experiments') %>% collect() # bety experiments table
   new_site <- sites$sitename # new sites added
   for(site in new_site){
     row <- sites %>% filter(sitename == site)
@@ -243,8 +243,8 @@ associate_experiments_sites <- function(sites, dbcon, commit){
 
 # associate_experiments_treatments
 associate_experiments_treatments <- function(treatments, dbcon, commit){
-  bety_treatments <- tbl(dbcon, 'treatments') # bety treatments table
-  bety_experiments <- tbl(dbcon, 'experiments') # bety experiments table
+  bety_treatments <- tbl(dbcon, 'treatments') %>% collect() # bety treatments table
+  bety_experiments <- tbl(dbcon, 'experiments') %>% collect() # bety experiments table
   new_treat <- treatments$name # new treatments
   for(treat in new_treat){
     row <- treatments %>% filter(name == treat)
@@ -257,21 +257,21 @@ associate_experiments_treatments <- function(treatments, dbcon, commit){
         filter(name == exp) %>%
         select(id)
       associate_vals(tbl_name = 'experiments_treatments',
-                   col_1 = 'experiment_id',
-                   col_2 = 'treatment_id',
-                   val_1 = as.double(exp_id$id),
-                   val_2 = as.double(treat_id$id), 
-                   dbcon = dbcon,
-                   commit = commit)
+                     col_1 = 'experiment_id',
+                     col_2 = 'treatment_id',
+                     val_1 = as.double(exp_id$id),
+                     val_2 = as.double(treat_id$id), 
+                     dbcon = dbcon,
+                     commit = commit)
     }
   }
 }
 
 # associate_sites_cultivars
 associate_sites_cultivars <- function(sites, dbcon, commit){
-  bety_sites <- tbl(dbcon, 'sites') # bety sites table
-  bety_species <- tbl(dbcon, 'species') # bety species table
-  bety_cultivars <- tbl(dbcon, 'cultivars') # bety cultivars table
+  bety_sites <- tbl(dbcon, 'sites') %>% collect() # bety sites table
+  bety_species <- tbl(dbcon, 'species') %>% collect() # bety species table
+  bety_cultivars <- tbl(dbcon, 'cultivars') %>% collect() # bety cultivars table
   new_site <- sites$sitename
   for(site in new_site){
     row <- sites %>% filter(sitename == site)
@@ -296,8 +296,8 @@ associate_sites_cultivars <- function(sites, dbcon, commit){
 
 #associate_citations_sites
 associate_citations_sites <- function(citations, sites, dbcon, commit){
-  bety_citations <- tbl(dbcon, 'citations')
-  bety_sites <- tbl(dbcon, 'sites')
+  bety_citations <- tbl(dbcon, 'citations') %>% collect()
+  bety_sites <- tbl(dbcon, 'sites') %>% collect()
   # get citation id (assuming only one citation)
   citation_id <- bety_citations %>%
     filter(author == citations$author & year == citations$year & title == citations$title) %>%
@@ -317,7 +317,6 @@ associate_citations_sites <- function(citations, sites, dbcon, commit){
                    commit = commit)
   }
 }
-
 ###################
 # helper functions
 ###################
