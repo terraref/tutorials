@@ -7,33 +7,33 @@ output: html_document
 
 # Section 1: Overview
 
-The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database.
+The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database. All traits data need to have associated metadata.
 
 Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
 
-For this tutorial, data will be uploaded to a test database. Instructions on how to set up a local instance of a test database can be found [here](https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d).
+For this tutorial, you will be uploading your metadata to a test database. Instructions on how to set up a local instance of a test database can be found [here](https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d).
 
 This tutorial will only cover how to add new experiments, sites, treatments, cultivars, and citations. 
 
-The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed after completing this tutorial and when all new metadata have been added (see below for more details). The second tutorial will cover how to associate the metadata that you add.
+The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed after you have completed this tutorial and all new metadata have been added (see below for more details on how to run this markdown file). The second tutorial will cover how to associate the metadata that you add.
 
 # Section 2: Required input
 
-URL to a public published google sheet (please provide in setup of section 3)
+URL to a public published google sheet (you will need to provide this url below in section 4)
 
    * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1pNEuwNHNHHrpql0b36DYFAbOlBU5TJVF_nO4RdRzdmg/edit#gid=0).
    * instructions on how to fill out the template can be found under the README worksheet.
-   * make the google sheet public (to anyone with link) and publish to the web.
+   * make the google sheet public (to anyone with link) and publish the entire document to the web as a xlsx.
 
 # Section 3: How to Run this Rmd
 
 ## Commit database transactions to upload data
 
-Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will be able to upload all of your new experiments, sites, treatments, cultivars, and citations metadata successfully.
+Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will not encounter any errors when uploading your metadata. All experiments, sites, treatments, cutlivars, and citations can be uploaded successfully. 
 
-To actually upload your data to the test database, you will need to make an edit to this markdown file. 
+To actually commit additions to the test database, you will need to make an edit to this markdown file. 
 
-`commit = TRUE` needs to be set in calls to `addRow`. The value of `commit` needs to be changed from `FALSE` to `TRUE` in the following chunk:
+The value of `commit` needs to be changed from `FALSE` to `TRUE` in the following chunk:
 
 ```{r commit-param}
 
@@ -41,15 +41,21 @@ commit <- FALSE
 
 ```
 
-NOTE: You will get errors if you try to insert your metadata more than once. 
+It is important to note that you should only be uploading your metadata once. 
 
-If you would like to restart the test database (remove additions that you have made), run step 4 of the `How to set up local instance of BETY test database` tutorial.
+Trying to upload your metadata more than once will result in errors. 
+
+If you would like to reinitialize the test database and remove any additions that you have made, re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
 
 ## Check uploaded data
 
-You will not be able to fetch any of your uploaded data until it has been added to the database. You can check your uploaded results when you run this Rmd with `commit <- TRUE` in the above chunk:
+You will not be able to fetch any of your uploaded data until it has been added to the database. 
 
-```{r check-upload}
+You can check your uploaded results when you run this Rmd with `commit <- TRUE` in the above chunk. 
+
+The value of `eval_chk` will depend on the value you set for `commit`. This variable will determine whether chunks for checking uploaded data will be evaluated. 
+
+```{r check-upload, results = 'hide'}
 
 ifelse(commit == TRUE, eval_chk <- TRUE, eval_chk <- FALSE)
 
@@ -83,13 +89,12 @@ library(DBI)
 
 ```
 
-Create database connection (make sure you have test database running). 
+A connection to the test database needs to be created. Make sure that you have the test database running. 
 
 The port number should be the same as the one indicated in docker-compose.override.yml.
 
 ```{r create-dbcon}
 
-# no password required 
 dbcon <- dbConnect(RPostgres::Postgres(),
                    host = 'localhost',
                    user = 'bety',
@@ -97,15 +102,15 @@ dbcon <- dbConnect(RPostgres::Postgres(),
 
 ```
 
-Functions to include in package
+The following functions will be used to upload metadata: `add_experiments`, `add_sites`, `add_treatments`, `add_species`, `get_new_cultivars`, `add_cultivars`, and `add_citations`. These functions are from _packagename_.
 
-```{r pack-fx}
+```{r pack-fx, echo = FALSE}
 ####################
 # exported functions
 ####################
 
 # add_experiments
-add_experiments <- function(experiments, users, dbcon, commit = FALSE){
+add_experiments <- function(experiments, users, dbcon, commit){
   
   # get user id from user login
   bety_users <- tbl(dbcon, 'users') %>% collect()
@@ -126,7 +131,7 @@ add_experiments <- function(experiments, users, dbcon, commit = FALSE){
 }
 
 # add_sites
-add_sites <- function(sites, dbcon, commit = FALSE){
+add_sites <- function(sites, dbcon, commit){
   # for each row of sites, upload data using add_row
   apply(sites,
         MARGIN = 1,
@@ -140,14 +145,14 @@ add_sites <- function(sites, dbcon, commit = FALSE){
 }
 
 # add_treatments
-add_treatments <- function(treatments, dbcon, commit = FALSE){
+add_treatments <- function(treatments, dbcon, commit){
   # for each row of treatments, upload data using add_row
   apply(treatments,
         MARGIN = 1,
         add_row,
         dbcon = dbcon,
         tbl_name = 'treatments',
-        tbl_fields = c('name', 'defintion', 'control'),
+        tbl_fields = c('name', 'definition', 'control'),
         commit = commit)
 }
 
@@ -184,14 +189,14 @@ get_new_cultivars <- function(cultivars, dbcon){
     select(name, specie_id) %>%
     collect()
   bety_cultivars$specie_id <- as.double(bety_cultivars$specie_id)
-  new_cultivars <- anti_join(cultivars[, c('name', 'specie_id')],
+  new_cultivars <- anti_join(cultivars,
                              bety_cultivars,
                              by = c('name', 'specie_id'))
   return(new_cultivars)
 }
 
 # add_cultivars
-add_cultivars <- function(new_cultivars, dbcon, commit = FALSE){
+add_cultivars <- function(new_cultivars, dbcon, commit){
   # for each row of new cultivars, upload data using add_row
   apply(new_cultivars,
         MARGIN = 1,
@@ -203,7 +208,7 @@ add_cultivars <- function(new_cultivars, dbcon, commit = FALSE){
 }
 
 # add_citations
-add_citations <- function(citations, dbcon, commit = FALSE){
+add_citations <- function(citations, dbcon, commit){
   # for each row of citations, upload data using add_row
   apply(citations,
         MARGIN = 1,
@@ -359,10 +364,9 @@ add_row <- function(row, dbcon, tbl_name, tbl_fields, user_id = NULL, commit = F
 
   fields <- get_fields(tbl_fields, row)
   params <- get_params(row, fields)
-  # extra addition needed to insert data into experiments
-  if(tbl_name == 'experiments'){
+  if(tbl_name == 'experiments'){ # user id needed to insert data into experiments
     fields <- append(fields, 'user_id')
-    params <- append(params, as.double(user_id)) #need to create this in experiments chunk
+    params <- append(params, as.double(user_id))
   }
   statement <- get_statement(dbcon, tbl_name, fields)
   DBI::dbBegin(dbcon)
@@ -383,7 +387,7 @@ associate_vals <- function(tbl_name, col_1, col_2, val_1, val_2, dbcon, commit =
 
 ```
 
-Read in metadata from google sheets. Each sheet of your google sheet will be read in directly as a R object.
+Your metadata will be read in using google sheets. Each sheet will be read in directly as a R object.
 
 ```{r read-user-gs, message = FALSE}
 
@@ -422,7 +426,7 @@ A user id will be needed to insert data into the experiments table. Your user id
 
 To add new experiments, run `add_experiments`. The experiments and users google sheet objects will need to be passed in as arguments.
 
-```{r add-experiments}
+```{r add-experiments, results = 'hide'}
 
 add_experiments(experiments, users, dbcon, commit)
 
@@ -432,7 +436,7 @@ add_experiments(experiments, users, dbcon, commit)
 
 To add new sites, run `add_sites`. The sites google sheet object will need to be passed in.
 
-```{r add-sites}
+```{r add-sites, results = 'hide'}
 
 add_sites(sites, dbcon, commit)
 
@@ -442,7 +446,7 @@ add_sites(sites, dbcon, commit)
 
 To add new treatments, run `add_treatments`. The treatments google sheet object will need to be passed in.
 
-```{r add-treatments}
+```{r add-treatments, results = 'hide'}
 
 add_treatments(treatments, dbcon, commit)
 
@@ -452,11 +456,11 @@ add_treatments(treatments, dbcon, commit)
 
 Only combinations of cultivars and specie id that are not yet present in BETYdb will be uploaded. 
 
-First need to make sure that all species present in cultivars sheet has been added to species table. This is needed since the cultivars table references the species table for specie_id.
+First you need to make sure that all species present in the cultivars sheet has been added to the BETYdb species table. This is needed since the cultivars table references the species table for specie_id.
 
 If found, new species will be added using `add_species`. The cultivars google sheet object will need to be passed in.
 
-```{r add-species}
+```{r add-species, results = 'hide'}
 
 add_species(cultivars, dbcon)
 
@@ -470,19 +474,19 @@ new_cultivars <- get_new_cultivars(cultivars, dbcon)
 
 ```
 
-Add new cultivars by passing in `new_cultivars` generated in the chunk above to the `add_cultivars` function.
+Add new cultivars by passing in `new_cultivars` generated above to the `add_cultivars` function.
 
-```{r add-cultivars}
+```{r add-cultivars, results = 'hide'}
 
 add_cultivars(new_cultivars, dbcon, commit)
 
 ```
 
-Since this file will be used for testing, new species added by the `get_new_cultivars` function will be removed unless you choose to upload your data. The following chunk will not be run unless you set the value fo `commit` to be `TRUE` on line 40.
+Since this file will be used for testing, new species added by the `get_new_cultivars` function will be removed unless you choose to upload your data. The following chunk will not be run unless you set the value of `commit` to be `TRUE` on line 40.
 
 ```{r remove-spp, eval = eval_chk}
 
-# need to determine if which new species had been added to species table
+# need to determine which new species had been added to species table
 bety_species <- tbl(dbcon, 'species') %>% collect()
 
 unq_spp <- unique(cultivars$species)
@@ -503,7 +507,7 @@ if(length(spp_to_add) != 0){
 
 Add new citations by running `add_citations`. The citations google sheet object will need to be passed in.
 
-```{r add-citations}
+```{r add-citations, results = 'hide'}
 
 add_citations(citations, dbcon, commit)
 
@@ -515,6 +519,15 @@ You can check if your data has been correctly uploaded to the database once you 
 
 These chunks will not be evaluated if `commit <- FALSE`.
 
+We will be using your user id and today's date to fetch the data you uploaded.
+
+```{r today}
+
+today <- Sys.Date()
+
+```
+
+
 ### Fetch experiments
 
 ```{r fetch-exp, eval = eval_chk}
@@ -522,7 +535,7 @@ These chunks will not be evaluated if `commit <- FALSE`.
 new_exp <- experiments$name
 
 exp_query <- dbSendQuery(dbcon,
-                         glue_sql("select * from experiments where name in ({new_exp*})",
+                         glue_sql("select * from experiments where created_at::date = {today}",
                                   .con = dbcon))
 
 exp_fetch <- dbFetch(exp_query)
