@@ -27,6 +27,20 @@ commit <- FALSE
 
 ```
 
+## Check associated data
+
+You will not be able to fetch any of the data you associate until you have commit your changes to the database. 
+
+You can check your upload results when you run this Rmd with `commit <- TRUE` in the above chunk. 
+
+The value of `eval_chk` will depend on the value you set for `commit`. This variable will determine whether chunks for fetching uploaded data will be evaluated. You will not see any tables below these chunks unless you set commit to TRUE.  
+
+```{r check-upload, results = 'hide'}
+
+ifelse(commit == TRUE, eval_chk <- TRUE, eval_chk <- FALSE)
+
+```
+
 # Section 2: Required input
 
 URL to a public published google sheet (please provide in section 3)
@@ -43,22 +57,24 @@ A sample URL has been provided for a google sheet containing MAC season 8 metada
 
 ```{r url}
 
-url <- 'https://docs.google.com/spreadsheets/d/1BPkZPfynZI9DB9bRJfa335uC_uNjST5jHVf-XUgSVvM/edit#gid=0' 
+url <- 'https://docs.google.com/spreadsheets/d/1BPkZPfynZI9DB9bRJfa335uC_uNjST5jHVf-XUgSVvM/edit#gid=347205052' 
 
 ```
 
-The following packages will need to be loaded: RPostgres, readxl, dplyr, and googlesheets
+The following packages will need to be loaded: RPostgres, readxl, dplyr, kableExtra, googlesheets and glue
 
 ```{r load-pack, message = FALSE}
 
 library(RPostgres)
 library(readxl)
 library(dplyr)
+library(kableExtra)
 library(googlesheets)
+library(glue)
 
 ```
 
-Connect to database. Make sure that you have the test database running and your new metadata has been added.
+A connection to the test database needs to be created. Make sure that you have the test database running and your new metadata has been added (from part 1).
 
 The port number should be the same as the one indicated in docker-compose.override.yml.
 
@@ -71,18 +87,13 @@ dbcon <- dbConnect(RPostgres::Postgres(),
 
 ```
 
-The following functions will be included in the package.
-
-```{r pack-fx}
+```{r pack-fx, echo = FALSE}
+####################
+# exported functions
+####################
 
 # add_experiments
-add_experiments <- function(experiments, users, dbcon, commit = FALSE){
-  
-  # get user id from user login
-  bety_users <- tbl(dbcon, 'users') %>% collect()
-  user_id <- bety_users %>%
-    filter(login == users$login) %>%
-    select(id)
+add_experiments <- function(experiments, user_id, dbcon, commit){
   
   # for each row of experiments, upload data using add_row
   apply(experiments,
@@ -92,12 +103,12 @@ add_experiments <- function(experiments, users, dbcon, commit = FALSE){
         tbl_name = 'experiments',
         tbl_fields = c('name', 'start_date', 'end_date',
                        'description', 'design'),
-        user_id = user_id$id,
+        user_id = user_id,
         commit = commit)
 }
 
 # add_sites
-add_sites <- function(sites, dbcon, commit = FALSE){
+add_sites <- function(sites, user_id, dbcon, commit){
   # for each row of sites, upload data using add_row
   apply(sites,
         MARGIN = 1,
@@ -107,18 +118,20 @@ add_sites <- function(sites, dbcon, commit = FALSE){
         tbl_fields = c('city', 'state', 'country',
                        'notes', 'sitename', 'greenhouse',
                        'geometry', 'time_zone'),
+        user_id = user_id,
         commit = commit)
 }
 
 # add_treatments
-add_treatments <- function(treatments, dbcon, commit = FALSE){
+add_treatments <- function(treatments, user_id, dbcon, commit){
   # for each row of treatments, upload data using add_row
   apply(treatments,
         MARGIN = 1,
         add_row,
         dbcon = dbcon,
         tbl_name = 'treatments',
-        tbl_fields = c('name', 'defintion', 'control'),
+        tbl_fields = c('name', 'definition', 'control'),
+        user_id = user_id,
         commit = commit)
 }
 
@@ -155,14 +168,14 @@ get_new_cultivars <- function(cultivars, dbcon){
     select(name, specie_id) %>%
     collect()
   bety_cultivars$specie_id <- as.double(bety_cultivars$specie_id)
-  new_cultivars <- anti_join(cultivars[, c('name', 'specie_id')],
+  new_cultivars <- anti_join(cultivars,
                              bety_cultivars,
                              by = c('name', 'specie_id'))
   return(new_cultivars)
 }
 
 # add_cultivars
-add_cultivars <- function(new_cultivars, dbcon, commit = FALSE){
+add_cultivars <- function(new_cultivars, dbcon, commit){
   # for each row of new cultivars, upload data using add_row
   apply(new_cultivars,
         MARGIN = 1,
@@ -174,7 +187,7 @@ add_cultivars <- function(new_cultivars, dbcon, commit = FALSE){
 }
 
 # add_citations
-add_citations <- function(citations, dbcon, commit = FALSE){
+add_citations <- function(citations, user_id, dbcon, commit){
   # for each row of citations, upload data using add_row
   apply(citations,
         MARGIN = 1,
@@ -184,6 +197,7 @@ add_citations <- function(citations, dbcon, commit = FALSE){
         tbl_fields = c('author', 'year', 'title',
                        'journal', 'volume', 'page',
                        'url', 'pdf', 'doi'),
+        user_id = user_id,
         commit = commit)
 }
 
@@ -326,14 +340,11 @@ get_statement <- function(dbcon, tbl_name, fields){
 }
 
 add_row <- function(row, dbcon, tbl_name, tbl_fields, user_id = NULL, commit = FALSE){
-  #user_id only required for experiment upload
-
   fields <- get_fields(tbl_fields, row)
   params <- get_params(row, fields)
-  # extra addition needed to insert data into experiments
-  if(tbl_name == 'experiments'){
+  if(tbl_name != 'cultivars'){ # cultivars does not have user id column # has a previous id column
     fields <- append(fields, 'user_id')
-    params <- append(params, as.double(user_id)) #need to create this in experiments chunk
+    params <- append(params, as.double(user_id))
   }
   statement <- get_statement(dbcon, tbl_name, fields)
   DBI::dbBegin(dbcon)
@@ -354,9 +365,7 @@ associate_vals <- function(tbl_name, col_1, col_2, val_1, val_2, dbcon, commit =
 
 ```
 
-Read in the treatments, sites, and citations sheets. 
-
-These sheets contain information about which metadata to associate.
+Read in the users, sites, treatments, and citations sheets. 
 
 ```{r read-user-gs, message = FALSE}
 
@@ -365,6 +374,9 @@ key <- extract_key_from_url(url)
 
 # register sheet 
 gs_obj <- key %>% gs_key(lookup = FALSE)
+
+# users sheet
+users <- gs_obj %>% gs_read(ws = 'users')
 
 # sites sheet
 sites <- gs_obj %>% gs_read(ws = 'sites')
@@ -378,6 +390,8 @@ citations <- gs_obj %>% gs_read(ws = 'citations')
 ```
 
 ## Associate data
+
+The following functions will be used to associate metadata in BETYdb: `associate_experiments_sites`, `associate_experiments_treatments`, `associate_sites_cultivars`, and `associate_citations_sites`. These functions are from _packagename_.
 
 ### Step 1: Associate experiments with sites
 
@@ -416,6 +430,105 @@ To associate citations with sites, run `associate_citations_sites`. The citation
 ```{r associate-citation-site}
 
 associate_citations_sites(citations, sites, dbcon, commit)
+
+```
+
+## Check data association
+
+You can check if your data has been correctly associated in the database once you run this markdown file with `commit <- TRUE` on line 26.
+
+These chunks will only be evaluated if `commit <- TRUE`. If evaluated, you should see a table of fetched records below a chunk.
+
+We will be using your user id and today's date to fetch the data you uploaded.
+
+```{r today}
+
+today <- Sys.Date()
+
+# get user id from user login
+bety_users <- tbl(dbcon, 'users') %>% collect()
+  
+user_id <- bety_users %>%
+  filter(login == users$login) %>%
+  select(id)
+
+```
+
+### Fetch records from experiments_sites
+
+```{r fetch-exp-site, eval = eval_chk}
+
+exp_site_query <- dbSendQuery(dbcon,
+                              glue_sql("select * from experiments_sites where experiment_id in 
+                                       (select id from experiments where created_at::date = {today} and 
+                                       user_id = (select id from users where login = {users$login})) and 
+                                       site_id in (select id from sites where created_at::date = {today} and
+                                       user_id = (select id from users where login = {users$login})) limit 10",
+                                       .con = dbcon))
+
+exp_site_fetch <- dbFetch(exp_site_query)
+dbClearResult(exp_site_query)
+
+kable(exp_site_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
+
+```
+
+## Fetch records from experiments_treatments
+
+```{r fetch-exp-treat, eval = eval_chk}
+
+exp_treat_query <- dbSendQuery(dbcon,
+                               glue_sql("select * from experiments_treatments where experiment_id in
+                                        (select id from experiments where created_at::date = {today} and
+                                        user_id = (select id from users where login = {users$login})) and                                                  treatment_id in (select id from treatments where created_at::date = {today}                                         and user_id = (select id from users where login = {users$login}))",
+                                        .con = dbcon))
+
+exp_treat_fetch <- dbFetch(exp_treat_query)
+dbClearResult(exp_treat_query)
+
+kable(exp_treat_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
+
+```
+
+### Fetch records from sites_cultivars
+
+```{r fetch-site-cultivar, eval = eval_chk}
+
+site_cultivar_query <- dbSendQuery(dbcon,
+                                   glue_sql("select * from sites_cultivars where site_id in
+                                            (select id from sites where created_at::date = {today} and 
+                                            user_id = (select id from users where login = {users$login})) 
+                                            limit 10",
+                                            .con = dbcon))
+
+site_cultivar_fetch <- dbFetch(site_cultivar_query)
+dbClearResult(site_cultivar_query)
+
+kable(site_cultivar_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
+
+```
+
+### Fetch records from citations_sites
+
+```{r fetch-citation-site, eval = eval_chk}
+
+citation_site_query <- dbSendQuery(dbcon,
+                                   glue_sql("select * from citations_sites where citation_id in
+                                            (select id from citations where created_at::date = {today} and 
+                                            user_id = (select id from users where login = {users$login})) and 
+                                            site_id in (select id from sites where created_at::date = {today} and
+                                            user_id = (select id from users where login = {users$login})) 
+                                            limit 10",
+                                            .con = dbcon))
+
+citation_site_fetch <- dbFetch(citation_site_query)
+dbClearResult(citation_site_query)
+
+kable(citation_site_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
 
 ```
 
