@@ -23,7 +23,7 @@ To make associations in the test database, you will need to make an edit to this
 
 ```{r commit-param}
 
-commit <- TRUE
+commit <- FALSE
 
 ```
 
