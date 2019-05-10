@@ -21,7 +21,7 @@ The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed af
 
 URL to a public published google sheet (you will need to provide this url below in section 4)
 
-   * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1pNEuwNHNHHrpql0b36DYFAbOlBU5TJVF_nO4RdRzdmg/edit#gid=0).
+   * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1pNEuwNHNHHrpql0b36DYFAbOlBU5TJVF_nO4RdRzdmg/edit#gid=279516453).
    * instructions on how to fill out the template can be found under the README worksheet.
    * make the google sheet public (to anyone with link) and publish the entire document to the web as a xlsx.
 
@@ -53,7 +53,7 @@ You will not be able to fetch any of your uploaded data until it has been added 
 
 You can check your uploaded results when you run this Rmd with `commit <- TRUE` in the above chunk. 
 
-The value of `eval_chk` will depend on the value you set for `commit`. This variable will determine whether chunks for checking uploaded data will be evaluated. 
+The value of `eval_chk` will depend on the value you set for `commit`. This variable will determine whether chunks for checking uploaded data will be evaluated. You will not see any tables below these chunks unless you set commit to TRUE. 
 
 ```{r check-upload, results = 'hide'}
 
@@ -71,7 +71,7 @@ A sample URL has been provided for a google sheet containing MAC season 8 metada
 
 ```{r url}
 
-url <- 'https://docs.google.com/spreadsheets/d/1BPkZPfynZI9DB9bRJfa335uC_uNjST5jHVf-XUgSVvM/edit#gid=0' 
+url <- 'https://docs.google.com/spreadsheets/d/1BPkZPfynZI9DB9bRJfa335uC_uNjST5jHVf-XUgSVvM/edit#gid=347205052' 
 
 ```
 
@@ -101,8 +101,6 @@ dbcon <- dbConnect(RPostgres::Postgres(),
                    port = 5433)
 
 ```
-
-The following functions will be used to upload metadata: `add_experiments`, `add_sites`, `add_treatments`, `add_species`, `get_new_cultivars`, `add_cultivars`, and `add_citations`. These functions are from _packagename_.
 
 ```{r pack-fx, echo = FALSE}
 ####################
@@ -317,6 +315,8 @@ associate_citations_sites <- function(citations, sites, dbcon, commit){
                    commit = commit)
   }
 }
+
+
 ###################
 # helper functions
 ###################
@@ -356,8 +356,6 @@ get_statement <- function(dbcon, tbl_name, fields){
 }
 
 add_row <- function(row, dbcon, tbl_name, tbl_fields, user_id = NULL, commit = FALSE){
-  #user_id only required for experiment upload
-
   fields <- get_fields(tbl_fields, row)
   params <- get_params(row, fields)
   if(tbl_name != 'cultivars'){ # cultivars does not have user id column # has a previous id column
@@ -383,7 +381,7 @@ associate_vals <- function(tbl_name, col_1, col_2, val_1, val_2, dbcon, commit =
 
 ```
 
-Your metadata will be read in using google sheets. Each sheet will be read in directly as a R object.
+Your metadata will be read in using googlesheets package. Each sheet will be read in directly as a R object.
 
 ```{r read-user-gs, message = FALSE}
 
@@ -428,12 +426,11 @@ user_id <- bety_users %>%
 
 ```
 
+The following functions will be used to upload metadata: `add_experiments`, `add_sites`, `add_treatments`, `add_species`, `get_new_cultivars`, `add_cultivars`, and `add_citations`. These functions are from _packagename_.
 
 ### Step 1: Add new experiments
 
-A user id will be needed to insert data into the experiments table. Your user id will be determined based on your provided user login (username for bety account). 
-
-To add new experiments, run `add_experiments`. The experiments and users google sheet objects will need to be passed in as arguments.
+To add new experiments, run `add_experiments`. The experiments google sheet object and your user id will need to be passed in.
 
 ```{r add-experiments, results = 'hide'}
 
@@ -443,7 +440,7 @@ add_experiments(experiments, user_id$id, dbcon, commit)
 
 ### Step 2: Add new sites
 
-To add new sites, run `add_sites`. The sites google sheet object will need to be passed in.
+To add new sites, run `add_sites`. The sites google sheet object and your user id will need to be passed in.
 
 ```{r add-sites, results = 'hide'}
 
@@ -453,7 +450,7 @@ add_sites(sites, user_id$id, dbcon, commit)
 
 ### Step 3: Add new treatments
 
-To add new treatments, run `add_treatments`. The treatments google sheet object will need to be passed in.
+To add new treatments, run `add_treatments`. The treatments google sheet object and your user id will need to be passed in.
 
 ```{r add-treatments, results = 'hide'}
 
@@ -465,7 +462,7 @@ add_treatments(treatments, user_id$id, dbcon, commit)
 
 Only combinations of cultivars and specie id that are not yet present in BETYdb will be uploaded. 
 
-First you need to make sure that all species present in the cultivars sheet has been added to the BETYdb species table. This is needed since the cultivars table references the species table for specie_id.
+First you need to make sure that all unique species present in the cultivars sheet has been added to the BETYdb species table. This is needed since the cultivars table references the species table for specie_id.
 
 If found, new species will be added using `add_species`. The cultivars google sheet object will need to be passed in.
 
@@ -491,9 +488,10 @@ add_cultivars(new_cultivars, dbcon, commit)
 
 ```
 
-Since this file will be used for testing, new species added by the `get_new_cultivars` function will be removed unless you choose to upload your data. The following chunk will not be run unless you set the value of `commit` to be `TRUE` on line 40.
+Since this file will be used for testing, new species added by the `add_species` function will be removed unless you choose to upload your data. 
 
-```{r remove-spp, eval = eval_chk}
+```{r remove-spp, eval = !eval_chk, echo = FALSE}
+# the following chunk will run unless the user sets the value of commit to be TRUE on line 40.
 
 # need to determine which new species had been added to species table
 bety_species <- tbl(dbcon, 'species') %>% collect()
@@ -514,7 +512,7 @@ if(length(spp_to_add) != 0){
 
 ### Step 5: Add new citations
 
-Add new citations by running `add_citations`. The citations google sheet object will need to be passed in.
+Add new citations by running `add_citations`. The citations google sheet object and your user id will need to be passed in.
 
 ```{r add-citations, results = 'hide'}
 
@@ -526,7 +524,7 @@ add_citations(citations, user_id$id, dbcon, commit)
 
 You can check if your data has been correctly uploaded to the database once you run this markdown file with `commit <- TRUE` on line 40.
 
-These chunks will not be evaluated if `commit <- FALSE`.
+These chunks will only be evaluated if `commit <- TRUE`. If evaluated, you should see a table of fetched records below a chunk.
 
 We will be using your user id and today's date to fetch the data you uploaded.
 
@@ -560,8 +558,9 @@ kable(exp_fetch) %>%
 ```{r fetch-site, eval = eval_chk}
 
 site_query <- dbSendQuery(dbcon,
-                          glue_sql("select * from sites where created_at::date = {today}
-                                   and user_id = (select id from users where login = {users$login}) limit 10",
+                          glue_sql("select id, city, state, country, sitename from sites where created_at::date =
+                                   {today} and user_id = (select id from users where login = {users$login}) 
+                                   limit 10",
                                    .con = dbcon))
 
 site_fetch <- dbFetch(site_query)
@@ -595,7 +594,7 @@ kable(treat_fetch) %>%
 
 # TBD
 # no user_id column
-# there is a previous_id column ?
+# also, not all cultivars will show up - only the ones that need to be uploaded
 
 ```
 
