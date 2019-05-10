@@ -23,7 +23,7 @@ To make associations in the test database, you will need to make an edit to this
 
 ```{r commit-param}
 
-commit <- FALSE
+commit <- TRUE
 
 ```
 
@@ -49,7 +49,7 @@ url <- 'https://docs.google.com/spreadsheets/d/1BPkZPfynZI9DB9bRJfa335uC_uNjST5j
 
 The following packages will need to be loaded: RPostgres, readxl, dplyr, and googlesheets
 
-```{r load-pack, results = 'hide'}
+```{r load-pack, message = FALSE}
 
 library(RPostgres)
 library(readxl)
@@ -58,15 +58,12 @@ library(googlesheets)
 
 ```
 
-Create database connection 
-
-_make sure that you have the test database running and your new metadata has been added_
+Connect to database. Make sure that you have the test database running and your new metadata has been added.
 
 The port number should be the same as the one indicated in docker-compose.override.yml.
 
 ```{r create-dbcon}
 
-# no password required 
 dbcon <- dbConnect(RPostgres::Postgres(),
                    host = 'localhost',
                    user = 'bety',
