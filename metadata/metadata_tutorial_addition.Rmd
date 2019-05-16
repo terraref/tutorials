@@ -5,7 +5,7 @@ date: "4/30/2019"
 output: html_document
 ---
 
-# Section 1: Overview
+# Overview
 
 The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database. All traits data need to have associated metadata.
 
@@ -17,15 +17,15 @@ This tutorial will only cover how to add new experiments, sites, treatments, cul
 
 The `Metadata Upload Tutorial Part 2: Associations` tutorial should be viewed after you have completed this tutorial and all new metadata have been added (see below for more details on how to run this markdown file). The second tutorial will cover how to associate the metadata that you add.
 
-# Section 2: Required input
+# Required input
 
-URL to a public published google sheet (you will need to provide this url below in section 4)
+URL to a public published google sheet (you will need to provide this url in the set up section)
 
    * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1pNEuwNHNHHrpql0b36DYFAbOlBU5TJVF_nO4RdRzdmg/edit#gid=279516453).
    * instructions on how to fill out the template can be found under the README worksheet.
    * make the google sheet public (to anyone with link) and publish the entire document to the web as a xlsx.
 
-# Section 3: How to Run this Rmd
+# How to Run this Rmd
 
 ## Commit database transactions to upload data
 
@@ -61,7 +61,7 @@ ifelse(commit == TRUE, eval_chk <- TRUE, eval_chk <- FALSE)
 
 ```
 
-# Section 4: Metadata upload
+# Metadata upload
 
 ## Set up
 
