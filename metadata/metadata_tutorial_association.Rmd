@@ -5,7 +5,7 @@ date: "4/30/2019"
 output: html_document
 ---
 
-# Section 1: Overview
+# Overview
 
 The objective of this tutorial is to demonstrate how to associate metadata that you have added to the traits database. 
 
@@ -41,13 +41,13 @@ ifelse(commit == TRUE, eval_chk <- TRUE, eval_chk <- FALSE)
 
 ```
 
-# Section 2: Required input
+# Required input
 
-URL to a public published google sheet (please provide in section 3)
+URL to a public published google sheet (please provide in set up section)
 
 _this should be the same URL that you used for the `Metadata Upload Tutorial Part 1: Addition` tutorial_
 
-# Section 3: Metadata association
+# Metadata association
 
 ## Set up
 
