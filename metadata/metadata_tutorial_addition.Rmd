@@ -11,7 +11,7 @@ The objective of this tutorial is to demonstrate how to upload a season's metada
 
 Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
 
-For this tutorial, you will be uploading your metadata to a test database. Instructions on how to set up a local instance of a test database can be found [here](https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d).
+For this tutorial, you will be uploading your metadata to a test database. A tutorial on how to set up a local instance of a test database can be found in this [metadata folder](https://github.com/terraref/tutorials/tree/test_db_tutorial/metadata).
 
 This tutorial will only cover how to add new experiments, sites, treatments, cultivars, and citations. 
 
