@@ -53,14 +53,6 @@ You will not be able to fetch any of your uploaded data until it has been added 
 
 You can check your uploaded results when you run this Rmd with `commit <- TRUE` in the above chunk. 
 
-The value of `eval_chk` will depend on the value you set for `commit`. This variable will determine whether chunks for checking uploaded data will be evaluated. You will not see any tables below these chunks unless you set commit to TRUE. 
-
-```{r check-upload, results = 'hide'}
-
-ifelse(commit == TRUE, eval_chk <- TRUE, eval_chk <- FALSE)
-
-```
-
 # Metadata upload
 
 ## Set up
@@ -490,7 +482,7 @@ add_cultivars(new_cultivars, dbcon, commit)
 
 Since this file will be used for testing, new species added by the `add_species` function will be removed unless you choose to upload your data. 
 
-```{r remove-spp, eval = !eval_chk, echo = FALSE}
+```{r remove-spp, eval = !commit, echo = FALSE}
 # the following chunk will run unless the user sets the value of commit to be TRUE on line 40.
 
 # need to determine which new species had been added to species table
@@ -537,7 +529,7 @@ today <- Sys.Date()
 
 ### Fetch experiments
 
-```{r fetch-exp, eval = eval_chk}
+```{r fetch-exp, eval = commit}
 
 exp_query <- dbSendQuery(dbcon,
                          glue_sql("select * from experiments where created_at::date = {today}
@@ -555,7 +547,7 @@ kable(exp_fetch) %>%
 
 ### Fetch sites
 
-```{r fetch-site, eval = eval_chk}
+```{r fetch-site, eval = commit}
 
 site_query <- dbSendQuery(dbcon,
                           glue_sql("select id, city, state, country, sitename from sites where created_at::date =
@@ -573,7 +565,7 @@ kable(site_fetch) %>%
 
 ### Fetch treatments
 
-```{r fetch-treat, eval = eval_chk}
+```{r fetch-treat, eval = commit}
 
 treat_query <- dbSendQuery(dbcon,
                            glue_sql("select * from treatments where created_at::date = {today}
@@ -590,7 +582,7 @@ kable(treat_fetch) %>%
 
 ### Fetch cultivars
 
-```{r fetch-cultivar, eval = eval_chk}
+```{r fetch-cultivar, eval = commit}
 
 # TBD
 # no user_id column
@@ -600,7 +592,7 @@ kable(treat_fetch) %>%
 
 ### Fetch citations
 
-```{r fetch-citation, eval = eval_chk}
+```{r fetch-citation, eval = commit}
 
 citation_query <- dbSendQuery(dbcon,
                               glue_sql("select * from citations where created_at::date = {today}
