@@ -33,14 +33,6 @@ You will not be able to fetch any of the data you associate until you have commi
 
 You can check your upload results when you run this Rmd with `commit <- TRUE` in the above chunk. 
 
-The value of `eval_chk` will depend on the value you set for `commit`. This variable will determine whether chunks for fetching uploaded data will be evaluated. You will not see any tables below these chunks unless you set commit to TRUE.  
-
-```{r check-upload, results = 'hide'}
-
-ifelse(commit == TRUE, eval_chk <- TRUE, eval_chk <- FALSE)
-
-```
-
 # Required input
 
 URL to a public published google sheet (please provide in set up section)
@@ -456,7 +448,7 @@ user_id <- bety_users %>%
 
 ### Fetch records from experiments_sites
 
-```{r fetch-exp-site, eval = eval_chk}
+```{r fetch-exp-site, eval = commit}
 
 exp_site_query <- dbSendQuery(dbcon,
                               glue_sql("select * from experiments_sites where experiment_id in 
@@ -476,7 +468,7 @@ kable(exp_site_fetch) %>%
 
 ## Fetch records from experiments_treatments
 
-```{r fetch-exp-treat, eval = eval_chk}
+```{r fetch-exp-treat, eval = commit}
 
 exp_treat_query <- dbSendQuery(dbcon,
                                glue_sql("select * from experiments_treatments where experiment_id in
@@ -494,7 +486,7 @@ kable(exp_treat_fetch) %>%
 
 ### Fetch records from sites_cultivars
 
-```{r fetch-site-cultivar, eval = eval_chk}
+```{r fetch-site-cultivar, eval = commit}
 
 site_cultivar_query <- dbSendQuery(dbcon,
                                    glue_sql("select * from sites_cultivars where site_id in
@@ -513,7 +505,7 @@ kable(site_cultivar_fetch) %>%
 
 ### Fetch records from citations_sites
 
-```{r fetch-citation-site, eval = eval_chk}
+```{r fetch-citation-site, eval = commit}
 
 citation_site_query <- dbSendQuery(dbcon,
                                    glue_sql("select * from citations_sites where citation_id in
