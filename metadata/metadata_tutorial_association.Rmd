@@ -1,5 +1,5 @@
 ---
-title: 'Metadata Upload Tutorial Part 2: Associations'
+title: 'Metadata Upload Tutorial Part 2: Associating new experiments, sites, treatments, cultivars and citations in BETYdb'
 author: "Kimberly Huynh"
 date: "4/30/2019"
 output: html_document
@@ -7,9 +7,9 @@ output: html_document
 
 # Overview
 
-The objective of this tutorial is to demonstrate how to associate metadata that you have added to the traits database. 
+The objective of this tutorial is to demonstrate how to associate the metadata that you have added to the traits database. Each site that you add must be associated with an experiment, cultivar, and citation. Each treatment added must be associated with an experiment. 
 
-This tutorial should be completed after `Metadata Upload Tutorial Part 1: Additions`.
+This tutorial should be completed after `Metadata Upload Tutorial Part 1: Adding new metadata to BETYdb`.
 
 For this tutorial, make sure that you have a local instance of a test database running and that all new experiments, sites, treatments, cultivars, and citations have been added.
 
@@ -17,7 +17,7 @@ For this tutorial, make sure that you have a local instance of a test database r
 
 Knitting this markdown file will not associate any data in the test database. Being able to knit this file means that you will not encounter any errors when associating experiments with sites, experiments with treatments, sites with cultivars, and citations with sites.
 
-To make associations in the test database, you will need to make an edit to this markdown file. 
+To commit changes to the test database, you will need to make an edit to this markdown file. 
 
 `commit = TRUE` needs to be set in the following chunk.
 

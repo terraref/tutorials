@@ -1,5 +1,5 @@
 ---
-title: "Metadata Upload Tutorial Part 1: Additions"
+title: "Metadata Upload Tutorial Part 1: Adding new metadata to BETYdb"
 author: "Kimberly Huynh"
 date: "4/30/2019"
 output: html_document
