@@ -1,5 +1,5 @@
 ---
-title: 'Metadata Upload Tutorial Part 2: Associating new experiments, sites, treatments, cultivars and citations in BETYdb'
+title: 'Metadata Upload Tutorial Part 2: Associating metadata in BETYdb'
 author: "Kimberly Huynh"
 date: "4/30/2019"
 output: html_document
@@ -7,13 +7,13 @@ output: html_document
 
 # Overview
 
-The objective of this tutorial is to demonstrate how to associate the metadata that you have added to the traits database. Each site that you add must be associated with an experiment, cultivar, and citation. Each treatment added must be associated with an experiment. 
+The objective of this tutorial is to demonstrate how to associate the metadata that you have added to the traits database. Each site that you add must be associated with an experiment, cultivar, and citation. Each treatment that you add must be associated with an experiment. 
 
-This tutorial should be completed after `Metadata Upload Tutorial Part 1: Adding new metadata to BETYdb`.
+This tutorial should be completed after the `Metadata Upload Tutorial Part 1: Adding new metadata to BETYdb`.
 
 For this tutorial, make sure that you have a local instance of a test database running and that all new experiments, sites, treatments, cultivars, and citations have been added.
 
-## Notes on Running this Rmd
+# How to run this Rmd
 
 Knitting this markdown file will not associate any data in the test database. Being able to knit this file means that you will not encounter any errors when associating experiments with sites, experiments with treatments, sites with cultivars, and citations with sites.
 
@@ -27,23 +27,13 @@ commit <- FALSE
 
 ```
 
-## Check associated data
+# Set up
 
-You will not be able to fetch any of the data you associate until you have commit your changes to the database. 
-
-You can check your upload results when you run this Rmd with `commit <- TRUE` in the above chunk. 
-
-# Required input
-
-URL to a public published google sheet (please provide in set up section)
-
-_this should be the same URL that you used for the `Metadata Upload Tutorial Part 1: Addition` tutorial_
-
-# Metadata association
-
-## Set up
+## URL (required input)
 
 Please provide the URL to your google sheet below. 
+
+_this should be the same URL that you used for the first tutorial_
 
 A sample URL has been provided for a google sheet containing MAC season 8 metadata. Replace the sample URL with your own.
 
@@ -53,10 +43,13 @@ url <- 'https://docs.google.com/spreadsheets/d/1BPkZPfynZI9DB9bRJfa335uC_uNjST5j
 
 ```
 
-The following packages will need to be loaded: RPostgres, readxl, dplyr, kableExtra, googlesheets and glue
+## Load packages 
+
+The `metadata` package will need to be loaded along with `RPostgres`, `dplyr`, `kableExtra`, `googlesheets` and `glue`. 
 
 ```{r load-pack, message = FALSE}
 
+library(metadata)
 library(RPostgres)
 library(readxl)
 library(dplyr)
@@ -66,296 +59,7 @@ library(glue)
 
 ```
 
-A connection to the test database needs to be created. Make sure that you have the test database running and your new metadata has been added (from part 1).
-
-The port number should be the same as the one indicated in docker-compose.override.yml.
-
-```{r create-dbcon}
-
-dbcon <- dbConnect(RPostgres::Postgres(),
-                   host = 'localhost',
-                   user = 'bety',
-                   port = 5433)
-
-```
-
-```{r pack-fx, echo = FALSE}
-####################
-# exported functions
-####################
-
-# add_experiments
-add_experiments <- function(experiments, user_id, dbcon, commit){
-  
-  # for each row of experiments, upload data using add_row
-  apply(experiments,
-        MARGIN = 1,
-        add_row,
-        dbcon = dbcon,
-        tbl_name = 'experiments',
-        tbl_fields = c('name', 'start_date', 'end_date',
-                       'description', 'design'),
-        user_id = user_id,
-        commit = commit)
-}
-
-# add_sites
-add_sites <- function(sites, user_id, dbcon, commit){
-  # for each row of sites, upload data using add_row
-  apply(sites,
-        MARGIN = 1,
-        add_row,
-        dbcon = dbcon,
-        tbl_name = 'sites',
-        tbl_fields = c('city', 'state', 'country',
-                       'notes', 'sitename', 'greenhouse',
-                       'geometry', 'time_zone'),
-        user_id = user_id,
-        commit = commit)
-}
-
-# add_treatments
-add_treatments <- function(treatments, user_id, dbcon, commit){
-  # for each row of treatments, upload data using add_row
-  apply(treatments,
-        MARGIN = 1,
-        add_row,
-        dbcon = dbcon,
-        tbl_name = 'treatments',
-        tbl_fields = c('name', 'definition', 'control'),
-        user_id = user_id,
-        commit = commit)
-}
-
-# add_species
-add_species <- function(cultivars, dbcon){
-  # need to determine which species to add
-  bety_species <- tbl(dbcon, 'species') %>% collect()
-  unq_spp <- unique(cultivars$species)
-  spp_to_add <- unq_spp[!unq_spp %in% bety_species$scientificname]
-  if(length(spp_to_add) != 0){
-    for(spp in spp_to_add){
-      spp_insert <- glue::glue_sql("insert into species (scientificname) values ({spp})",
-                                   .con = dbcon)
-      send <- DBI::dbSendStatement(dbcon, spp_insert)
-      DBI::dbClearResult(send)
-    }
-  }
-}
-
-# get_new_cultivars 
-get_new_cultivars <- function(cultivars, dbcon){
-  # create specie_id column in cultivars 
-  bety_species <- tbl(dbcon, 'species') %>% collect() # read in updated bety species table
-  cultivars$specie_id <- vector('numeric', nrow(cultivars)) # create specie_id column
-  for(i in 1:nrow(cultivars)){ # get specie id from specie name
-    sci_name <- cultivars$species[i]
-    spp_id <- bety_species %>%
-      filter(scientificname == sci_name) %>%
-      select(id)
-    cultivars$specie_id[i] <- as.double(spp_id$id)
-  }
-  # get subset of cultivars to be uploaded
-  bety_cultivars <- tbl(dbcon, 'cultivars') %>% 
-    select(name, specie_id) %>%
-    collect()
-  bety_cultivars$specie_id <- as.double(bety_cultivars$specie_id)
-  new_cultivars <- anti_join(cultivars,
-                             bety_cultivars,
-                             by = c('name', 'specie_id'))
-  return(new_cultivars)
-}
-
-# add_cultivars
-add_cultivars <- function(new_cultivars, dbcon, commit){
-  # for each row of new cultivars, upload data using add_row
-  apply(new_cultivars,
-        MARGIN = 1,
-        add_row,
-        dbcon = dbcon,
-        tbl_name = 'cultivars',
-        tbl_fields = c('name', 'specie_id', 'ecotype', 'notes'),
-        commit = commit)
-}
-
-# add_citations
-add_citations <- function(citations, user_id, dbcon, commit){
-  # for each row of citations, upload data using add_row
-  apply(citations,
-        MARGIN = 1,
-        add_row,
-        dbcon = dbcon,
-        tbl_name = 'citations',
-        tbl_fields = c('author', 'year', 'title',
-                       'journal', 'volume', 'page',
-                       'url', 'pdf', 'doi'),
-        user_id = user_id,
-        commit = commit)
-}
-
-# associate_experiments_sites
-associate_experiments_sites <- function(sites, dbcon, commit){
-  bety_sites <- tbl(dbcon, 'sites') %>% collect() # bety sites table
-  bety_experiments <- tbl(dbcon, 'experiments') %>% collect() # bety experiments table
-  new_site <- sites$sitename # new sites added
-  for(site in new_site){
-    row <- sites %>% filter(sitename == site)
-    site_id <- bety_sites %>%
-      filter(sitename == row$sitename) %>%
-      select(id)
-    exp_id <- bety_experiments %>%
-      filter(name == row$experiment) %>%
-      select(id)
-    associate_vals(tbl_name = 'experiments_sites',
-                   col_1 = 'experiment_id',
-                   col_2 = 'site_id',
-                   val_1 = as.double(exp_id$id),
-                   val_2 = as.double(site_id$id),
-                   dbcon = dbcon,
-                   commit = commit)
-  }
-}
-
-# associate_experiments_treatments
-associate_experiments_treatments <- function(treatments, dbcon, commit){
-  bety_treatments <- tbl(dbcon, 'treatments') %>% collect() # bety treatments table
-  bety_experiments <- tbl(dbcon, 'experiments') %>% collect() # bety experiments table
-  new_treat <- treatments$name # new treatments
-  for(treat in new_treat){
-    row <- treatments %>% filter(name == treat)
-    treat_id <- bety_treatments %>%
-      filter(name == treat) %>%
-      select(id)
-    associate_exp <- strsplit(row$experiment, split = ', ')[[1]]
-    for(exp in associate_exp){
-      exp_id <- bety_experiments %>%
-        filter(name == exp) %>%
-        select(id)
-      associate_vals(tbl_name = 'experiments_treatments',
-                     col_1 = 'experiment_id',
-                     col_2 = 'treatment_id',
-                     val_1 = as.double(exp_id$id),
-                     val_2 = as.double(treat_id$id), 
-                     dbcon = dbcon,
-                     commit = commit)
-    }
-  }
-}
-
-# associate_sites_cultivars
-associate_sites_cultivars <- function(sites, dbcon, commit){
-  bety_sites <- tbl(dbcon, 'sites') %>% collect() # bety sites table
-  bety_species <- tbl(dbcon, 'species') %>% collect() # bety species table
-  bety_cultivars <- tbl(dbcon, 'cultivars') %>% collect() # bety cultivars table
-  new_site <- sites$sitename
-  for(site in new_site){
-    row <- sites %>% filter(sitename == site)
-    site_id <- bety_sites %>%
-      filter(sitename == row$sitename) %>%
-      select(id)
-    spp_id <- bety_species %>%
-      filter(scientificname == row$species) %>%
-      select(id)
-    cultivar_id <- bety_cultivars %>%
-      filter(name == row$cultivar & specie_id == as.double(spp_id$id)) %>%
-      select(id)
-    associate_vals(tbl_name = 'sites_cultivars',
-                   col_1 = 'site_id',
-                   col_2 = 'cultivar_id',
-                   val_1 = as.double(site_id$id),
-                   val_2 = as.double(cultivar_id$id),
-                   dbcon = dbcon,
-                   commit = commit)
-  }
-}
-
-#associate_citations_sites
-associate_citations_sites <- function(citations, sites, dbcon, commit){
-  bety_citations <- tbl(dbcon, 'citations') %>% collect()
-  bety_sites <- tbl(dbcon, 'sites') %>% collect()
-  # get citation id (assuming only one citation)
-  citation_id <- bety_citations %>%
-    filter(author == citations$author & year == citations$year & title == citations$title) %>%
-    select(id)
-  new_site <- sites$sitename # new sites added
-  for(site in new_site){
-    row <- sites %>% filter(sitename == site)
-    site_id <- bety_sites %>%
-      filter(sitename == row$sitename) %>%
-      select(id)
-    associate_vals(tbl_name = 'citations_sites',
-                   col_1 = 'citation_id',
-                   col_2 = 'site_id',
-                   val_1 = as.double(citation_id$id),
-                   val_2 = as.double(site_id$id), 
-                   dbcon = dbcon, 
-                   commit = commit)
-  }
-}
-
-###################
-# helper functions
-###################
-
-prepared_statement <- function(con, query, params) {
-  stopifnot(
-    class(con) == "PqConnection",
-    is.character(query),
-    length(query) == 1,
-    is.list(params)
-  )
-  qry <- DBI::dbSendStatement(con, query)
-  res <- DBI::dbBind(qry, params)
-  on.exit(DBI::dbClearResult(res))
-}
-
-get_fields <- function(tbl_fields, row){
-  com_ind <- which(!is.na(row))
-  com_fields <- names(row)[com_ind]
-  com_tbl_fields <- tbl_fields[tbl_fields %in% com_fields]
-  return(com_tbl_fields)
-}
-
-get_params <- function(row, fields){
-  params <- unname(as.list(row[fields]))
-  return(params)
-}
-
-get_statement <- function(dbcon, tbl_name, fields){
-  num_params <- length(fields)
-  posit_params <- sapply(1:num_params, function(x) paste0('$', x))
-  statement <- glue::glue_sql("insert into {DBI::SQL(tbl_name)}
-                              ({DBI::SQL(paste(fields, collapse = ', '))})
-                              values ({DBI::SQL(paste(posit_params, collapse = ', '))})",
-                              .con = dbcon)
-  return(statement)
-}
-
-add_row <- function(row, dbcon, tbl_name, tbl_fields, user_id = NULL, commit = FALSE){
-  fields <- get_fields(tbl_fields, row)
-  params <- get_params(row, fields)
-  if(tbl_name != 'cultivars'){ # cultivars does not have user id column # has a previous id column
-    fields <- append(fields, 'user_id')
-    params <- append(params, as.double(user_id))
-  }
-  statement <- get_statement(dbcon, tbl_name, fields)
-  DBI::dbBegin(dbcon)
-  prepared_statement(dbcon, statement, params)
-  ifelse(commit == TRUE, DBI::dbCommit(dbcon), DBI::dbRollback(dbcon))
-}
-
-associate_vals <- function(tbl_name, col_1, col_2, val_1, val_2, dbcon, commit = FALSE){
-  statement <- glue::glue_sql("insert into {DBI::SQL(tbl_name)}
-                              ({DBI::SQL(paste(c(col_1, col_2), collapse = ', '))})
-                              values ($1, $2)",
-                              .con = dbcon)
-  params <- list(val_1, val_2)
-  DBI::dbBegin(dbcon)
-  prepared_statement(dbcon, statement, params)
-  ifelse(commit == TRUE, DBI::dbCommit(dbcon), DBI::dbRollback(dbcon))
-}
-
-```
+## Read in google sheets
 
 Read in the users, sites, treatments, and citations sheets. 
 
@@ -381,51 +85,76 @@ citations <- gs_obj %>% gs_read(ws = 'citations')
 
 ```
 
-## Associate data
+# Metadata association
 
-The following functions will be used to associate metadata in BETYdb: `associate_experiments_sites`, `associate_experiments_treatments`, `associate_sites_cultivars`, and `associate_citations_sites`. These functions are from _packagename_.
+## Connect to database
 
-### Step 1: Associate experiments with sites
+A connection to the test database needs to be created. Make sure that you have the test database running and your new metadata has been added.
+
+The port number should be the same as the one indicated in docker-compose.override.yml.
+
+```{r create-dbcon}
+
+dbcon <- dbConnect(RPostgres::Postgres(),
+                   host = 'localhost',
+                   user = 'bety',
+                   port = 5433)
+
+```
+
+## Functions to be used for metadata association
+
+You will be using the following functions from the `metadata` package to associate your data: 
+
+   * `associate_experiments_sites`
+   
+   * `associate_experiments_treatments`
+   
+   * `associate_sites_cultivars`
+   
+   * `associate_citations_sites`
+
+## Step 1: Associate experiments with sites
 
 To associate experiments with sites, run `associate_experiments_sites`. The sites google sheet object will need to be passed in. 
 
 ```{r associate-exp-site}
 
-associate_experiments_sites(sites, dbcon, commit)
+associate_experiments_sites(dbcon, commit, sites)
 
 ```
 
-### Step 2: Associate experiments with treatments
+## Step 2: Associate experiments with treatments
 
 To associate experiments with treatments, run `associate_experiments_treatments`. The treatments google sheet object will need to be passed in.
 
 ```{r associate-exp-treat}
 
-associate_experiments_treatments(treatments, dbcon, commit)
+associate_experiments_treatments(dbcon, commit, treatments)
 
 ```
 
-### Step 3: Associate sites with cultivars
+## Step 3: Associate sites with cultivars
 
 To associate sites with cultivars, run `associate_sites_cultivars`. The sites google sheet object will need to be passed in.
 
 ```{r associate-site-cultivar}
 
-associate_sites_cultivars(sites, dbcon, commit)
+associate_sites_cultivars(dbcon, commit, sites)
 
 ```
 
-### Step 4: Associate citations with sites
+## Step 4: Associate citations with sites
 
 To associate citations with sites, run `associate_citations_sites`. The citations and sites google sheet objects will need to be passed in.
 
 ```{r associate-citation-site}
 
-associate_citations_sites(citations, sites, dbcon, commit)
+associate_citations_sites(dbcon, commit, citations, sites)
 
 ```
 
-## Check data association
+# Check data association
 
 You can check if your data has been correctly associated in the database once you run this markdown file with `commit <- TRUE` on line 26.
 
@@ -446,7 +175,7 @@ user_id <- bety_users %>%
 
 ```
 
-### Fetch records from experiments_sites
+## Fetch records from experiments_sites
 
 ```{r fetch-exp-site, eval = commit}
 
@@ -484,7 +213,7 @@ kable(exp_treat_fetch) %>%
 
 ```
 
-### Fetch records from sites_cultivars
+## Fetch records from sites_cultivars
 
 ```{r fetch-site-cultivar, eval = commit}
 
@@ -503,7 +232,7 @@ kable(site_cultivar_fetch) %>%
 
 ```
 
-### Fetch records from citations_sites
+## Fetch records from citations_sites
 
 ```{r fetch-citation-site, eval = commit}
 
