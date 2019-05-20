@@ -7,7 +7,7 @@ output: html_document
 
 # Objective
 
-The objective of this tutorial is to demonstrate how to add plot boundaries to the BETYdb sites table. For this tutorial, data will be added to a local instance of a test database. Instructions on how to set up a test database can be found (here)[https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d].
+The objective of this tutorial is to demonstrate how to add plot boundaries to the BETYdb sites table. For this tutorial, data will be added to a local instance of a test database. Instructions on how to set up a test database can be found [here](https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d).
 
 Shapefiles for MAC Season 8 sites will be used as an example.
 
