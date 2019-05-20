@@ -1,0 +1,140 @@
+---
+title: "Adding plot boundaries to BETYdb"
+author: "Kimberly Huynh"
+date: "5/20/2019"
+output: html_document
+---
+
+# Objective
+
+The objective of this tutorial is to demonstrate how to add plot boundaries to the BETYdb sites table. For this tutorial, data will be added to a local instance of a test database. Instructions on how to set up a test database can be found (here)[https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d].
+
+Shapefiles for MAC Season 8 sites will be used as an example.
+
+# Set up
+
+Load in the `sf` and `RPostgreSQL` packages.
+
+```{r load-pack, message = FALSE}
+
+library(sf)
+library(RPostgreSQL)
+
+```
+
+Create a connection to the BETY test database.
+
+```{r create-dbcon}
+
+dbcon <- dbConnect(PostgreSQL(),
+                   host = 'localhost',
+                   user = 'bety',
+                   port = 5433)
+
+```
+
+# Adding plot boundaries to BETYdb sites using `sf` package
+
+## Read in shapefiles using `st_read`
+
+MAC Season 8 shapefiles can be read in as a `simple features object` using `st_read`. These shapefiles are saved in the `MAC_season8` folder of this directory. 
+
+A `sf` object is a dataframe where rows are features (points, lines, polygons) and columns are attributes of the features.
+
+```{r read-shape, results = 'hide'}
+
+s8_bounds <- st_read('MAC_season8/S8_one_row_polys.shp')
+
+```
+
+If you need to convert the coordinate reference system to another, you can use the `st_transform` function. In this example, we will be converting the EPSG from `32612` to `4326`.
+
+```{r transform-crs}
+
+s8_bounds <- st_transform(s8_bounds, 4326)
+
+```
+
+## Write site boundaries to BETYdb using `st_write`
+
+The `st_write` function can be used to write a new table to BETYdb. The new table will be named `s8_bounds` and will contain the contents of the `sf` object. This table will later be dropped after inserting new data into the `sites` table.
+
+```{r write-table}
+
+st_write(s8_bounds, dbcon)
+
+```
+
+# Updating and inserting new records into BETYdb using `RPostgreSQL` package
+
+The MAC Season 8 shapefiles did not inlude a `sitename` attribute. We will need to add this field to the `s8_bounds` table and update its values. The `dbSendStatement` function from the `RPostgreSQL` package will be used to make the updates.
+
+SQL statement to add `sitename` field to `s8_bounds` table: 
+
+`alter table s8_bounds add column sitename VARCHAR`
+
+SQL statement to update `sitename` values:
+
+`update s8_bounds set sitename = concat('MAC Field Scanner Season 8 Range ', f_range, ' Column ', f_column, ' ', row)`
+
+```{r create-update-sitename, results = 'hide'}
+
+# create sitename field in s8_bounds table
+create_sitename <- dbSendStatement(dbcon,
+                                   "alter table s8_bounds add column sitename VARCHAR")
+dbClearResult(create_sitename)
+
+# populate sitename values to be concatenation of multiple fields from table
+update_sitename <- dbSendStatement(dbcon,
+                                   paste0("update s8_bounds ",
+                                          "set sitename = concat(",
+                                          "'MAC Field Scanner Season 8 Range ', ",
+                                          "f_range, ",
+                                          "' Column ', ",
+                                          "f_column, ",
+                                          "' ', ",
+                                          "row)"))
+dbClearResult(update_sitename)
+
+```
+
+## Add new records to BETYdb sites table using subset of s8_bounds
+
+The `sitename` and `geometry` fields of the `s8_bounds` table will be selected to insert new records into the sites table. You may need to use functions such as `st_force3D` or `st_transform` to transform the `geometry` field. 
+
+SQL statement to insert new records into sites: 
+
+`insert into sites (sitename, geometry) select sitename, st_force3D(geometry) from s8_bounds`
+
+```{r insert-sites, results = 'hide'}
+
+# insert new records into sites table using records from s8_bounds
+insert_sites <- dbSendStatement(dbcon,
+                                paste0("insert into sites (sitename, geometry) ",
+                                       "select sitename, st_force3D(geometry) from s8_bounds;"))
+dbClearResult(insert_sites)
+
+```
+
+Once the new MAC season 8 plot records have been added to the sites table, the `s8_bounds` table should be dropped.
+
+SQL statement to drop table: 
+
+`drop table s8_bounds`
+
+```{r drop-s8-bounds, results = 'hide'}
+
+# drop the s8_bounds table
+drop_table <- dbSendStatement(dbcon, "drop table s8_bounds")
+dbClearResult(drop_table)
+
+```
+
+# Close database connection
+
+```{r close-dbcon}
+
+dbDisconnect(dbcon)
+
+```
+
