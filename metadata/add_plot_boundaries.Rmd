@@ -33,7 +33,7 @@ dbcon <- dbConnect(PostgreSQL(),
 
 ```
 
-# Adding plot boundaries to BETYdb sites using `sf` package
+# Adding plot boundaries using `sf` package
 
 ## Read in shapefiles using `st_read`
 
@@ -47,7 +47,7 @@ s8_bounds <- st_read('MAC_season8/S8_one_row_polys.shp')
 
 ```
 
-If you need to convert the coordinate reference system to another, you can use the `st_transform` function. In this example, we will be converting the EPSG from `32612` to `4326`.
+If you need to convert the coordinate reference system, you can use the `st_transform` function. In this example, we will be converting the EPSG from `32612` to `4326`.
 
 ```{r transform-crs}
 
@@ -55,9 +55,9 @@ s8_bounds <- st_transform(s8_bounds, 4326)
 
 ```
 
-## Write site boundaries to BETYdb using `st_write`
+## Write a table to BETYdb using `st_write`
 
-The `st_write` function can be used to write a new table to BETYdb. The new table will be named `s8_bounds` and will contain the contents of the `sf` object. This table will later be dropped after inserting new data into the `sites` table.
+The `st_write` function can be used to write a new table to BETYdb containing the contents of the `sf` object. The new table will be named `s8_bounds` and will be dropped after it is used to insert new data into the `sites` table.
 
 ```{r write-table}
 
@@ -65,23 +65,23 @@ st_write(s8_bounds, dbcon)
 
 ```
 
-# Updating and inserting new records into BETYdb using `RPostgreSQL` package
+# Updating and inserting new records using `RPostgreSQL` package
 
-The MAC Season 8 shapefiles did not inlude a `sitename` attribute. We will need to add this field to the `s8_bounds` table and update its values. The `dbSendStatement` function from the `RPostgreSQL` package will be used to make the updates.
+The MAC Season 8 shapefiles did not inlude a `sitename` attribute. We will need to add this field to the `s8_bounds` table and update its values.
 
-SQL statement to add `sitename` field to `s8_bounds` table: 
+The `dbSendStatement` function from the `RPostgreSQL` package will be used to execute SQL statements. 
 
-`alter table s8_bounds add column sitename VARCHAR`
+The following statements will be executed:
 
-SQL statement to update `sitename` values:
+`alter table s8_bounds add column sitename VARCHAR;`
 
-`update s8_bounds set sitename = concat('MAC Field Scanner Season 8 Range ', f_range, ' Column ', f_column, ' ', row)`
+`update s8_bounds set sitename = concat('MAC Field Scanner Season 8 Range ', f_range, ' Column ', f_column, ' ', row);`
 
 ```{r create-update-sitename, results = 'hide'}
 
 # create sitename field in s8_bounds table
 create_sitename <- dbSendStatement(dbcon,
-                                   "alter table s8_bounds add column sitename VARCHAR")
+                                   "alter table s8_bounds add column sitename VARCHAR;")
 dbClearResult(create_sitename)
 
 # populate sitename values to be concatenation of multiple fields from table
@@ -93,18 +93,18 @@ update_sitename <- dbSendStatement(dbcon,
                                           "' Column ', ",
                                           "f_column, ",
                                           "' ', ",
-                                          "row)"))
+                                          "row);"))
 dbClearResult(update_sitename)
 
 ```
 
-## Add new records to BETYdb sites table using subset of s8_bounds
+## Add new records to sites table using subset of s8_bounds
 
 The `sitename` and `geometry` fields of the `s8_bounds` table will be selected to insert new records into the sites table. You may need to use functions such as `st_force3D` or `st_transform` to transform the `geometry` field. 
 
 SQL statement to insert new records into sites: 
 
-`insert into sites (sitename, geometry) select sitename, st_force3D(geometry) from s8_bounds`
+`insert into sites (sitename, geometry) select sitename, st_force3D(geometry) from s8_bounds;`
 
 ```{r insert-sites, results = 'hide'}
 
@@ -116,23 +116,25 @@ dbClearResult(insert_sites)
 
 ```
 
+## Drop table
+
 Once the new MAC season 8 plot records have been added to the sites table, the `s8_bounds` table should be dropped.
 
 SQL statement to drop table: 
 
-`drop table s8_bounds`
+`drop table s8_bounds;`
 
 ```{r drop-s8-bounds, results = 'hide'}
 
 # drop the s8_bounds table
-drop_table <- dbSendStatement(dbcon, "drop table s8_bounds")
+drop_table <- dbSendStatement(dbcon, "drop table s8_bounds;")
 dbClearResult(drop_table)
 
 ```
 
 # Close database connection
 
-```{r close-dbcon}
+```{r close-dbcon, results = 'hide'}
 
 dbDisconnect(dbcon)
 
