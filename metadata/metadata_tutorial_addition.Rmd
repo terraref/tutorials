@@ -11,7 +11,7 @@ The objective of this tutorial is to demonstrate how to upload a season's metada
 
 Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
 
-For this tutorial, you will be uploading your metadata to a test database. A tutorial on how to set up a local instance of a test database can be found in the [metadata folder of the terraref tutorials repository](https://github.com/terraref/tutorials/tree/test_db_tutorial/metadata).
+For this tutorial, you will be uploading your metadata to a test database. A tutorial on how to set up a local instance of a test database can be found in the [metadata folder of the terraref tutorials repository](https://github.com/terraref/tutorials/blob/master/metadata/test_database_tutorial.Rmd).
 
 This tutorial will only cover how to add new experiments, sites, treatments, cultivars, and citations. 
 
@@ -42,8 +42,6 @@ commit <- FALSE
 It is important to note that you should only be uploading your metadata once. 
 
 Trying to upload your metadata more than once will result in errors. 
-
-If you would like to reinitialize the test database and remove any additions that you have made, re-run step 3 of the `How to set up local instance of BETY test database` tutorial.
 
 # Set up
 
@@ -219,12 +217,11 @@ add_cultivars(dbcon, commit, new_cultivars)
 
 ```
 
-Since this file will be used for testing, new species added by the `add_species` function will be removed unless you choose to upload your data. 
-
 ```{r remove-spp, eval = !commit, echo = FALSE}
-# the following chunk will run unless the user sets the value of commit to be TRUE 
 
-# need to determine which new species had been added to species table
+# remove new species added to database for cultivar addition
+# chunk will run if commit = FALSE
+
 bety_species <- tbl(dbcon, 'species') %>% collect()
 
 unq_spp <- unique(cultivars$species)

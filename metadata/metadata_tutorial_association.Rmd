@@ -118,7 +118,7 @@ You will be using the following functions from the `metadata` package to associa
 
 To associate experiments with sites, run `associate_experiments_sites`. The sites google sheet object will need to be passed in. 
 
-```{r associate-exp-site}
+```{r associate-exp-site, results = 'hide'}
 
 associate_experiments_sites(dbcon, commit, sites)
 
@@ -128,7 +128,7 @@ associate_experiments_sites(dbcon, commit, sites)
 
 To associate experiments with treatments, run `associate_experiments_treatments`. The treatments google sheet object will need to be passed in.
 
-```{r associate-exp-treat}
+```{r associate-exp-treat, results = 'hide'}
 
 associate_experiments_treatments(dbcon, commit, treatments)
 
@@ -138,7 +138,7 @@ associate_experiments_treatments(dbcon, commit, treatments)
 
 To associate sites with cultivars, run `associate_sites_cultivars`. The sites google sheet object will need to be passed in.
 
-```{r associate-site-cultivar}
+```{r associate-site-cultivar, results = 'hide'}
 
 associate_sites_cultivars(dbcon, commit, sites)
 
@@ -148,7 +148,7 @@ associate_sites_cultivars(dbcon, commit, sites)
 
 To associate citations with sites, run `associate_citations_sites`. The citations and sites google sheet objects will need to be passed in.
 
-```{r associate-citation-site}
+```{r associate-citation-site, results = 'hide'}
 
 associate_citations_sites(dbcon, commit, citations, sites)
 
@@ -156,7 +156,7 @@ associate_citations_sites(dbcon, commit, citations, sites)
 
 # Check data association
 
-You can check if your data has been correctly associated in the database once you run this markdown file with `commit <- TRUE` on line 26.
+You can check if your data has been correctly associated in the database once you run this markdown file with `commit <- TRUE`.
 
 These chunks will only be evaluated if `commit <- TRUE`. If evaluated, you should see a table of fetched records below a chunk.
 
