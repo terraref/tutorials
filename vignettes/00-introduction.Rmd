@@ -1,3 +1,14 @@
 # (PART\*) Section 1: Vignettes {-}
 
 # Vignettes Introduction
+
+
+These vignettes provide a **quick start** tutorial - they quickly show you how to access and perform ‘hello world’ type introductions to different types of data in the TERRA Reference datasets. These vignettes are designed so that they don’t require any user accounts or passwords to access to the data so that they can be run as easily as possible.
+
+The vignettes currently include:
+* trait data
+* weather data
+* image data
+* how to use combine trait, weather, and image data in a single analysis
+
+Note that only a sample of the full dataset is available without an account. Although we want to make these data broadly available, we want to keep track of who is using them and collect emails so that we can contact you.
