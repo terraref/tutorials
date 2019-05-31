@@ -9,8 +9,8 @@ The second analysis compares greenness from image data with canopy cover.
 ## Get and join data
 
 Here we combine two dataframes. 
-The first contains all the canopy height values for 2017, which was created in the traits vignette. 
-The second is the cumulative growing degree days for all of 2017, which were calculated from the daily minimum and maximum temperatures in the weather vignette. 
+The first contains all the canopy cover values for 2018, which was created in the traits vignette. 
+The second is the cumulative growing degree days for all of 2018, which were calculated from the daily minimum and maximum temperatures in the weather vignette. 
 They are combined by their common column, the date. 
 
 ```{r synth_setup}
@@ -19,7 +19,6 @@ library(ggplot2)
 library(jsonlite)
 library(lubridate)
 library(traits)
-library(inflection)
 library(sf)
 library(stringr)
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
@@ -27,16 +26,16 @@ options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
 ```
 
 ```{r get_trait_data, message = FALSE}
-trait_canopy_height <- betydb_query(table     = "search", 
-                      trait     = "canopy_height", 
-                      date      = "~2017",
+trait_canopy_cover <- betydb_query(table     = "search", 
+                      trait     = "canopy_cover", 
+                      date      = "~2018",
                       limit     =  "none")
-trait_canopy_height_day = trait_canopy_height %>% 
+trait_canopy_cover_day = trait_canopy_cover %>% 
   mutate(day = as.Date(raw_date))
 ```
 
 ```{r get_weather_data}
-weather <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-01&until=2017-12-31', flatten = FALSE)
+weather <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-01-01&until=2018-12-31', flatten = FALSE)
 weather <- weather$properties %>% 
   mutate(time = ymd_hms(weather$end_time))
 daily_values = weather %>% 
@@ -52,7 +51,7 @@ daily_values <- daily_values %>%
 ```
 
 ```{r combine_trait_weather}
-trait_weather_df <- full_join(trait_canopy_height_day, daily_values, by = "day") %>% 
+trait_weather_df <- full_join(trait_canopy_cover_day, daily_values, by = "day") %>% 
   select(day, cultivar, mean, gdd_cum) %>% 
   na.omit()
 ```
@@ -62,8 +61,27 @@ trait_weather_df <- full_join(trait_canopy_height_day, daily_values, by = "day")
 We are interested in how growing degree days affects canopy cover. 
 To investigate this, we are going to model and plot their relationship. 
 We want to know the relationship for each cultivar, so we'll start of by determining the parameters of the model for one of the cultivars in our dataset. 
-We are using a logistic growth model here because it is appropriate for the shape of the GDD-cover relationship. 
+We are using a logistic growth model here because it is appropriate for the shape of the GDD-cover relationship. (From Bolker? ... need to cite)
 
+This needs to be flushed out ... and the variable names should be consistent b/w equations and code
+
+The logistic growth model is specified as 
+
+$Y=\frac{z}{1+e^{-k(t-t_0)}}$
+
+$Y = \frac{c}{1+e^{a + b * \textrm{gdd}}}$
+
+Where $Y$ is canopy cover, $c$ is the maximum canopy cover, $a$ is ... $b$ is ...
+
+From this we can find the asymptote and maximum growth rate. The maximum growth rate is the change in canopy cover per day at the rate of maximum growth. The growing degree day at which maximum growth is obtained is called the _inflection point_ $\textrm{gdd}_i=\frac{\log{a}}{b}$.
+<!--
+or maybe start from the bolker form of the model (I added )
+if $Y=\frac{e^{a+b(t-t_0)}}{1+e^{a+b(t-t_0)}}$
+
+then $t-t_0$ is the number of days after planting.
+
+then the inflection point is at $x=\frac{-a}{b}$ and the maximum rate of growth, $\max{\frac{dY}{dt}}=\frac{b}{4}$
+-->
 ```{r model_get_parameters}
 single_cultivar <- trait_weather_df %>% 
   filter(cultivar == "PI656026")
@@ -129,7 +147,7 @@ ggplot(data.frame(inf_points = unique(all_cultivars$inf_point))) +
 
 In this examnple we will extract our plot data from a series of images taken in May of Season 6, measure its "greeness" annd plot that against the plant heights from above in this vignette.
 
-The chosen statistic here is the normalised green-red difference index, NGRDI=(R-G)/(R+G) (Rasmussen et al., 2016), which uses the red and green bands from the image raster.
+The chosen statistic here is the normalised green-red difference index, $\textrm{NGRDI}=\frac{R-G}/{R+G}$ (Rasmussen et al., 2016), which uses the red and green bands from the image raster.
 
 Below we retrieve all the available plots for a particular date, then find and convert the plot boundary JSON into tuples.
 We will use these tuples to extract the data for our plot.
