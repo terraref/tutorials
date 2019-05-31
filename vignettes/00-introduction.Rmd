@@ -11,4 +11,6 @@ The vignettes currently include:
 * image data
 * how to use combine trait, weather, and image data in a single analysis
 
-Note that only a sample of the full dataset is available without an account. Although we want to make these data broadly available, we want to keep track of who is using them and collect emails so that we can contact you.
+In order to make these vignettes as easy to use as possible, we only use sample of the full dataset is available without an account; specifically we have made data from thirty two plots in each of two seasons available. Although we want to make these data broadly available, we want to keep track of who is using them and collect emails so that we can contact you.
+
+In order to use the vignettes, you will need to have R installed along with the extra packages that are used. Except where otherwise indicated, the packages are available on CRAN and can be installed using the syntax `install.packages('packagename')`. 
