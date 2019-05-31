@@ -1,0 +1,350 @@
+---
+title: "Metadata Upload Tutorial Part 1: Adding new metadata to BETYdb"
+author: "Kimberly Huynh"
+date: "4/30/2019"
+output: html_document
+---
+
+# Overview
+
+The objective of this tutorial is to demonstrate how to upload a season's metadata to the traits database. All traits data need to have associated metadata.
+
+Each season should have metadata for experiments, sites, treatments, cultivars, and citations.
+
+For this tutorial, you will be uploading your metadata to a test database. A tutorial on how to set up a local instance of a test database can be found in the [metadata folder of the terraref tutorials repository](https://github.com/terraref/tutorials/blob/master/metadata/test_database_tutorial.Rmd).
+
+This tutorial will only cover how to add new experiments, sites, treatments, cultivars, and citations. 
+
+The `Metadata Upload Tutorial Part 2: Associating metadata in BETYdb` tutorial should be viewed after you have completed this tutorial and all new metadata have been added (see below for more details on how to run this markdown file). The second tutorial will cover how to associate the metadata that you add.
+
+# Required input
+
+URL to a public published google sheet (you will need to provide this url in the URL set up section)
+
+   * copy and fill out the following [google sheets template](https://docs.google.com/spreadsheets/d/1pNEuwNHNHHrpql0b36DYFAbOlBU5TJVF_nO4RdRzdmg/edit#gid=279516453).
+   * instructions on how to fill out the template can be found under the README worksheet.
+   * make the google sheet public (to anyone with link) and publish the entire document to the web as a xlsx.
+
+# How to Run this Rmd
+
+Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will not encounter any errors when uploading your metadata. All experiments, sites, treatments, cutlivars, and citations can be uploaded successfully. 
+
+To actually commit additions to the test database, you will need to make an edit to this markdown file. 
+
+The value of `commit` needs to be changed from `FALSE` to `TRUE` in the following chunk:
+
+```{r commit-param}
+
+commit <- FALSE
+
+```
+
+It is important to note that you should only be uploading your metadata once. 
+
+Trying to upload your metadata more than once will result in errors. 
+
+# Set up
+
+## Load packages
+
+The following packages will need to be loaded: `RPostgres`, `DBI`, `dplyr`, `googlesheets`, `kableExtra`, and `glue`. The `metadata` upload package will first need to be installed from github and then loaded in. 
+
+```{r load-pack, message = FALSE}
+
+if(!require(metadata)){
+  install_github('kimberlyh66/betydbtools@metadata_package', subdir = 'metadata')
+}
+
+library(RPostgres)
+library(DBI)
+library(dplyr)
+library(googlesheets)
+library(kableExtra)
+library(glue)
+library(metadata)
+
+```
+
+## URL 
+
+Please provide the URL to your google sheet below. 
+
+A sample URL has been provided for a google sheet containing MAC season 8 metadata. Replace the sample URL with your own.
+
+```{r url}
+
+url <- 'https://docs.google.com/spreadsheets/d/1BPkZPfynZI9DB9bRJfa335uC_uNjST5jHVf-XUgSVvM/edit#gid=347205052' 
+
+```
+
+## Read in google sheets using URL
+
+Your metadata will be read in using the `googlesheets` package. Each sheet will be read in directly as a R object.
+
+```{r read-user-gs, message = FALSE}
+
+# get key from URL
+key <- extract_key_from_url(url)
+
+# register sheet 
+gs_obj <- key %>% gs_key(lookup = FALSE)
+
+# users sheet
+users <- gs_obj %>% gs_read(ws = 'users')
+
+# experiments sheet
+experiments <- gs_obj %>% gs_read(ws = 'experiments')
+
+# sites sheet
+sites <- gs_obj %>% gs_read(ws = 'sites')
+
+# treatments sheet
+treatments <- gs_obj %>% gs_read(ws = 'treatments')
+
+# cultivars sheet
+cultivars <- gs_obj %>% gs_read(ws = 'cultivars')
+
+# citations sheet
+citations <- gs_obj %>% gs_read(ws = 'citations')
+
+```
+
+# Upload data
+
+## Connect to database
+
+A connection to the test database needs to be created. Make sure that you have the test database running. 
+
+The port number should be the same as the one indicated in docker-compose.override.yml.
+
+```{r create-dbcon}
+dbcon <- dbConnect(RPostgres::Postgres(),
+                   host = 'localhost',
+                   user = 'bety',
+                   port = 5433)
+```
+
+## User id
+
+Your user id will be used when uploading your data. Your user id will be determined based on your provided user login (username for betydb account).
+
+```{r user-id}
+
+# get user id from user login
+bety_users <- tbl(dbcon, 'users') %>% collect()
+  
+user_id <- bety_users %>%
+  filter(login == users$login) %>%
+  select(id)
+
+```
+
+## Functions to be used for metadata upload
+
+You will be using the following functions from the `metadata` package to upload your data: 
+
+   * `add_experiments`
+   
+   * `add_sites`
+   
+   * `add_treatments`
+   
+   * `add_species`
+   
+   * `get_new_cultivars`
+   
+   * `add_cultivars`
+   
+   * `add_citations`
+
+## Step 1: Add new experiments
+
+To add new experiments, run `add_experiments`. The experiments google sheet object and your user id will need to be passed in.
+
+```{r add-experiments, results = 'hide'}
+
+add_experiments(dbcon, commit, user_id$id, experiments)
+
+```
+
+## Step 2: Add new sites
+
+To add new sites, run `add_sites`. The sites google sheet object and your user id will need to be passed in.
+
+```{r add-sites, results = 'hide'}
+
+add_sites(dbcon, commit, user_id$id, sites)
+
+```
+
+## Step 3: Add new treatments
+
+To add new treatments, run `add_treatments`. The treatments google sheet object and your user id will need to be passed in.
+
+```{r add-treatments, results = 'hide'}
+
+add_treatments(dbcon, commit, user_id$id, treatments)
+
+```
+
+## Step 4: Add new cultivars
+
+Only combinations of cultivars and specie id that are not yet present in BETYdb will be uploaded. 
+
+First you need to make sure that all unique species present in the cultivars sheet has been added to the BETYdb species table. This is needed since the cultivars table references the species table for specie_id.
+
+If found, new species will be added using `add_species`. The cultivars google sheet object will need to be passed in.
+
+```{r add-species, results = 'hide'}
+
+add_species(dbcon, cultivars)
+
+```
+
+To determine which cultivars need to be uploaded, run `get_new_cultivars`. The cultivars google spread sheet will need to be passed in.
+
+```{r get-new-cultivars}
+
+new_cultivars <- get_new_cultivars(dbcon, cultivars)
+
+```
+
+Add new cultivars by passing in `new_cultivars` generated above to the `add_cultivars` function.
+
+```{r add-cultivars, results = 'hide'}
+
+add_cultivars(dbcon, commit, new_cultivars)
+
+```
+
+```{r remove-spp, eval = !commit, echo = FALSE}
+
+# remove new species added to database for cultivar addition
+# chunk will run if commit = FALSE
+
+bety_species <- tbl(dbcon, 'species') %>% collect()
+
+unq_spp <- unique(cultivars$species)
+
+spp_to_add <- unq_spp[!unq_spp %in% bety_species$scientificname]
+
+if(length(spp_to_add) != 0){
+  delete_spp <- glue_sql("delete from species where scientificname in
+                         ({spp_to_add*})",
+                         .con = dbcon)
+  send <- dbSendStatement(dbcon, delete_spp)
+  dbClearResult(send)
+}
+
+```
+
+## Step 5: Add new citations
+
+Add new citations by running `add_citations`. The citations google sheet object and your user id will need to be passed in.
+
+```{r add-citations, results = 'hide'}
+
+add_citations(dbcon, commit, user_id$id, citations)
+
+```
+
+# Check data upload
+
+You can check if your data has been correctly uploaded to the database once you run this markdown file with `commit <- TRUE`.
+
+These chunks will only be evaluated if `commit <- TRUE`. If evaluated, you should see a table of fetched records below a chunk.
+
+We will be using your user id and today's date to fetch the data you uploaded.
+
+```{r today}
+
+today <- Sys.Date()
+
+```
+
+
+## Fetch experiments
+
+```{r fetch-exp, eval = commit}
+
+exp_query <- dbSendQuery(dbcon,
+                         glue_sql("select * from experiments where created_at::date = {today}
+                                  and user_id = (select id from users where login = {users$login})",
+                                  .con = dbcon))
+
+exp_fetch <- dbFetch(exp_query)
+dbClearResult(exp_query)
+
+kable(exp_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
+
+
+```
+
+## Fetch sites
+
+```{r fetch-site, eval = commit}
+
+site_query <- dbSendQuery(dbcon,
+                          glue_sql("select id, city, state, country, sitename from sites where created_at::date =
+                                   {today} and user_id = (select id from users where login = {users$login}) 
+                                   limit 10",
+                                   .con = dbcon))
+
+site_fetch <- dbFetch(site_query)
+dbClearResult(site_query)
+
+kable(site_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
+
+```
+
+## Fetch treatments
+
+```{r fetch-treat, eval = commit}
+
+treat_query <- dbSendQuery(dbcon,
+                           glue_sql("select * from treatments where created_at::date = {today}
+                                    and user_id = (select id from users where login = {users$login})",
+                                    .con = dbcon))
+
+treat_fetch <- dbFetch(treat_query)
+dbClearResult(treat_query)
+
+kable(treat_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
+
+```
+
+## Fetch cultivars
+
+```{r fetch-cultivar, eval = commit}
+
+# TBD
+# no user_id column
+# also, not all cultivars will show up - only the ones that need to be uploaded
+
+```
+
+## Fetch citations
+
+```{r fetch-citation, eval = commit}
+
+citation_query <- dbSendQuery(dbcon,
+                              glue_sql("select * from citations where created_at::date = {today}
+                                       and user_id = (select id from users where login = {users$login})",
+                                       .con = dbcon))
+
+citation_fetch <- dbFetch(citation_query)
+dbClearResult(citation_query)
+
+kable(citation_fetch) %>%
+  kable_styling(latex_options = c('scale_down'))
+
+```
+
+## Close database connection
+
+```{r close-dbcon}
+dbDisconnect(dbcon)
+```
