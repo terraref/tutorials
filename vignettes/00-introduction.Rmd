@@ -13,4 +13,24 @@ The vignettes currently include:
 
 In order to make these vignettes as easy to use as possible, we only use sample of the full dataset is available without an account; specifically we have made data from thirty two plots in each of two seasons available. Although we want to make these data broadly available, we want to keep track of who is using them and collect emails so that we can contact you.
 
-In order to use the vignettes, you will need to have R installed along with the extra packages that are used. Except where otherwise indicated, the packages are available on CRAN and can be installed using the syntax `install.packages('packagename')`. 
+
+## Prerequisites
+
+### R
+
+In order to use the vignettes, you will need to have R installed along with the extra packages that are used. 
+All of the packages except 'trait' are available on CRAN and can be installed using the `install.packages` funciton:
+
+```r
+install.packages('tidyverse', 'jsonlite', 'knitr', 'lubridate', 'raster', 'sf')
+```
+
+Although 'traits' is also on CRAN, you need to download the TERRA REF version from GitHub to handle larger datasets: 
+
+```r
+install.packages('devtools')
+devtools::install_github('terraref/traits')
+```
+### Python
+
+... need instructions on how to install terrautils! ... 
