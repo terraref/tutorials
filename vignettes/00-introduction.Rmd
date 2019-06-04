@@ -36,4 +36,6 @@ devtools::install_github('terraref/traits')
 ```
 ### Python
 
+```sh
 pip install terrautils
+```
