@@ -13,7 +13,8 @@ The vignettes currently include examples of:
 
 In order to make these vignettes as easy to use as possible, we are using a subset of the full dataset that is is available without an account or password. Specifically, we have made data from thirty two plots in each of the two seasons available. 
 
-Although we want to make these data broadly available, the remainder of the dataset requires an account to use so we can keep track of who and how many people are using it, and can contact users with their provided email addresses. Information for getting a beta user account is available in [section 1.1.2](https://terraref.github.io/tutorials/index.html). 
+Although we want to make these data broadly available, the remainder of the dataset requires an account to use so we can keep track of who and how many people are using it, and can contact users with their provided email addresses. 
+Information for getting a beta user account is available in the section on [User Accounts](#user-accounts).
 
 
 ## Prerequisites
