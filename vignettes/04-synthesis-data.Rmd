@@ -1,5 +1,7 @@
 # Combining trait, weather, and image datasets
 
+Contributors: Kristina Riemer, Chris Schnaufer, Kimberly Huynh
+
 The objective of this vignette is to walk through how to combine our several types of data, and demonstrate several realistic analyses that can be done on these merged data. 
 
 For the first analysis, we want to figure out how the number of sufficiently warm days affects the amount of canopy cover at our site. We do this by combining the canopy cover data with the meteorological data on growing degree days, then modeling and plotting their relationship. We are specifically interested in figuring out when the increase in canopy cover starts to slow down in response to warm temperature days. 

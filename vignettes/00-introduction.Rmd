@@ -1,6 +1,6 @@
-# (PART\*) Section 1: Vignettes {-}
+# (PART\*) Section 1: Vignettes {-#vignettes}
 
-# Vignettes Introduction
+# Introduction 
 
 
 These vignettes provide a **quick start** tutorial - they quickly show you how to access different types of data in the TERRA Reference datasets and perform ‘hello world’ tasks with them. 

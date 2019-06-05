@@ -1,5 +1,7 @@
 # Accessing meteorological data
 
+Contributors: Max Burnette and Kristina Riemer
+
 Objectives:
 
   * This tutorial will walk through the steps required to access meteorological data from the Maricopa Agricultural Center.

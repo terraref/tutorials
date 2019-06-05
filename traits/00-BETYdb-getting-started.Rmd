@@ -1,4 +1,4 @@
-# (PART\*) Secton 2: Traits {-}
+# (PART\*) Secton 2: Traits {-#traits}
 
 # Getting Started with BETYdb
 

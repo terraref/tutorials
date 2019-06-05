@@ -10,6 +10,8 @@ rmd_files: ["index.Rmd",
 "vignettes/02-get-weather-data-R.Rmd",
 "vignettes/03-get-images-python.Rmd", 
 "vignettes/04-synthesis-data.Rmd", 
+"traits/00-BETYdb-getting-started.Rmd",
 "traits/03-access-r-traits.Rmd",
 "sensors/01-meteorological-data.Rmd",
-"sensors/06-list-datasets-by-plot.Rmd"]
+"sensors/06-list-datasets-by-plot.Rmd",
+"data_use_policy.Rmd"]
