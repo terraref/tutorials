@@ -31,24 +31,23 @@ Therefore, we are not going to put it in code that we share.
 
 A common way of handling private API keys is to place it in a text file in your current directory. Don't put it in a project directory where it might be inadvertently shared.
 
-Here is how to find and save your API key:
+Here is how to find and save your API key to a hidden file:
 
 * click file --> new --> text file
 * copy the api key that was sent when you registered into the file
-* file --> save as '.betykey'
+* file --> save as '.betykey' (don't use apostrophes).
+* you won't be able to see this file in the file browser in R Studio, as this build doesn't allow display of hidden files in this window. To see your hidden file, open the terminal window in that folder and type 'ls -a'
 
-An API key is not needed to access public data. This includes metadata tables and simulated data in the https://terraref.ncsa.illinois.edu/bety-test database.
-
-
+An API key is not needed to access public data includes sample datasets and metadata.
 
 ## Accessing data using a URL query
 
 
 ### Components of a URL query
 
-* base url: `terraref.ncsa.illinois.edu/bety`
-* path to the api: `/api/v1`
-* api endpoint: `/search` or `traits` or `sites`. For BETYdb, these are the names of database tables. 
+* Base url: `terraref.ncsa.illinois.edu/bety`
+* Path to the api: `/api/v1`
+* API endpoint: `/search` or `traits` or `sites`. For BETYdb, these are the names of database tables. 
 * Query parameters: `genus=Sorghum`
 
 * Authentication: `key=api_key` is your assigned API key. This will only be needed when querying trait data. No key is needed to access the public metadata tables.
@@ -61,16 +60,16 @@ First, lets construct a query by putting together a URL.
 1. start with the database url: `terraref.ncsa.illinois.edu/bety`
   * this url brings you to the home page
 2. Add the path to the API, `/api/v1`
-  * now we have terraref.ncsa.illinois.edu/bety/api/v1, which points to the API documentation
+  * now we have terraref.ncsa.illinois.edu/bety/api/v1, which points to the API documentation for additional detail on available options
 3. Add the name of the table you want to query. Lets start with `variables`
   * terraref.ncsa.illinois.edu/bety/api/v1/variables
-4. add query terms by appending a `?` and combining with `&`, for example:
+4. Add query terms by appending a `?` and combining with `&`. These can be done in any order. For example:
   * `type=trait` where the variable type is 'trait'
   * `name=~height` where the variable name contains 'height'
-5. This is your complete query:
+5. Assembling all of this, you have a complete query:
   * `terraref.ncsa.illinois.edu/bety/api/v1/variables?type=trait&name=~height`
-  * it will query all variables that are type trait and have 'height' in the name
-  * Does it return the expected values?
+  * This will query all trait variables that have 'height' in their name.
+  * Does it return the expected values? There should be two.
   
 ## Your Turn
 

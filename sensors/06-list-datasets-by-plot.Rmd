@@ -16,7 +16,8 @@ from the workbench or Globus.
 ## Getting started
 
 After installing terrautils, you should be able to import the `products` module.
-```{python eval = F}
+
+```{python eval = FALSE}
 from terrautils.products import get_sensor_list, unique_sensor_names
 from terrautils.products import get_file_listing, extract_file_paths
 ```
@@ -38,12 +39,13 @@ sensor list and provides a list of names suitable for use in the
 To use this tutorial you will need to sign up for Clowder, have your 
 account approved, and then get an API key from the [Clowder web interface](https://terraref.ncsa.illinois.edu/clowder).
 
-```{python eval = F}
+```{python eval = FALSE}
 url = 'https://terraref.ncsa.illinois.edu/clowder/'
 key = 'ENTER YOUR KEY HERE'
 ```
 
-```{python eval = F}
+
+```{python eval = FALSE}
 sensors = get_sensor_list(None, url, key)
 names = unique_sensor_names(sensors)
 print(names)

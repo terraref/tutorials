@@ -1,3 +1,5 @@
+# (PART\*) Section 2: Tutorials {-}
+
 # Accessing Trait Data in R
 
 The rOpenSci traits package makes it easier to query the TERRA REF trait database because 1) you can pass the query parameters in an R function, and the package takes care of putting the parameters into a valid URL and 2) because the package returns data in a tabular format that is ready to analyze.
