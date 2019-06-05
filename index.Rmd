@@ -35,11 +35,8 @@ At a minimum, you should have:
 * Software:
     + Software requirements vary with the tutorials, and may be complex
 
-<<<<<<< HEAD
-### User Accounts and permission to access TERRA REF data
-=======
+
 ### User Accounts and permission to access TERRA REF data {#user-accounts}
->>>>>>> 18ab82be09679905f4dd033ed63536f18b52f9c1
 
 The first few chapters in the 'vignettes' section use publicly available sample data sets.
 Subsequent sections are also written to use publicly available data sets, but some of the examples require data that requires users to sign up.
