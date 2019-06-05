@@ -21,12 +21,6 @@ These are divided into sections on [Traits](#traits), [Sensors](), and Genomics 
 
 For those who are eager to find and contribute to tutorials that are on deck, these can be found in the [tutorials repository](https://github.com/terraref/tutorials) on GitHub. We encouraged you to revise and contribute new content.
 
-**Acknowledgements** 
-
-The TERRA REF data and computing pipeline, along with the underlying research, would not be possible without an enormous team - you can learn more about us on the [Team](terraref.org/team) page of the terraref website.
-
-Contributors to this book include [Kimberly Huynh](https://github.com/kimberlyh66), [Chris Black](https://github.com/infotroph), [Kristina Riemer](https://github.com/KristinaRiemer), [Chris Schnaufer](https://github.com/Chris-Schnaufer), [Noah Fahlgren](https://github.com/nfahlgren), [Max Burnette](https://github.com/max-zilla), and [others](https://github.com/terraref/tutorials/graphs/contributors).
-
 ## Pre-requisites
 
 While we assume that readers will have some familiarity with the nature of the problem - remote sensing of crop plants - for the most part, these tutorials assume that the user will bring their own scientific questions and a sense of curiosity and are eager to learn. 
@@ -52,6 +46,17 @@ The first few chapters in the 'vignettes' section use publicly available sample 
 Subsequent sections are also written to use publicly available data sets, but some of the examples require data that requires users to sign up.
 To sign up, you will need to 1) fill out the TERRA REF Beta user questionaire ([terraref.org/beta](terraref.org/beta)) and 2) request access to specific databases.
 
+
+### Finding Help
+
+- Join us on Slack! at terra-ref.slack.com ([signup](https://terraref-slack-invite.herokuapp.com/)).
+- Browse issues and repositories in GitHub: 
+  - search the organization at github.com/terraref
+  - questions about the tutorials in the [tutorials repository](https://github.com/terraref/tutorials/issues)
+  - about the data in the [reference-data repository](https://github.com/terraref/reference-data/issues)
+- TERRA REF website: [terraref.org](http://terraref.org/)
+- Technical Documentation: [docs.terraref.org](docs.terraref.org)
+
 ## How to Access TERRA REF Data {#data}
 
 There are multiple ways to access the TERRA REF data. 
@@ -74,18 +79,13 @@ The tutorials include examples that walk users through all of these options (web
 
 ## Other Resources
 
-The TERRA REF website: [terraref.org](http://terraref.org/)
+**Acknowledgements** 
 
-The TERRA REF Technical Documentation: [docs.terraref.org](docs.terraref.org)
+The TERRA REF data and computing pipeline, along with the underlying research, would not be possible without an enormous team - you can learn more about us on the [Team](terraref.org/team) page of the terraref website.
 
+Contributors to this book include [Kimberly Huynh](https://github.com/kimberlyh66), [Chris Black](https://github.com/infotroph), [Kristina Riemer](https://github.com/KristinaRiemer), [Chris Schnaufer](https://github.com/Chris-Schnaufer), [Noah Fahlgren](https://github.com/nfahlgren), [Max Burnette](https://github.com/max-zilla), and [others](https://github.com/terraref/tutorials/graphs/contributors).
 
-### Finding help
-
-- Slack at terra-ref.slack.com ([signup](https://terraref-slack-invite.herokuapp.com/)).
-- Browse issues and repositories in GitHub: 
-  - search the organization at github.com/terraref
-  - questions about the tutorials in the [tutorials repository](https://github.com/terraref/tutorials/issues)
-  - about the data in the [reference-data repository](https://github.com/terraref/reference-data/issues)
+The information and data presented here is from the TERRA REF experiment, funded by the Advanced Research Projects Agency-Energy (ARPA-E), U.S. Department of Energy, under Award Number DE-AR0000594. The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or any agency thereof.
 
 ```{r, include = FALSE}
 options(warn = -1)
