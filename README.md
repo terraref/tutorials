@@ -5,28 +5,27 @@
 
 ## An introduction to the use of TERRA REF data and software
 
-This repository provides a set of tutorials that are divided by data types and use cases. 
+This repository provides a set of tutorials that are divided by data types and use cases.
 
-In the repository, you will find three folders that contain examples of how to access data:
+In the repository, you will find folders that contain examples of how to access data. 
+Within each folder there are both R markdown and Jupyter notebooks.
 
-* traits
-* sensors
-* plantCV
+_If you are **interested in learning how to use the TERRA REF data**_, please find these tutorials published in book form at [terraref.org/tutorials](https://terraref.org/tutorials).
 
-Within each folder there are both R markdown and Jupyter notebooks. These describe different approaches to accessing data. These are intended to cover diverse use cases, and you will find information about accessing data from web interfaces but the primary focus is on accessing data using R, Python, SQL, and REST APIs. These are intended to provide quick-start introductions to access data along with computing environments required for further exploration. They are not intended to teach analyses, although some illustrative visualizations and statistical models are provided.
+If you want to **fix, improve, or contribute new tutorials**, please continue reading here!
 
 This is a work in progress, and an open source community that welcomes contributions in many forms. Please feel welcome to ask questions, provide suggestions or share analyses that may be of interest to others.
 
 
-## Getting Started
+## Contributing
 
-### Requirements
+While you can run many of these tutorials locally, many require access to the TERRA REF filesystem and databases. These are available on a web-based cloud development environment that provides Rstudio, Jupyter Notebooks, and other interfaces. Therefore, the _only technical requirements_ are:
 
-All of the tutorials have been designed to work in the cloud and can be accessed using a web browser. Therefore, the _only technical requirements_ are:
 * Web browser
 * Internet connection
 
 In addition, you will need to:
+
 * Sign up as as a TERRA REF [Beta User by filling out this application](http://terraref.org/beta).
 * Sign up for an account on the [TERRA REF Workbench](https://www.workbench.terraref.org), and wait for approval.
 
