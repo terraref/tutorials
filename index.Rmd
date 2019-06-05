@@ -21,8 +21,6 @@ These are divided into sections on [Traits](#traits), [Sensors](), and Genomics 
 
 For those who are eager to find and contribute to tutorials that are on deck, these can be found in the [tutorials repository](https://github.com/terraref/tutorials) on GitHub. We encouraged you to revise and contribute new content.
 
-For those who are eager to see what is on deck, there are additional tutorials under development in the [tutorials repository](https://github.com/terraref/tutorials) on GitHub. These can be found in the traits, sensors, and genomics subfolders. Users are encouraged to revise and contribute new content.
-
 ## Pre-requisites
 
 While we assume that readers will have some familiarity with the nature of the problem - remote sensing of crop plants - for the most part, these tutorials assume that the user will bring their own scientific questions and a sense of curiosity and are eager to learn. 
@@ -38,9 +36,9 @@ At a minimum, you should have:
 * An internet connection
 * Web Browser
 * Access to the data that you are using
-    + The tutorials will state which databases you will need access to
+    - The tutorials will state which databases you will need access to
 * Software:
-    + Software requirements vary with the tutorials, and may be complex
+    - Software requirements vary with the tutorials, and may be complex
 
 ### User Accounts and permission to access TERRA REF data {#user-accounts}
 
@@ -48,6 +46,11 @@ The first few chapters in the 'vignettes' section use publicly available sample 
 Subsequent sections are also written to use publicly available data sets, but some of the examples require data that requires users to sign up.
 To sign up, you will need to 1) fill out the TERRA REF Beta user questionaire ([terraref.org/beta](terraref.org/beta)) and 2) request access to specific databases.
 
+### Using Cloud Services
+
+Cloud services like the [TERRA REF Workbench](#workbench) and [CyVerse VICE](#vice) provide computing environments _with all requirements pre-installed!_ that support Rstudio, JupyterHub, and other web-based services.
+
+You can learn how to get started using these environments in the sections  [Using Workbench](#workbench) and [Using VICE](#vice) sections.
 
 ### Finding Help
 
