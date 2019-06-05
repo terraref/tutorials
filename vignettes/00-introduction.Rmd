@@ -1,3 +1,41 @@
 # (PART\*) Section 1: Vignettes {-}
 
 # Vignettes Introduction
+
+
+These vignettes provide a **quick start** tutorial - they quickly show you how to access different types of data in the TERRA Reference datasets and perform ‘hello world’ tasks with them. 
+
+The vignettes currently include examples of:
+* trait data
+* weather data
+* image data
+* combining trait, weather, and image data in a single analysis
+
+In order to make these vignettes as easy to use as possible, we are using a subset of the full dataset that is is available without an account or password. Specifically, we have made data from thirty two plots in each of the two seasons available. 
+
+Although we want to make these data broadly available, the remainder of the dataset requires an account to use so we can keep track of who and how many people are using it, and can contact users with their provided email addresses. 
+Information for getting a beta user account is available in the section on [User Accounts](#user-accounts).
+
+
+## Prerequisites
+
+### R
+
+In order to use the vignettes, you will need to have R installed along with the extra packages that are used. 
+All of the packages except 'trait' are available on CRAN and can be installed using the `install.packages` funciton:
+
+```r
+install.packages('tidyverse', 'jsonlite', 'knitr', 'lubridate', 'raster', 'sf')
+```
+
+Although 'traits' is also on CRAN, you need to download the TERRA REF version from GitHub to handle larger datasets: 
+
+```r
+install.packages('devtools')
+devtools::install_github('terraref/traits')
+```
+### Python
+
+```sh
+pip install terrautils
+```
