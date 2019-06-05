@@ -222,6 +222,7 @@ spaces <- fromJSON(paste0(api_url, '/spaces'))
 print(spaces %>% select(id, name))
 ```
 
+
 ```{r list-of-datasets, eval = FALSE}
 
 # Get list of (at most 20) Datasets within that Space from Clowder
@@ -254,6 +255,7 @@ for (i in 1:length(sources)) {
 #### Using the netCDF 1/s data
 
 One use case getting the solar spectrum associated with a particular hyperspectral image.
+
 
 ```{r, eval = FALSE}
 time <- vector()

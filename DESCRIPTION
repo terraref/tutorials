@@ -1,0 +1,21 @@
+Package: placeholder
+Title: Does not matter.
+Version: 0.0.1
+Imports: 
+  bookdown, 
+  traits, 
+  ggplot2, 
+  lubridate, 
+  dplyr, 
+  knitr, 
+  jsonlite, 
+  tidyr, 
+  inflection, 
+  sf, 
+  stringr, 
+  raster, 
+  ggthemes, 
+  magrittr, 
+  RCurl, 
+  reticulate
+Remotes: rstudio/bookdown

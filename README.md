@@ -1,3 +1,4 @@
+[![Travis-CI Build Status](https://travis-ci.org/terraref/tutorials.svg?branch=master)](https://travis-ci.org/terraref/tutorials)
 
 # Tutorials
 
