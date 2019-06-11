@@ -7,7 +7,9 @@ output: html_document
 
 # Objective
 
-The objective of this tutorial is to demonstrate how to add plot boundaries to the BETYdb sites table. For this tutorial, data will be added to a local instance of a test database. Instructions on how to set up a test database can be found [here](https://gist.github.com/kimberlyh66/935106e35478829b9e844ba5b496784d).
+The objective of this tutorial is to demonstrate how to add plot boundaries to the BETYdb sites table. Each site in the sites table should be associated with an experiment. An experiment should have a unique name, a start date, and an end date. The description and design of the experiment are optional.
+
+For this tutorial, data will be added to a local instance of a test database. Instructions on how to set up a test database can be found [here](https://github.com/terraref/tutorials/blob/master/metadata/test_database_tutorial.Rmd).
 
 Shapefiles for MAC Season 8 sites will be used as an example.
 
@@ -22,7 +24,7 @@ library(RPostgreSQL)
 
 ```
 
-Create a connection to the BETY test database.
+Create a connection to the BETY test database. 
 
 ```{r create-dbcon}
 
@@ -33,7 +35,7 @@ dbcon <- dbConnect(PostgreSQL(),
 
 ```
 
-# Adding plot boundaries using `sf` package
+# Adding plot boundaries to BETYdb using `sf` package
 
 ## Read in shapefiles using `st_read`
 
@@ -43,25 +45,37 @@ A `sf` object is a dataframe where rows are features (points, lines, polygons) a
 
 ```{r read-shape, results = 'hide'}
 
-s8_bounds <- st_read('MAC_season8/S8_one_row_polys.shp')
+s8_sf <- st_read('MAC_season8/S8_one_row_polys.shp')
 
 ```
 
-If you need to convert the coordinate reference system, you can use the `st_transform` function. In this example, we will be converting the EPSG from `32612` to `4326`.
+## Transform coordinate reference system to match BETYdb
+
+The `geometry` column of the BETYdb sites table is set to only accept geometries with a `SRID` of `4326`. If you need to convert the coordinate reference system, you can use the `st_transform` function. In this example, we will be converting the coordinate reference system from `32612` to `4326`.
 
 ```{r transform-crs}
 
-s8_bounds <- st_transform(s8_bounds, 4326)
+s8_transformed <- st_transform(s8_sf, 4326)
 
 ```
 
-## Write a table to BETYdb using `st_write`
+## Write a table containing season 8 plot boundaries to BETYdb using `st_write`
 
-The `st_write` function can be used to write a new table to BETYdb containing the contents of the `sf` object. The new table will be named `s8_bounds` and will be dropped after it is used to insert new data into the `sites` table.
+The `st_write` function can be used to write a new table to BETYdb containing the contents of the `sf` object. If you transformed the coordinate reference system of the sf object, pass in the updated transformed object `s8_transformed`. If you did not need to transform your sf object, pass in the original object `s8_sf`.
+
+The new table will be named `s8_bounds` and will be dropped after it is used to insert new data into the `sites` table. The name of the new table being written can be specified using the `layer` parameter.
 
 ```{r write-table}
 
-st_write(s8_bounds, dbcon)
+# run the following if the coordinate reference system of the sf object was transformed
+st_write(s8_transformed,
+         dbcon,
+         layer = 's8_bounds')
+
+# run the following if the coordinate reference system of the sf object was not transformed
+#st_write(s8_sf,
+#         dbcon,
+#         layer = 's8_bounds')
 
 ```
 
@@ -71,11 +85,12 @@ The MAC Season 8 shapefiles did not inlude a `sitename` attribute. We will need 
 
 The `dbSendStatement` function from the `RPostgreSQL` package will be used to execute SQL statements. 
 
-The following statements will be executed:
+The following SQL statements will be executed:
 
-`alter table s8_bounds add column sitename VARCHAR;`
-
-`update s8_bounds set sitename = concat('MAC Field Scanner Season 8 Range ', f_range, ' Column ', f_column, ' ', row);`
+```sql
+alter table s8_bounds add column sitename VARCHAR;
+update s8_bounds set sitename = concat('MAC Field Scanner Season 8 Range ', f_range, ' Column ', f_column, ' ', row);
+```
 
 ```{r create-update-sitename, results = 'hide'}
 
@@ -104,7 +119,10 @@ The `sitename` and `geometry` fields of the `s8_bounds` table will be selected t
 
 SQL statement to insert new records into sites: 
 
-`insert into sites (sitename, geometry) select sitename, st_force3D(geometry) from s8_bounds;`
+```sql
+insert into sites (sitename, geometry)
+select sitename, st_force3D(geometry) from s8_bounds;
+```
 
 ```{r insert-sites, results = 'hide'}
 
@@ -116,13 +134,39 @@ dbClearResult(insert_sites)
 
 ```
 
+## Clean up geometries of added sites if not valid
+
+The `ST_IsValid` function can be used to check if the geometry of an added site is valid and the `ST_MakeValid` function can be used to create a valid geometry for a site with an invalid geometry.
+
+We can exectute the following SQL statement to make any needed updates to invalid geometries for the sites we just added:
+
+```sql
+update sites
+set geometry = ST_MakeValid(geometry)
+where ST_IsValid(geometry) = 'f' and
+sitename like 'MAC Field Scanner Season 8%';
+```
+
+```{r valid-geom, results = 'hide'}
+
+validate_geom <- dbSendStatement(dbcon,
+                                 paste0("update sites ",
+                                        "set geometry = ST_MakeValid(geometry) ",
+                                        "where ST_IsValid(geometry) = 'f' and ",
+                                        "sitename like 'MAC Field Scanner Season 8%';"))
+dbClearResult(validate_geom)
+
+```
+
 ## Drop table
 
 Once the new MAC season 8 plot records have been added to the sites table, the `s8_bounds` table should be dropped.
 
 SQL statement to drop table: 
 
-`drop table s8_bounds;`
+```sql
+drop table s8_bounds;
+```
 
 ```{r drop-s8-bounds, results = 'hide'}
 
