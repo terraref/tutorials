@@ -1,11 +1,6 @@
----
-title: "Getting Started with TERRA Workbench"
-author: "David LeBauer"
-date: "`r Sys.Date()`"
-output: html_document
----
+# Cloud Computing Environments
 
-# TERRA REF Workbench
+## TERRA Workbench {#workbench}
 
 TODO _Add Description of NDS Labs Workbench_
 
@@ -59,11 +54,11 @@ It is important to note that the tutorials each assume that you are using a spec
 |Sensor Data | /sensors |  | pyClowder-netcdf and Rstudio-geospatial |
 |pyClowder  | coming soon | adding algorithms to pipeline | Cloud9 and JupyterLab|
 
-## Launching An Application
+### Launching An Application
 
 [Full Documentation](https://nationaldataservice.atlassian.net/wiki/display/NDSC/User%27s+Guide#User'sGuide-Launchinganapplication)
 
-## Application 1: the command line 
+### Application 1: the command line 
 
 Most of these applications allow you to use the basic command line tools. 
 
@@ -105,7 +100,7 @@ You should see something like this:
 
 ![](figures/docker_terminal_directories.png)
 
-#### Directories
+##### Directories
 
 All of the application provide access to the same file systems. You will find two directories, one for your own work and one that contains files from the TERRA REF data.
 
@@ -114,7 +109,7 @@ All of the application provide access to the same file systems. You will find tw
 
 
 
-### Application 2: Rstudio Server
+#### Application 2: Rstudio Server
 
 Now we are ready to get started! However, this command line tool is not particularly powerful. 
 
@@ -131,7 +126,53 @@ Create Application:
   ![](figures/rstudio_authentication.png)
   
   
-#### Clone the 'Tutorials' Directory
+5. Now you should see a new 'tutorials' directory has been created in your home directory
+  * if you don't see this folder, you will need to [clone the tutorials repository](#rstudio-clone-tutorials)
+  * There are folders with plantCV, sensors, and traits. 
+     * We are interested in the traits folder
+     * Note that other tutorials will not run in this Application
+  * Click the "traits" directory
+
+![](figures/clone_tutorials5.png)  
+  
+  * Open the file "00-BETYdb-getting-started.Rmd"
+
+![](figures/clone_tutorials6.png)  
+  
+### Next Steps
+
+Now, you are ready to move on to the first tutorial "Getting Started with BETYdb".
+
+You can also open applications for the sensor data tutorials (Rstudio-Geospatial and Jupyter/NetCDF) and plantCV (Jupyter/PlantCV) data.
+
+## VICE {#vice}
+
+CyVerse provides excellent documentation for their VICE services. 
+You can learn more about VICE in the [VICE documentation](https://learning.cyverse.org/projects/vice/en/latest/).
+This section is intended to quickly get you up an running with the TERRA REF container on CyVerse.
+It is the same Rstudio environment as is available in workbench. 
+Unlike workbench, VICE does not provide a ~/data directory with all of the TERRA REF files, and it also does not have a local postgres database where you can run SQL commands. 
+But, you can still access the database through its API, which means that you can use the R traits package, the BrAPI interface, the terrutils python library, and if you really want to use SQL, you can mirror the database using Docker. <!--need to cross reference tutorials here-->
+
+1. If you don't have an account, [register here for a free account on CyVerse](https://user.cyverse.org/register).
+2. [Login to CyVerse](https://user.cyverse.org).
+3. Launch the Discovery Environment
+![](figures/cyverse_launch_de.png)
+4. Select the Apps button
+![](figures/cyverse_select_apps.png)
+5. Search for the terra-rstudio-geospatial application (VICE container)
+![](figures/cyverse_search_terra.png)
+6. Launch the TERRA Geospatial Rstudio Application
+![](figures/cyverse_launch_terra.png)
+7. Open the Analysis Section
+![](figures/cyverse_open_analyses.png)
+![](figures/cyverse_launch_analysis.png)
+7. Launch the Rstudio container
+![](figures/cyverse_launch_rstudio.png)
+8. Log in to Rstudio with the username 'rstudio' and password 'rstudio'
+![](figures/cyverse_rstudio_signin.png)
+
+## Clone the 'Tutorials' Repository in Rstudio {#rstudio-clone-tutorials}
 
 With the RStudio Application Open
 
@@ -152,21 +193,3 @@ With the RStudio Application Open
   * Click "Create Project"
 
 ![](figures/clone_tutorials4.png)  
-
-5. Now you should see a new 'tutorials' directory has been created in your home directory
-  * There are folders with plantCV, sensors, and traits. 
-     * We are interested in the traits folder
-     * Note that other tutorials will not run in this Application
-  * Click the "traits" directory
-
-![](figures/clone_tutorials5.png)  
-  
-  * Open the file "00-BETYdb-getting-started.Rmd"
-
-![](figures/clone_tutorials6.png)  
-  
-## Next Steps
-
-Now, you are ready to move on to the first tutorial "Getting Started with BETYdb".
-
-You can also open applications for the sensor data tutorials (Rstudio-Geospatial and Jupyter/NetCDF) and plantCV (Jupyter/PlantCV) data.

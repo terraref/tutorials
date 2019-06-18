@@ -1,5 +1,7 @@
 # Generating file lists by plot
 
+Contributors: Max Burnette and Chris Schnaufer
+
 ## Pre-requisites: 
 
 * if you have not already done so, you will need to 1) sign up for the [beta user program](terraref.org/beta) and 2) 

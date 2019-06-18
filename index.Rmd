@@ -1,6 +1,6 @@
 ---
 title: "TERRA REF Tutorials"
-author: "David LeBauer and others"
+author: "David LeBauer and Contributors"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 date: "`r Sys.Date()`"
@@ -12,9 +12,14 @@ documentclass: book
 
 This book is intended to quickly introduce users to TERRA REF data through a series of tutorials. TERRA REF has many types of data, and most can be  accessed in multiple ways. Although this makes it more complicated to learn (and teach!), the objective is to provide users with the flexibility to access data in the most useful way.
 
-The first section walks the user through the steps of downloading and combining three different types of data: plot level phenotypes, meteorological data, and images. Subesquent sections provide more detailed examples that show how to access a larger variety of data and meta-data.
+**Quick start:** The first section named ["Vignettes"](#vignettes) walks the user through the steps of downloading and combining three different types of data: plot level phenotypes, meteorological data, and images. 
+These vignettes are designed to have minimum requirements - depending on the tutorial you only need a way to R, Python, and specific libraries. 
+Because they rely on samples of our data, it is not necessary to register for any accounts, but we do expect you to follow our [data use policy](#data_use_policy).
 
-For those who are eager to see what is on deck, there are additional tutorials under development in the [tutorials repository](https://github.com/terraref/tutorials) on GitHub. These can be found in the traits, sensors, and genomics subfolders. Users are encouraged to revise and contribute new content.
+**How-to Guides:** The next sections provide more technical and detailed instructions for accessing datasets. 
+These are divided into sections on [Traits](#traits), [Sensors](), and Genomics (TODO). These sections provide more detailed examples that show how to access a wide (baffling) variety of data and meta-data through from a diverse set of interfaces described in the section on [data](#data) below.
+
+For those who are eager to find and contribute to tutorials that are on deck, these can be found in the [tutorials repository](https://github.com/terraref/tutorials) on GitHub. We encouraged you to revise and contribute new content.
 
 ## Pre-requisites
 
@@ -31,10 +36,9 @@ At a minimum, you should have:
 * An internet connection
 * Web Browser
 * Access to the data that you are using
-    + The tutorials will state which databases you will need access to
+    - The tutorials will state which databases you will need access to
 * Software:
-    + Software requirements vary with the tutorials, and may be complex
-
+    - Software requirements vary with the tutorials, and may be complex
 
 ### User Accounts and permission to access TERRA REF data {#user-accounts}
 
@@ -42,36 +46,51 @@ The first few chapters in the 'vignettes' section use publicly available sample 
 Subsequent sections are also written to use publicly available data sets, but some of the examples require data that requires users to sign up.
 To sign up, you will need to 1) fill out the TERRA REF Beta user questionaire ([terraref.org/beta](terraref.org/beta)) and 2) request access to specific databases.
 
-<!-- Not sure where this goes, either in documentation or perhaps in an appendix. But I don't think this belongs in the introduction. Perhaps after the vignettes chaper 
--->
+### Using Cloud Services
 
-## Ways of Acessing Data
+Cloud services like the [TERRA REF Workbench](#workbench) and [CyVerse VICE](#vice) provide computing environments _with all requirements pre-installed!_ that support Rstudio, JupyterHub, and other web-based services.
 
-* Web Interfaces
-    + [Clowder](https://docs.terraref.org/user-manual/how-to-access-data/using-clowder-sensor-and-genoomics-data) (sensor and genomic data)
-    + [Globus](https://docs.terraref.org/user-manual/how-to-access-data/using-globus-sensor-and-genomics-data) (sensor and genomic data)
-    + [BETYdb](https://docs.terraref.org/user-manual/how-to-access-data/using-betydb-trait-data-experimental-metadata) (trait data and experimental metadata)
-    + [CoGe](https://docs.terraref.org/user-manual/how-to-access-data/using-coge-genomics) (genomic data)
-* Files
-* Programming APIs
-    + [BETYdb API](https://pecan.gitbook.io/betydb-data-access/api-for-url-based-queries)
-* API Clients
-    + [rOpenSci traits package](https://pecan.gitbook.io/betydb-data-access/ropensci-traits-package)
+You can learn how to get started using these environments in the sections  [Using Workbench](#workbench) and [Using VICE](#vice) sections.
 
-## Other Resources
+### Finding Help
 
-The TERRA REF website: [terraref.org](http://terraref.org/)
-
-The TERRA REF Technical Documentation: [docs.terraref.org](docs.terraref.org)
-
-
-### Finding help
-
-- Slack at terra-ref.slack.com ([signup](https://terraref-slack-invite.herokuapp.com/)).
+- Join us on Slack! at terra-ref.slack.com ([signup](https://terraref-slack-invite.herokuapp.com/)).
 - Browse issues and repositories in GitHub: 
   - search the organization at github.com/terraref
   - questions about the tutorials in the [tutorials repository](https://github.com/terraref/tutorials/issues)
   - about the data in the [reference-data repository](https://github.com/terraref/reference-data/issues)
+- TERRA REF website: [terraref.org](http://terraref.org/)
+- Technical Documentation: [docs.terraref.org](docs.terraref.org)
+
+## How to Access TERRA REF Data {#data}
+
+There are multiple ways to access the TERRA REF data. 
+It is understandable if it seems overwhelming!
+
+There are **web interfaces** such as:
+* [Clowder](https://docs.terraref.org/user-manual/how-to-access-data/using-clowder-sensor-and-genoomics-data) for sensor and genomic data, 
+* [Globus](https://docs.terraref.org/user-manual/how-to-access-data/using-globus-sensor-and-genomics-data) which provides direct access to our filesystem, including both sensor and genomic datasets,
+* [BETYdb](https://docs.terraref.org/user-manual/how-to-access-data/using-betydb-trait-data-experimental-metadata) which provides plot-level phenotypes (traits) as well as experimental metadata,
+* [CoGe](https://docs.terraref.org/user-manual/how-to-access-data/using-coge-genomics), which provides a way of browsing genomic data
+* [CyVerse Data Store](http://datacommons.cyverse.org/browse/iplant/home/shared/terraref) where you can find another copy of the genomics data. 
+
+While these web interfaces are appealing for browsing around, they are limited and dispersed, and because some were not originally designed to handle so much data, the search interfaces can be frustratingly slow. Apologies!
+
+We have focused our efforts on providing _programmatic access_ through APIs (urls that provide access to data) and API clients (R and Python libraries that make it easy to use these URLs). 
+Most of the websites listed above have APIs.
+API clients include the R 'traits' package that retrieves data from the BETYdb API and the python library 'terrautils' that retrieves data from both Clowder and BETYdb.
+
+The tutorials include examples that walk users through all of these options (web interfaces, APIs, and R and Python interfaces)! 
+
+## Other Resources
+
+**Acknowledgements** 
+
+The TERRA REF data and computing pipeline, along with the underlying research, would not be possible without an enormous team - you can learn more about us on the [Team](terraref.org/team) page of the terraref website.
+
+Contributors to this book include [Kimberly Huynh](https://github.com/kimberlyh66), [Chris Black](https://github.com/infotroph), [Kristina Riemer](https://github.com/KristinaRiemer), [Chris Schnaufer](https://github.com/Chris-Schnaufer), [Noah Fahlgren](https://github.com/nfahlgren), [Max Burnette](https://github.com/max-zilla), and [others](https://github.com/terraref/tutorials/graphs/contributors).
+
+The information and data presented here is from the TERRA REF experiment, funded by the Advanced Research Projects Agency-Energy (ARPA-E), U.S. Department of Energy, under Award Number DE-AR0000594. The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or any agency thereof.
 
 ```{r, include = FALSE}
 options(warn = -1)

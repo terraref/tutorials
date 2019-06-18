@@ -1,5 +1,7 @@
 # Combining trait, weather, and image datasets
 
+Contributors: Kristina Riemer, Chris Schnaufer, Kimberly Huynh
+
 The objective of this vignette is to walk through how to combine our several types of data, and demonstrate several realistic analyses that can be done on these merged data. 
 
 For the first analysis, we want to figure out how the number of sufficiently warm days affects the amount of canopy cover at our site. We do this by combining the canopy cover data with the meteorological data on growing degree days, then modeling and plotting their relationship. We are specifically interested in figuring out when the increase in canopy cover starts to slow down in response to warm temperature days. 
@@ -157,7 +159,7 @@ We will be extracting our plot data from these files.
 A compressed file containing these images can be found on [Clowder](https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870?dataset=5c81709a4f0c78f6486d686c&space=).
 Be sure to extract the image files into a folder that's accessible to the code below.
 
-```{r synth_filename_array}
+```{r, echo = FALSE}
 download.file("https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870/blob", destfile = "vignettes/rgb_images.zip")
 unzip("vignettes/rgb_images.zip", exdir = "vignettes/")
 image_files <- list.files("vignettes/", pattern = "*.tif")

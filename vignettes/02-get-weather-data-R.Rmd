@@ -1,6 +1,6 @@
 # Accessing weather data in R
 
-Learning Objective: To be able to demonstrate how to get TERRA REF meteorological data
+## Objective: To be able to demonstrate how to get TERRA REF meteorological data
 
 This vignette shows how to read weather data for the month of January 2017 from the [weather station](https://cals-mac.arizona.edu/weather-station) at the University of Arizona's [Maricopa Agricultural Center](http://cals-mac.arizona.edu/) into R. 
 These data are stored online on the data management system Clowder, which is accessed using an API. 
