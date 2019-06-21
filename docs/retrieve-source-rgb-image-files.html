@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>TERRA REF Tutorials</title>
+  <meta name="description" content="TERRA REF Tutorials">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="TERRA REF Tutorials" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="TERRA REF Tutorials" />
+  
+  
+  
+
+<meta name="author" content="David LeBauer and others">
+
+
+<meta name="date" content="2019-02-07">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="accessing-weather-data-in-r.html">
+<link rel="next" href="combining-trait-weather-and-image-datasets.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Overview</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#pre-requisites"><i class="fa fa-check"></i><b>1.1</b> Pre-requisites</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#technical-requirements"><i class="fa fa-check"></i><b>1.1.1</b> Technical Requirements</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#user-accounts-and-permission-to-access-terra-ref-data"><i class="fa fa-check"></i><b>1.1.2</b> User Accounts and permission to access TERRA REF data</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#ways-of-acessing-data"><i class="fa fa-check"></i><b>1.2</b> Ways of Acessing Data</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i><b>1.3</b> Other Resources</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#finding-help"><i class="fa fa-check"></i><b>1.3.1</b> Finding help</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>Section 1: Vignettes</b></span></li>
+<li class="chapter" data-level="2" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html"><i class="fa fa-check"></i><b>2</b> Vignettes Introduction</a></li>
+<li class="chapter" data-level="3" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html"><i class="fa fa-check"></i><b>3</b> Accessing trait data in R</a><ul>
+<li class="chapter" data-level="3.1" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#learning-objectives"><i class="fa fa-check"></i><b>3.1</b> Learning Objectives</a></li>
+<li class="chapter" data-level="3.2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#introduction"><i class="fa fa-check"></i><b>3.2</b> Introduction</a></li>
+<li class="chapter" data-level="3.3" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#query-for-available-traits"><i class="fa fa-check"></i><b>3.3</b> Query for available traits</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#getting-started"><i class="fa fa-check"></i><b>3.3.1</b> Getting Started</a></li>
+<li class="chapter" data-level="3.3.2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#setting-options"><i class="fa fa-check"></i><b>3.3.2</b> Setting options</a></li>
+<li class="chapter" data-level="3.3.3" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#querying-available-traits"><i class="fa fa-check"></i><b>3.3.3</b> Querying available traits</a></li>
+<li class="chapter" data-level="3.3.4" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#plot-season-4-summary"><i class="fa fa-check"></i><b>3.3.4</b> Plot season 4 summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#querying-a-specific-trait"><i class="fa fa-check"></i><b>3.4</b> Querying a specific trait</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#querying-season-6-canopy-height-data"><i class="fa fa-check"></i><b>3.4.1</b> Querying season 6 canopy height data</a></li>
+<li class="chapter" data-level="3.4.2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#plotting-query-results"><i class="fa fa-check"></i><b>3.4.2</b> Plotting query results</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html"><i class="fa fa-check"></i><b>4</b> Accessing weather data in R</a><ul>
+<li class="chapter" data-level="4.1" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html#objective-to-be-able-to-demonstrate-how-to-get-terra-ref-meteorological-data"><i class="fa fa-check"></i><b>4.1</b> Objective: To be able to demonstrate how to get TERRA REF meteorological data</a></li>
+<li class="chapter" data-level="4.2" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html#read-in-data-using-r"><i class="fa fa-check"></i><b>4.2</b> Read in data using R</a></li>
+<li class="chapter" data-level="4.3" data-path="accessing-weather-data-in-r.html"><a href="accessing-weather-data-in-r.html#plot-data-using-r"><i class="fa fa-check"></i><b>4.3</b> Plot data using R</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html"><i class="fa fa-check"></i><b>5</b> Retrieve source RGB image files</a><ul>
+<li class="chapter" data-level="5.1" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#learning-objective"><i class="fa fa-check"></i><b>5.1</b> Learning Objective</a></li>
+<li class="chapter" data-level="5.2" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#introduction-1"><i class="fa fa-check"></i><b>5.2</b> Introduction</a></li>
+<li class="chapter" data-level="5.3" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#getting-started-1"><i class="fa fa-check"></i><b>5.3</b> Getting Started</a></li>
+<li class="chapter" data-level="5.4" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#retrieving-sensor-names"><i class="fa fa-check"></i><b>5.4</b> Retrieving sensor names</a></li>
+<li class="chapter" data-level="5.5" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#retrieving-the-images"><i class="fa fa-check"></i><b>5.5</b> Retrieving the images</a></li>
+<li class="chapter" data-level="5.6" data-path="retrieve-source-rgb-image-files.html"><a href="retrieve-source-rgb-image-files.html#sample-images"><i class="fa fa-check"></i><b>5.6</b> Sample Images</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html"><i class="fa fa-check"></i><b>6</b> Combining trait, weather, and image datasets</a><ul>
+<li class="chapter" data-level="6.1" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#get-and-join-data"><i class="fa fa-check"></i><b>6.1</b> Get and join data</a></li>
+<li class="chapter" data-level="6.2" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#plot-and-model-relationship-between-gdd-and-canopy-cover-for-each-cultivar"><i class="fa fa-check"></i><b>6.2</b> Plot and model relationship between GDD and canopy cover for each cultivar</a></li>
+<li class="chapter" data-level="6.3" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#create-histogram-of-growth-rate-for-all-cultivars"><i class="fa fa-check"></i><b>6.3</b> Create histogram of growth rate for all cultivars</a></li>
+<li class="chapter" data-level="6.4" data-path="combining-trait-weather-and-image-datasets.html"><a href="combining-trait-weather-and-image-datasets.html#get-image-data"><i class="fa fa-check"></i><b>6.4</b> Get image data</a></li>
+</ul></li>
+<li class="part"><span><b>Section 2: Tutorials</b></span></li>
+<li class="chapter" data-level="7" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html"><i class="fa fa-check"></i><b>7</b> Accessing Trait Data in R</a><ul>
+<li class="chapter" data-level="7.1" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html#using-the-r-traits-package-to-query-the-database"><i class="fa fa-check"></i><b>7.1</b> Using the R traits package to query the database</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html#setup"><i class="fa fa-check"></i><b>7.1.1</b> Setup</a></li>
+<li class="chapter" data-level="7.1.2" data-path="accessing-trait-data-in-r-1.html"><a href="accessing-trait-data-in-r-1.html#example-time-series-of-height"><i class="fa fa-check"></i><b>7.1.2</b> Example: Time series of height</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html"><i class="fa fa-check"></i><b>8</b> Accessing meteorological data</a><ul>
+<li class="chapter" data-level="8.1" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#the-maricopa-weather-station"><i class="fa fa-check"></i><b>8.1</b> The Maricopa Weather Station</a><ul>
+<li class="chapter" data-level="8.1.1" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#meteorological-data-formats"><i class="fa fa-check"></i><b>8.1.1</b> Meteorological data formats</a></li>
+<li class="chapter" data-level="8.1.2" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#using-the-api-to-get-data"><i class="fa fa-check"></i><b>8.1.2</b> Using the API to get data</a></li>
+<li class="chapter" data-level="8.1.3" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#the-structure-of-the-geostreams-database"><i class="fa fa-check"></i><b>8.1.3</b> The structure of the Geostreams database</a></li>
+<li class="chapter" data-level="8.1.4" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#creating-the-urls-for-all-data-table-types"><i class="fa fa-check"></i><b>8.1.4</b> Creating the URLs for all data table types</a></li>
+<li class="chapter" data-level="8.1.5" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#querying-weather-sensor-data-stream"><i class="fa fa-check"></i><b>8.1.5</b> Querying weather sensor data stream</a></li>
+<li class="chapter" data-level="8.1.6" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#download-data-using-the-command-line"><i class="fa fa-check"></i><b>8.1.6</b> Download data using the command line</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#weather-plots"><i class="fa fa-check"></i><b>8.2</b> Weather Plots</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="accessing-meteorological-data.html"><a href="accessing-meteorological-data.html#high-resolution-data-1s-spectroradiometer"><i class="fa fa-check"></i><b>8.2.1</b> High resolution data (1/s) + spectroradiometer</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html"><i class="fa fa-check"></i><b>9</b> Generating file lists by plot</a><ul>
+<li class="chapter" data-level="9.1" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#pre-requisites-1"><i class="fa fa-check"></i><b>9.1</b> Pre-requisites:</a></li>
+<li class="chapter" data-level="9.2" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-started-2"><i class="fa fa-check"></i><b>9.2</b> Getting started</a></li>
+<li class="chapter" data-level="9.3" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-the-sensor-list"><i class="fa fa-check"></i><b>9.3</b> Getting the sensor list</a></li>
+<li class="chapter" data-level="9.4" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-a-list-of-files"><i class="fa fa-check"></i><b>9.4</b> Getting a list of files</a></li>
+<li class="chapter" data-level="9.5" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#querying-the-api"><i class="fa fa-check"></i><b>9.5</b> Querying the API</a><ul>
+<li class="chapter" data-level="9.5.1" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#a-word-of-caution"><i class="fa fa-check"></i><b>9.5.1</b> A Word of Caution</a></li>
+<li class="chapter" data-level="9.5.2" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#finding-plot-id"><i class="fa fa-check"></i><b>9.5.2</b> Finding plot ID</a></li>
+<li class="chapter" data-level="9.5.3" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#finding-stream-id-within-a-plot"><i class="fa fa-check"></i><b>9.5.3</b> Finding stream ID within a plot</a></li>
+<li class="chapter" data-level="9.5.4" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#listing-clowder-dataset-ids-for-that-plot-sensor-stream"><i class="fa fa-check"></i><b>9.5.4</b> Listing Clowder dataset IDs for that plot &amp; sensor stream</a></li>
+<li class="chapter" data-level="9.5.5" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#getting-file-paths-from-dataset"><i class="fa fa-check"></i><b>9.5.5</b> Getting file paths from dataset</a></li>
+<li class="chapter" data-level="9.5.6" data-path="generating-file-lists-by-plot.html"><a href="generating-file-lists-by-plot.html#retrieving-the-files"><i class="fa fa-check"></i><b>9.5.6</b> Retrieving the files</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">TERRA REF Tutorials</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="retrieve-source-rgb-image-files" class="section level1">
+<h1><span class="header-section-number">Chapter 5</span> Retrieve source RGB image files</h1>
+<div id="learning-objective" class="section level2">
+<h2><span class="header-section-number">5.1</span> Learning Objective</h2>
+<p>In this chapter you will learn:</p>
+<ul>
+<li>Find and retrieve a list of available sensor names</li>
+<li>Retrieve files by downloading them to your system</li>
+</ul>
+</div>
+<div id="introduction-1" class="section level2">
+<h2><span class="header-section-number">5.2</span> Introduction</h2>
+<p>In this chapter we will show how to use the <a href="https://www.python.org/">Python</a> <code>terrutils</code> library to retrieve the list of available sensor names. The <code>terrautils</code> library provides a number of functions that can be used to perform different actions with data that is stored in <a href="https://terraref.ncsa.illinois.edu/clowder/">TerraRef</a>. The names of the sensors we retrieve using <code>TerraUtils</code> can provide information on what types of Level 1 data is available.</p>
+<p>Our examples also show how to retrieve files of interest from <code>TerraUtils</code> by using the available <a href="https://clowder.ncsa.illinois.edu/swagger/?url=https://terraref.ncsa.illinois.edu/clowder/swagger">API</a> (Application Programming Interface).</p>
+</div>
+<div id="getting-started-1" class="section level2">
+<h2><span class="header-section-number">5.3</span> Getting Started</h2>
+<p>First, we will need to install the <code>terrautils</code> library into the Python environment. We can do this by using the <code>pip</code> utility to install the library from pypi. Simple run <code>pip install terrautils</code> in a terminal to install <code>terrautils</code>. All the <code>terrautils</code> functions are now available in Python, although we will only use a very limited number of them.</p>
+</div>
+<div id="retrieving-sensor-names" class="section level2">
+<h2><span class="header-section-number">5.4</span> Retrieving sensor names</h2>
+<p>In this section we retrieve the names of different sensor types that are available. This will allow you to understand what files may be avaialable other than just those containing RBG image data.</p>
+<p>We will first be using the <code>get_sensor_list</code> function to retrieve all the data on available sensors. We will then use the <code>unique_sensor_names</code> function to extract only the sensor names from the data we just retrieved.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> terrautils.products <span class="im">import</span> get_sensor_list, unique_sensor_names
+url <span class="op">=</span> <span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/&#39;</span>
+key <span class="op">=</span> <span class="st">&#39;&#39;</span>
+sensors <span class="op">=</span> get_sensor_list(<span class="va">None</span>, url, key)
+names <span class="op">=</span> unique_sensor_names(sensors)</code></pre></div>
+<p>The variable <code>names</code> will now contain the list of all available sensors.</p>
+</div>
+<div id="retrieving-the-images" class="section level2">
+<h2><span class="header-section-number">5.5</span> Retrieving the images</h2>
+<p>Once we have a list of files and their IDs we can retrieve them one-by-one. We do this by creating a URL that identifies the file to retrieve, making the API call to retrieve the file contents, and writing the contents to disk.</p>
+<p>To create the correct URL we start with the one defined before and attach the keyword ‘/files/’ followed by the ID of each file. For example, assuming we have a file ID of ‘111’, the final URL for retrieving the file would be:</p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">https</span>://terraref.ncsa.illinois.edu/clowder/api/files/111</code></pre></div>
+<p>By looping through each of our files, and using their ID and filename, we can retrieve the files from the server and store them locally.</p>
+<p>We are streaming the data returned from our server request (<code>stream=True</code> in the code below) due to the high probability of large file sizes. If the <code>stream=True</code> parameter was omitted the file’s entire contents would be in the <code>r</code> variable which could then be written to the local file.</p>
+<p>To illustrate how this might work we are going to pre-populated an array of file names and their associated Clowder IDs.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">files <span class="op">=</span> [ {<span class="st">&quot;id&quot;</span>: <span class="st">&quot;5c507cb74f0c4b0cbe6705f2&quot;</span>,
+           <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_right.tif&quot;</span>}, 
+          {<span class="st">&quot;id&quot;</span>: <span class="st">&quot;5c507cb84f0cfd2aedf5a75a&quot;</span>,
+           <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_left.tif&quot;</span>},
+          {<span class="st">&quot;id&quot;</span>: <span class="st">&quot;5c507eaf4f0c4b0cbe6716cd&quot;</span>,
+           <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;rgb_geotiff_L1_ua-mac_2018-05-05__11-35-13-442_left.tif&quot;</span>},
+          {<span class="st">&quot;id&quot;</span>: <span class="st">&quot;5c507eaf4f0cfd2aedf5b680&quot;</span>,
+           <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;rgb_geotiff_L1_ua-mac_2018-05-05__11-37-40-442_right.tif&quot;</span>}
+          ]</code></pre></div>
+<p>The following code shows how to download the image files. First we format the base URL for our query allowing us to reuse it for each file. Next we loop through our array and create a customized URL while making the call to fetch the data using the <code>requests</code> interface. Finally we open the output file and use a loop to write the retrieved data.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> requests
+<span class="im">from</span> io <span class="im">import</span> <span class="bu">open</span>
+<span class="co"># We are using the same `url` and `key` variables declared in the previous example above.</span>
+filesurl <span class="op">=</span> url <span class="op">+</span> <span class="st">&#39;/files/&#39;</span>
+params<span class="op">=</span>{ <span class="st">&#39;key&#39;</span>: key }
+<span class="cf">for</span> f <span class="kw">in</span> files:
+  r <span class="op">=</span> requests.get(filesurl <span class="op">+</span> f[<span class="st">&quot;id&quot;</span>], params<span class="op">=</span>params, stream<span class="op">=</span><span class="va">True</span>)
+  <span class="cf">with</span> <span class="bu">open</span>(f[<span class="st">&quot;filename&quot;</span>], <span class="st">&#39;wb&#39;</span>) <span class="im">as</span> o:
+        <span class="cf">for</span> chunk <span class="kw">in</span> r.iter_content(chunk_size<span class="op">=</span><span class="dv">1024</span>): 
+            <span class="cf">if</span> chunk:
+                o.write(chunk)
+     </code></pre></div>
+<p>The images are now stored on the local file system.</p>
+</div>
+<div id="sample-images" class="section level2">
+<h2><span class="header-section-number">5.6</span> Sample Images</h2>
+<p>Below are examples of images captured approximately one month apart <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+<table>
+<thead>
+<tr class="header">
+<th>Date</th>
+<th>Images</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>May 4, 2018</td>
+<td><img src="https://user-images.githubusercontent.com/45463434/52152314-38d23a80-2633-11e9-99c8-983d79d7bcda.png" /> <img src="https://user-images.githubusercontent.com/45463434/52152386-78992200-2633-11e9-9cca-ab6e7d09614d.png" /></td>
+</tr>
+<tr class="even">
+<td>Jun 2, 2018</td>
+<td><img src="https://user-images.githubusercontent.com/45463434/52152360-65865200-2633-11e9-9397-14429a192868.png" /> <img src="https://user-images.githubusercontent.com/45463434/52152339-530c1880-2633-11e9-8b64-50ffdf8215be.png" /></td>
+</tr>
+</tbody>
+</table>
+<!-- The following is the 'correct' way of retrieving file names and IDS based upon a site and sensor name 
+
+
+
+## Objective: To be able to demonstrate how to locate and retrieve RGB image files
+
+This vignette shows how to locate and retrieve image files from your site for a specific date range using Python.
+We will be searching for and retrieving [ublicly available images associated with growing Season 6 from the University of Arizona's [Maricopa Agricultural Center](http://cals-mac.arizona.edu/). 
+Note that the search in this vignette will not return any results, but we wull walk you through the process so that you can query your own data.
+The files are stored online on the data management system Clowder, which is accessed using an API. 
+
+After completing this vignette it should be possible to search for and retrieve other files through the use of the API.
+
+As an added bonus we've also included an exmple of how to retrieve the list of available sensor names through the API.
+By using the sensor names returned, it's possible to retrieve other files containing the data the sensors have collected.
+
+**Requirements** 
+
+* Python 
+* the terrautils library
+    + this can be installed from pypi by running `pip install terrautils` in the terminal
+* an API key to access these data
+
+The API key is a string that gets generated upon request through your Clowder account. 
+Existing API keys will work with this vignette.
+The following steps can help you get a new API key
+
+1. first register with Clowder at "https://terraref.ncsa.illinois.edu/clowder/" site
+      a) click the `Login` button and wait for the login screen to appear
+      b) then select the `Sign up` button and enter an email address you have access to
+2. an email is sent to the entered address with instructions for completing the registration process
+3. once registration is complete
+      c) log  into Clowder and select the `View profile` menu option from the drop-down that is near the search control
+      d) enter a name and click the `+ Add` button under "User API Keys" heading in the profile page to generate a new key
+4. copy the key shown for use in this vignette
+
+## Locating the images
+
+To begin looking for files, a sensor name and site name are needed. 
+We will be using 'RGB GeoTIFFs Datasets' as the sensor name and 'MAC Field Scanner Season 6 Range 20 Column 6' as the site name. 
+Later in this vignette we show how to retrieve the list of available sensors.
+When seraching for your images, you will want to use your site name.
+
+The URL string points to the API to query. 
+In this case we'll be using "https://terraref.ncsa.illinois.edu/clowder/api".
+We will be using an empty key for this example since we are querying public data.
+You will want to use the key you created for your Clowder account when querying your data.
+
+As mentioned in the Objectives, we are limiting the search timeframe through the use of the `since` and `until` parameters.
+These parameters can be omitted to search for all available images (or all other files by changing the sensor).
+
+
+```python
+from terrautils.products import get_file_listing
+url = 'https://terraref.ncsa.illinois.edu/clowder/'
+key = ''
+sensor = 'RGB GeoTIFFs Datasets'
+sitename = 'MAC Field Scanner Season 6 Range 20 Column 6'
+files = get_file_listing(None, url, key, sensor, sitename,
+                   since='2018-05-01', until='2018-05-31')
+```
+
+The `files` variable now contains an array of all the file in the datasets that match the sensor in the plot for the month of May. 
+As with this example, when performing you own queries it's possible that there are no matches found and the `files` array would be empty.
+
+-->
+
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="1">
+<li id="fn1"><p>May 4, 2018 - rgb_geotiff_L1_ua-mac_2018-05-04__13-07-04-077_right.tif,rgb_geotiff_L1_ua-mac_2018-05-04__13-07-04-077_left.tif<a href="retrieve-source-rgb-image-files.html#fnref1">↩</a></p></li>
+<li id="fn2"><p>Jun 2, 2018 - rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_right.tif,rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_left.tif<a href="retrieve-source-rgb-image-files.html#fnref2">↩</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="accessing-weather-data-in-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="combining-trait-weather-and-image-datasets.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
