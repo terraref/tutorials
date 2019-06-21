@@ -16,5 +16,5 @@ deploy:
   keep-history: true
   on: 
     branch: master
-  local_dir: _bookdown_files
+  local_dir: _book
   target_branch: gh-pages
