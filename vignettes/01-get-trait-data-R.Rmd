@@ -21,10 +21,10 @@ Our example will show how to query for season 6 data <!-- what is a season? need
 
 ### Getting Started
 
-First, we will need to install and load the traits package from github, and load it into our environment, along with the other packages we will use in this tutorial.
+First, we will need to install and load the traits package from CRAN, and load it into our environment, along with the other packages we will use in this tutorial.
 
 ```{r traits-vig-pack, message = FALSE, results = FALSE}
-# devtools::install_github('terraref/traits', force = TRUE) # run once
+# install.packages('traits') # run once
 library(traits)
 library(ggplot2)
 library(lubridate)
@@ -40,7 +40,8 @@ The function that is used to query BETYdb is called `betydb_query`. To reduce th
 
 ```{r traits-vig-bety-opt}
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'v1')
+        betydb_api_version = 'beta',
+        betydb_key = '9999999999999999999999999999999999999999')
 ```
 
 
@@ -48,7 +49,7 @@ options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
 
 The TERRA REF database contains trait data for many other seasons of observation, and available data may vary by season. Here, we get a visual summary of available traits and methods of measurement for a season.
 
-First we construct a general query for the Season 4 data. This returns all season 4 data. The function `betydb_query` takes as arguments `key = "value"` pairs which represent columns in the database to query. In this example, we `sitename` column for season 4 data, and set the limit to "none" to return all records. By default, the function will search all tables in the database. To specify a particular table you can use the `table` argument.
+First we construct a general query for the Season 4 data. This returns all season 4 data. The function `betydb_query` takes as arguments `key = "value"` pairs which represent columns in the database to query. In this example, we set `sitename` column for season 4 data, and set the limit to "none" to return all records. By default, the function will search all tables in the database. To specify a particular table you can use the `table` argument.
 
 ```{r traits-vig-s4-summary-get-trait, message = FALSE}
 # get all of season 4 data 
@@ -72,12 +73,12 @@ Now we can create a plot of all of the trait data collected during season 4, inc
 
 ```{r traits-vig-s4-summary-plot-data, fig.height = 15, fig.width = 7}
 ggplot(data = season_4) +
-  geom_point(aes(x = raw_date, y = mean, color = method_name)) +
+  geom_point(aes(x = raw_date, y = mean, color = method_name), shape = '.') +
   geom_line(aes(x = raw_date, y = mean, group = cultivar, color = method_name)) +
-  facet_wrap(~trait, ncol = 1, scales = "free_y") +
+  facet_wrap(~trait, ncol = 4, scales = "free_y") +
   xlab("Date") + 
   ylab("Mean trait value") + 
-  ggtitle("Season 6 data summary") +
+  ggtitle("Season 4 data summary") +
   guides(color = guide_legend(title="Method", ncol = 1, title.position = "top")) +
   theme_bw() +
   theme(legend.position = "bottom")
