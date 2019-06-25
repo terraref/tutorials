@@ -12,6 +12,8 @@ rmd_files: ["index.Rmd",
 "vignettes/04-synthesis-data.Rmd", 
 "traits/00-BETYdb-getting-started.Rmd",
 "traits/03-access-r-traits.Rmd",
+"traits/08-access-traits-python.Rmd",
 "sensors/01-meteorological-data.Rmd",
 "sensors/06-list-datasets-by-plot.Rmd",
+"sensors/10-meteorological-data-python.Rmd",
 "data_use_policy.Rmd"]

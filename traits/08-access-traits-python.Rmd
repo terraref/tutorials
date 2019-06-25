@@ -1,0 +1,137 @@
+# "Query TERRA REF traits using python"
+
+Contributors: Max Burnette
+
+## How to query traits using Python
+
+This is a high level tutorial for how to read in traits from BETYdb into python, and then write them out into a csv file.
+
+```{python}
+import requests
+
+bety_api = "https://terraref.ncsa.illinois.edu/bety/api/v1/search"
+bety_key = open(r".betykey","r")
+```
+
+## Download and write out csv
+
+```{python}
+
+sitename = "Season 6" # Can also specify particular plots here
+traits = ["canopy_cover", "canopy_height"]
+
+for t in traits:
+    print("Requesting %s" % t)
+    full_url = "%s?trait=%s&sitename=~%s&limit=10000&key=%s" % (bety_api, t, sitename, bety_key)
+    r = requests.get(full_url, timeout=None)
+    if r.status_code == 200:
+        print("Writing results to CSV")
+        data = r.json()["data"]
+        with open("%s %s.csv" % (sitename, t), 'w') as out:
+            out.write("date,sitename,trait,description,value\n")
+            for entry in data:
+                vals = entry["traits_and_yields_view"]
+                out.write("%s,%s,%s,%s,%s\n" % (vals["date"],
+                                             vals["sitename"],
+                                             vals["trait"],
+                                             vals["trait_description"],
+                                             vals["mean"]))
+        print("%s done." % t)
+
+    else:
+        print("%s request failed (%s)" % (t, r.status_code))
+
+print("Done.")
+
+```
+
+## Read in and Reformat csv files above
+
+```{python}
+import os, requests, csv
+from datetime import datetime
+
+"""
+Translate data downloaded above into:
+
+    culivarID, sitename, day, trait
+
+"""
+
+season_no    = 6
+trait        = "canopy_height"
+value_column = "mean" # column containing actual measurement
+
+# Overwrite this filename if necessary
+bety_data = "season%s_%s.csv" % (season_no, trait)
+out_data = bety_data.replace(".csv", "_formatted.csv")
+
+
+# Load mapping from sitename (plot) to cultivar (genotype)
+def load_cultivar_lookups(season_no):
+    if season_no == 4:
+        source_file = "cultivars_s4_2017.csv"
+    elif season_no == 6:
+        source_file = "cultivars_s6_2018.csv"
+    else:
+        print("No cultivar lookup available for Season %s" % season_no)
+
+    if not os.path.exists(source_file):
+        print("Cannot find lookup file %s" % source_file)
+        exit()
+
+    lookup = {}
+    with open(source_file, 'r') as source_data:
+        for l in source_data.readlines():
+            (sitename, cultivar) = l.rstrip().split(",")
+            lookup[sitename] = cultivar
+
+    return lookup
+
+# Get start and end dates for the season
+def get_season_dates(season_number):
+    if season_number == 4:
+        return ("2017-04-20", "2017-09-18")
+    elif season_number == 6:
+        return ("2018-04-06", "2018-08-01")
+    else:
+        # This can be used to test on small scale
+        return ("2018-07-01", "2018-07-10")
+
+# Get days since start of season
+def get_days_since(start_date, row_date):
+    date_format = "%Y-%m-%d"
+    start = datetime.strptime(start_date, date_format)
+    end = datetime.strptime(row_date, date_format)
+    delta = end - start
+    # First day of season should be Day 1, not Day 0
+    return delta.days + 1
+
+
+def main():
+    lookups = load_cultivar_lookups(season_no)
+    start_day = get_season_dates(season_no)[0]
+
+    print("Reformatting %s into %s" % (bety_data, out_data))
+    out = open(out_data, 'w')
+    out.write("cultivar,sitename,day,%s\n" % trait)
+    with open(bety_data, 'r') as input:
+        csv_reader = csv.DictReader(input, delimiter=",")
+        curr_row = 0
+        for row in csv_reader:
+            if curr_row > 0:
+                cols = [
+                    lookups[row["sitename"]],
+                    row["sitename"],
+                    str(get_days_since(start_day, row["raw_date"][:10])),
+                    str(row[value_column])
+                ]
+                out.write(",".join(cols)+"\n")
+            curr_row += 1
+    out.close()
+
+    print("Done.")
+
+main()
+
+```
