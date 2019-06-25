@@ -192,42 +192,25 @@ site.clip <- as(site.poly,"Spatial")
 
 These are the names of the full field RGB data for the month of May.
 We will be extracting our plot data from these files.
-A compressed file containing these images can be found on [Google Drive](https://drive.google.com/file/d/1UuVHHcyf9sxjX9fEUpD4qa9LGlBR0XnK/view?usp=sharing).
-Be sure to extract the image files into a folder that's accessible to the code below.
+A compressed file containing these images can be found on [Clowder](https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870?dataset=5c81709a4f0c78f6486d686c&space=).
+The code below downloads the image files into a .zip file, which takes a few minutes, and then unzips that file so the image files are accessible. 
 
 ```{r synth_filename_array}
-image_files <- 
-   c('fullfield_L1_ua-mac_2018-05-01_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-02_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-03_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-05_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-06_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-08_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-09_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-10_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_-_copy_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-12_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-13_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-14_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-15_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-17_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-18_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-20_rgb_stereovis_ir_sensors_plots_sorghum6_shade_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-21_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-22_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-23_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif',
-     'fullfield_L1_ua-mac_2018-05-28_rgb_stereovis_ir_sensors_plots_sorghum6_shade_rgb_eastedge_mn_thumb.tif'
-     )
-```
-
-```{r, echo = F}
-image_files_paths <- file.path("vignettes/", image_files)
+if(!file.exists("rgb_images.zip")){
+  download.file("https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870/blob", destfile = "rgb_images.zip")
+  unzip("rgb_images.zip", exdir = ".")
+}
 ```
 
 We will loop through these images, extract our plot data, and calculate the "greeness" of each extract.
 We are using the name of the file to extract the date for later.
 
-```{r synth_get_greeness}
+```{r synth_get_greeness, message=FALSE}
 library(raster)
+
+# Get file paths for all image files
+image_files <- list.files(".", pattern = "*.tif")
+image_files_paths <- file.path(".", image_files)
 
 # Extract the date from the file name
 getDate <- function(file_name){
@@ -270,9 +253,9 @@ We then pull in the canopy data for our charting purposes.
 
 ```{r get_trait_data_2, message = FALSE}
 trait_canopy_cover <- betydb_query(table     = "search", 
-                       trait     = "canopy_cover", 
-                       date      = "~2018 May",
-                       limit     =  "none")
+                                   trait     = "canopy_cover", 
+                                   date      = "~2018 May",
+                                   limit     =  "none")
                        
 trait_canopy_cover_day <- trait_canopy_cover %>% 
   mutate(day = as.Date(raw_date))
@@ -283,15 +266,14 @@ We now need to add the height data to the data set to plot.
 We then determine the average canopy cover across the site for the day that the sensor data were collected. 
 The relationship between our greenness metric and average canopy cover are plotted. 
 
-```{r plot_sensor_trait}
+```{r plot_sensor_trait, warning=FALSE}
 trait_canopy_cover_daily <- trait_canopy_cover_day %>% 
   filter(day %in% greenness_df$day) %>% 
   group_by(day) %>% 
   summarise(mean_canopy_cover = mean(mean), 
             sd_canopy_cover = sd(mean))
 sensor_trait_df <- left_join(trait_canopy_cover_daily, greenness_df, by = "day")
+
 ggplot(sensor_trait_df, aes(x = mean_canopy_cover, y = greeness)) +
   geom_point()
 ```
-
-
