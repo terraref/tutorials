@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-06-21" />
+<meta name="date" content="2019-06-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -248,8 +248,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">3.3</span> Query for available traits</h2>
 <div id="getting-started" class="section level3">
 <h3><span class="header-section-number">3.3.1</span> Getting Started</h3>
-<p>First, we will need to install and load the traits package from github, and load it into our environment, along with the other packages we will use in this tutorial.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># devtools::install_github(&#39;terraref/traits&#39;, force = TRUE) # run once</span>
+<p>First, we will need to install and load the traits package from CRAN, and load it into our environment, along with the other packages we will use in this tutorial.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(&#39;traits&#39;) # run once</span>
 <span class="kw">library</span>(traits)
 <span class="kw">library</span>(ggplot2)
 <span class="kw">library</span>(lubridate)
@@ -260,12 +260,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">3.3.2</span> Setting options</h3>
 <p>The function that is used to query BETYdb is called <code>betydb_query</code>. To reduce the number of arguments needed to pass into this function, we can set some global options using <code>options</code>. In this case, we will set the URL used in the query, and the API version.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/bety/&quot;</span>,
-        <span class="dt">betydb_api_version =</span> <span class="st">&#39;v1&#39;</span>)</code></pre>
+        <span class="dt">betydb_api_version =</span> <span class="st">&#39;beta&#39;</span>,
+        <span class="dt">betydb_key =</span> <span class="st">&#39;9999999999999999999999999999999999999999&#39;</span>)</code></pre>
 </div>
 <div id="querying-available-traits" class="section level3">
 <h3><span class="header-section-number">3.3.3</span> Querying available traits</h3>
 <p>The TERRA REF database contains trait data for many other seasons of observation, and available data may vary by season. Here, we get a visual summary of available traits and methods of measurement for a season.</p>
-<p>First we construct a general query for the Season 4 data. This returns all season 4 data. The function <code>betydb_query</code> takes as arguments <code>key = &quot;value&quot;</code> pairs which represent columns in the database to query. In this example, we <code>sitename</code> column for season 4 data, and set the limit to “none” to return all records. By default, the function will search all tables in the database. To specify a particular table you can use the <code>table</code> argument.</p>
+<p>First we construct a general query for the Season 4 data. This returns all season 4 data. The function <code>betydb_query</code> takes as arguments <code>key = &quot;value&quot;</code> pairs which represent columns in the database to query. In this example, we set <code>sitename</code> column for season 4 data, and set the limit to “none” to return all records. By default, the function will search all tables in the database. To specify a particular table you can use the <code>table</code> argument.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all of season 4 data </span>
 season_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">sitename  =</span> <span class="st">&quot;~Season 4&quot;</span>,
                          <span class="dt">limit     =</span>  <span class="st">&quot;none&quot;</span>)</code></pre>
@@ -278,12 +279,12 @@ season_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">
 <h3><span class="header-section-number">3.3.4</span> Plot season 4 summary</h3>
 <p>Now we can create a plot of all of the trait data collected during season 4, including information about the methods used.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> season_<span class="dv">4</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> raw_date, <span class="dt">y =</span> mean, <span class="dt">color =</span> method_name)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> raw_date, <span class="dt">y =</span> mean, <span class="dt">color =</span> method_name), <span class="dt">shape =</span> <span class="st">&#39;.&#39;</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> raw_date, <span class="dt">y =</span> mean, <span class="dt">group =</span> cultivar, <span class="dt">color =</span> method_name)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>trait, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>trait, <span class="dt">ncol =</span> <span class="dv">4</span>, <span class="dt">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Date&quot;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Mean trait value&quot;</span>) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Season 6 data summary&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Season 4 data summary&quot;</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">guides</span>(<span class="dt">color =</span> <span class="kw">guide_legend</span>(<span class="dt">title=</span><span class="st">&quot;Method&quot;</span>, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">title.position =</span> <span class="st">&quot;top&quot;</span>)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</code></pre>
