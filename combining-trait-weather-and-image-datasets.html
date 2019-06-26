@@ -236,26 +236,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="get-and-join-data" class="section level2">
 <h2><span class="header-section-number">6.1</span> Get and join data</h2>
 <p>Here we combine two dataframes.
-The first contains all the canopy height values for 2017, which was created in the traits vignette.
-The second is the cumulative growing degree days for all of 2017, which were calculated from the daily minimum and maximum temperatures in the weather vignette.
+The first contains all the canopy cover values for 2018, which was created in the traits vignette.
+The second is the cumulative growing degree days for all of 2018, which were calculated from the daily minimum and maximum temperatures in the weather vignette.
 They are combined by their common column, the date.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="kw">library</span>(ggplot2)
 <span class="kw">library</span>(jsonlite)
 <span class="kw">library</span>(lubridate)
 <span class="kw">library</span>(traits)
-<span class="kw">library</span>(inflection)
 <span class="kw">library</span>(sf)
 <span class="kw">library</span>(stringr)
 <span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/bety/&quot;</span>,
-        <span class="dt">betydb_api_version =</span> <span class="st">&#39;v1&#39;</span>)</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">trait_canopy_height &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">table     =</span> <span class="st">&quot;search&quot;</span>, 
-                      <span class="dt">trait     =</span> <span class="st">&quot;canopy_height&quot;</span>, 
-                      <span class="dt">date      =</span> <span class="st">&quot;~2017&quot;</span>,
+        <span class="dt">betydb_api_version =</span> <span class="st">&#39;beta&#39;</span>, 
+        <span class="dt">betydb_key =</span> <span class="st">&#39;9999999999999999999999999999999999999999&#39;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">trait_canopy_cover &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">table     =</span> <span class="st">&quot;search&quot;</span>, 
+                      <span class="dt">trait     =</span> <span class="st">&quot;canopy_cover&quot;</span>, 
+                      <span class="dt">date      =</span> <span class="st">&quot;~2018&quot;</span>,
                       <span class="dt">limit     =</span>  <span class="st">&quot;none&quot;</span>)
-trait_canopy_height_day =<span class="st"> </span>trait_canopy_height <span class="op">%&gt;%</span><span class="st"> </span>
+trait_canopy_cover_day =<span class="st"> </span>trait_canopy_cover <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">day =</span> <span class="kw">as.Date</span>(raw_date))</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">weather &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-01&amp;until=2017-12-31&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)
+<pre class="sourceCode r"><code class="sourceCode r">weather &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2018-01-01&amp;until=2018-12-31&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)
 weather &lt;-<span class="st"> </span>weather<span class="op">$</span>properties <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">ymd_hms</span>(weather<span class="op">$</span>end_time))
 daily_values =<span class="st"> </span>weather <span class="op">%&gt;%</span><span class="st"> </span>
@@ -268,7 +268,7 @@ daily_values =<span class="st"> </span>weather <span class="op">%&gt;%</span><sp
                          (max_temp <span class="op">+</span><span class="st"> </span>min_temp) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">10</span>, <span class="dv">0</span>))
 daily_values &lt;-<span class="st"> </span>daily_values <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gdd_cum =</span> <span class="kw">cumsum</span>(gdd))</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">trait_weather_df &lt;-<span class="st"> </span><span class="kw">full_join</span>(trait_canopy_height_day, daily_values, <span class="dt">by =</span> <span class="st">&quot;day&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<pre class="sourceCode r"><code class="sourceCode r">trait_weather_df &lt;-<span class="st"> </span><span class="kw">full_join</span>(trait_canopy_cover_day, daily_values, <span class="dt">by =</span> <span class="st">&quot;day&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">select</span>(day, cultivar, mean, gdd_cum) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">na.omit</span>()</code></pre>
 </div>
@@ -276,42 +276,77 @@ daily_values &lt;-<span class="st"> </span>daily_values <span class="op">%&gt;%<
 <h2><span class="header-section-number">6.2</span> Plot and model relationship between GDD and canopy cover for each cultivar</h2>
 <p>We are interested in how growing degree days affects canopy cover.
 To investigate this, we are going to model and plot their relationship.
-We want to know the relationship for each cultivar, so we’ll start of by determining the parameters of the model for one of the cultivars in our dataset.
 We are using a logistic growth model here because it is appropriate for the shape of the GDD-cover relationship.</p>
+<p>The logistic growth model is specified as</p>
+<p><span class="math display">\[y = \frac{c}{1+e^{a + b * \textrm{x}}}\]</span></p>
+<p>where <span class="math inline">\(y\)</span> is the response variable canopy cover, <span class="math inline">\(x\)</span> is the predictor growing degree days, <span class="math inline">\(c\)</span> is the asymptote or maximum canopy cover, <span class="math inline">\(a\)</span> is the initial value for canopy cover, and <span class="math inline">\(b\)</span> is the steepness of the curve. (reference)</p>
+<p>We want to know the relationship for each cultivar, so we’ll start of by determining the parameters of the model for one of the cultivars in our dataset.
+We provide estimated values for the asymptote <span class="math inline">\(c\)</span> and initial canopy cover value <span class="math inline">\(a\)</span>, and provide canopy cover <span class="math inline">\(y\)</span> with corresponding growing degree days <span class="math inline">\(x\)</span> for one measurement of the chosen cultivar.</p>
+<p>The below provides better estimates for the <span class="math inline">\(c\)</span>, <span class="math inline">\(a\)</span>, and <span class="math inline">\(b\)</span> parameters, which are used to plot the model as an orange line on top of the black points which are actual values.</p>
 <pre class="sourceCode r"><code class="sourceCode r">single_cultivar &lt;-<span class="st"> </span>trait_weather_df <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">filter</span>(cultivar <span class="op">==</span><span class="st"> &quot;PI656026&quot;</span>)
-cap     &lt;-<span class="st"> </span><span class="dv">150</span>
-initial &lt;-<span class="st"> </span><span class="dv">25</span>
-mean    &lt;-<span class="st"> </span>single_cultivar<span class="op">$</span>mean[<span class="dv">15</span>]
-gdd_cum &lt;-<span class="st"> </span>single_cultivar<span class="op">$</span>gdd_cum[<span class="dv">15</span>]
-rate    &lt;-<span class="st"> </span>((<span class="kw">log</span>((cap<span class="op">/</span>mean) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)) <span class="op">-</span><span class="st"> </span>initial)<span class="op">/</span>gdd_cum
-model_single_cultivar &lt;-<span class="st"> </span><span class="kw">nls</span>(mean <span class="op">~</span><span class="st"> </span>cap <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(initial <span class="op">+</span><span class="st"> </span>rate <span class="op">*</span><span class="st"> </span>gdd_cum)), 
-                             <span class="dt">start =</span> <span class="kw">list</span>(<span class="dt">cap =</span> cap, <span class="dt">initial =</span> initial, <span class="dt">rate =</span> rate),
-                             <span class="dt">data =</span> single_cultivar, <span class="dt">trace =</span> <span class="ot">TRUE</span>)
+
+c &lt;-<span class="st"> </span><span class="dv">90</span>
+a &lt;-<span class="st"> </span><span class="fl">0.1</span>
+y &lt;-<span class="st"> </span>single_cultivar<span class="op">$</span>mean[<span class="dv">3</span>]
+g &lt;-<span class="st"> </span>single_cultivar<span class="op">$</span>gdd_cum[<span class="dv">3</span>]
+b &lt;-<span class="st"> </span>((<span class="kw">log</span>((c<span class="op">/</span>y) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)) <span class="op">-</span><span class="st"> </span>a)<span class="op">/</span>g
+model_single_cultivar &lt;-<span class="st"> </span><span class="kw">nls</span>(mean <span class="op">~</span><span class="st"> </span>c <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(a <span class="op">+</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span>gdd_cum)), 
+                             <span class="dt">start =</span> <span class="kw">list</span>(<span class="dt">c =</span> c, <span class="dt">a =</span> a, <span class="dt">b =</span> b),
+                             <span class="dt">data =</span> single_cultivar)
+<span class="kw">summary</span>(model_single_cultivar)
+<span class="kw">coef</span>(model_single_cultivar)
+
+single_c &lt;-<span class="st"> </span><span class="kw">coef</span>(model_single_cultivar)[<span class="dv">1</span>]
+single_a &lt;-<span class="st"> </span><span class="kw">coef</span>(model_single_cultivar)[<span class="dv">2</span>]
+single_b &lt;-<span class="st"> </span><span class="kw">coef</span>(model_single_cultivar)[<span class="dv">3</span>]
+
 single_cultivar &lt;-<span class="st"> </span>single_cultivar <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mean_predict =</span> <span class="kw">coef</span>(model_single_cultivar)[<span class="dv">1</span>] <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="kw">coef</span>(model_single_cultivar)[<span class="dv">2</span>] <span class="op">+</span><span class="st"> </span><span class="kw">coef</span>(model_single_cultivar)[<span class="dv">3</span>] <span class="op">*</span><span class="st"> </span>gdd_cum)))</code></pre>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mean_predict =</span> single_c <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(single_a <span class="op">+</span><span class="st"> </span>single_b <span class="op">*</span><span class="st"> </span>gdd_cum)))
+<span class="kw">ggplot</span>(single_cultivar) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean_predict), <span class="dt">color =</span> <span class="st">&quot;orange&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Cumulative growing degree days&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Canopy Height&quot;</span>)</code></pre>
+<p>We then calculate the inflection point for this cultivar’s model.</p>
+<p>The maximum growth rate is the change in canopy cover per day at the rate of maximum growth. The growing degree day at which maximum growth is obtained is called the <em>inflection point</em>. This occurs near the midpoint of the y-axis, or <span class="math inline">\(\frac{c - a}{2}\)</span>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">inf_y &lt;-<span class="st"> </span>(<span class="kw">as.numeric</span>(single_c) <span class="op">-</span><span class="st"> </span><span class="kw">as.numeric</span>(single_a)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>
+inf_x &lt;-<span class="st"> </span>((<span class="kw">log</span>((<span class="kw">as.numeric</span>(single_c) <span class="op">/</span><span class="st"> </span>inf_y) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)) <span class="op">-</span><span class="st"> </span><span class="kw">as.numeric</span>(single_a)) <span class="op">/</span><span class="st"> </span><span class="kw">as.numeric</span>(single_b)
+
+<span class="kw">ggplot</span>(single_cultivar) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean_predict), <span class="dt">color =</span> <span class="st">&quot;orange&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> inf_y, <span class="dt">linetype =</span> <span class="st">&quot;dashed&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> inf_x) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Cumulative growing degree days&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Canopy Height&quot;</span>)</code></pre>
 <p>We then use the parameters from a single cultivar to run a model for each of the rest of the cultivars.
 These results are used to plot the model predictions, which are shown as an orange line.
 We also calculated the inflection point from each cultivar’s model, which will be used in the following section.</p>
 <pre class="sourceCode r"><code class="sourceCode r">all_cultivars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">day =</span> <span class="kw">as.double</span>(), <span class="dt">cultivar =</span> <span class="kw">as.character</span>(), <span class="dt">mean =</span> <span class="kw">as.numeric</span>(), 
-                   <span class="dt">gdd_cum =</span> <span class="kw">as.numeric</span>(), <span class="dt">mean_predict =</span> <span class="kw">as.numeric</span>())
+                   <span class="dt">gdd_cum =</span> <span class="kw">as.numeric</span>(), <span class="dt">mean_predict =</span> <span class="kw">as.numeric</span>(), 
+                   <span class="dt">inf_y =</span> <span class="kw">as.numeric</span>(), <span class="dt">inf_x =</span> <span class="kw">as.numeric</span>())
+
 <span class="cf">for</span>(each_cultivar <span class="cf">in</span> <span class="kw">unique</span>(trait_weather_df<span class="op">$</span>cultivar)){
   each_cultivar_df &lt;-<span class="st"> </span><span class="kw">filter</span>(trait_weather_df, cultivar <span class="op">==</span><span class="st"> </span>each_cultivar)
-  each_cultivar_model &lt;-<span class="st"> </span><span class="kw">nls</span>(mean <span class="op">~</span><span class="st"> </span>cap <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(initial <span class="op">+</span><span class="st"> </span>rate <span class="op">*</span><span class="st"> </span>gdd_cum)), 
-                            <span class="dt">start =</span> <span class="kw">list</span>(<span class="dt">cap =</span> cap, <span class="dt">initial =</span> initial, <span class="dt">rate =</span> rate),
-                            <span class="dt">data =</span> each_cultivar_df)
-  model_cap     &lt;-<span class="st"> </span><span class="kw">coef</span>(each_cultivar_model)[<span class="dv">1</span>]
-  model_initial &lt;-<span class="st"> </span><span class="kw">coef</span>(each_cultivar_model)[<span class="dv">2</span>]
-  model_rate    &lt;-<span class="st"> </span><span class="kw">coef</span>(each_cultivar_model)[<span class="dv">3</span>]
+  each_cultivar_model &lt;-<span class="st"> </span><span class="kw">nls</span>(mean <span class="op">~</span><span class="st"> </span>c <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(a <span class="op">+</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span>gdd_cum)), 
+                             <span class="dt">start =</span> <span class="kw">list</span>(<span class="dt">c =</span> c, <span class="dt">a =</span> a, <span class="dt">b =</span> b), 
+                             <span class="dt">data =</span> each_cultivar_df)
+  model_c &lt;-<span class="st"> </span><span class="kw">coef</span>(each_cultivar_model)[<span class="dv">1</span>]
+  model_a &lt;-<span class="st"> </span><span class="kw">coef</span>(each_cultivar_model)[<span class="dv">2</span>]
+  model_b &lt;-<span class="st"> </span><span class="kw">coef</span>(each_cultivar_model)[<span class="dv">3</span>]
   each_cultivar_df &lt;-<span class="st"> </span>each_cultivar_df <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">mean_predict =</span> model_cap <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(model_initial <span class="op">+</span><span class="st"> </span>model_rate <span class="op">*</span><span class="st"> </span>gdd_cum)), 
-             <span class="dt">inf_point =</span> ((<span class="kw">log</span>((model_cap <span class="op">/</span><span class="st"> </span><span class="dv">100</span>) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)) <span class="op">-</span><span class="st"> </span>model_initial) <span class="op">/</span><span class="st"> </span>model_rate)
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">mean_predict =</span> model_c <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(model_a <span class="op">+</span><span class="st"> </span>model_b <span class="op">*</span><span class="st"> </span>gdd_cum)), 
+           <span class="dt">inf_y =</span> (<span class="kw">as.numeric</span>(model_c) <span class="op">-</span><span class="st"> </span><span class="kw">as.numeric</span>(model_a)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, 
+           <span class="dt">inf_x =</span> ((<span class="kw">log</span>((<span class="kw">as.numeric</span>(model_c) <span class="op">/</span><span class="st"> </span>inf_y) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)) <span class="op">-</span><span class="st"> </span>
+<span class="st">                      </span><span class="kw">as.numeric</span>(single_a)) <span class="op">/</span><span class="st"> </span><span class="kw">as.numeric</span>(single_b))
   all_cultivars &lt;-<span class="st"> </span><span class="kw">rbind</span>(each_cultivar_df, all_cultivars)
 }
+
 <span class="kw">ggplot</span>(all_cultivars) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean_predict), <span class="dt">color =</span> <span class="st">&quot;orange&quot;</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>cultivar, <span class="dt">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> inf_y, <span class="dt">linetype =</span> <span class="st">&quot;dashed&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> inf_x) <span class="op">+</span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Cumulative growing degree days&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Canopy Height&quot;</span>)</code></pre>
 </div>
 <div id="create-histogram-of-growth-rate-for-all-cultivars" class="section level2">
@@ -319,28 +354,18 @@ We also calculated the inflection point from each cultivar’s model, which will
 <p>The last thing that we are going to do is assess the difference in this relationship among the cultivars.
 We are going to use the inflection point from the logistic growth model, which indicates when canopy cover stops increasing as quickly with increasingly more warm days.
 The resulting inflection points for each cultivar are plotted as a histogram.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(all_cultivars) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdd_cum, <span class="dt">y =</span> mean_predict), <span class="dt">color =</span> <span class="st">&quot;orange&quot;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_vline</span>(<span class="kw">aes</span>(<span class="dt">xintercept =</span> inf_point)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>cultivar, <span class="dt">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Cumulative growing degree days&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Canopy Height&quot;</span>)
-<span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">inf_points =</span> <span class="kw">unique</span>(all_cultivars<span class="op">$</span>inf_point))) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> inf_points)) <span class="op">+</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">inf_points =</span> <span class="kw">unique</span>(all_cultivars<span class="op">$</span>inf_x))) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x =</span> inf_points), <span class="dt">bins =</span> <span class="dv">300</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">xlim</span>(<span class="kw">min</span>(all_cultivars<span class="op">$</span>gdd_cum), <span class="kw">max</span>(all_cultivars<span class="op">$</span>gdd_cum)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Inflection points&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Number&quot;</span>)</code></pre>
 </div>
 <div id="get-image-data" class="section level2">
 <h2><span class="header-section-number">6.4</span> Get image data</h2>
 <p>In this examnple we will extract our plot data from a series of images taken in May of Season 6, measure its “greeness” annd plot that against the plant heights from above in this vignette.</p>
-<p>The chosen statistic here is the normalised green-red difference index, NGRDI=(R-G)/(R+G) (Rasmussen et al., 2016), which uses the red and green bands from the image raster.</p>
+<p>The chosen statistic here is the normalised green-red difference index, <span class="math inline">\(\textrm{NGRDI}=\frac{R-G}/{R+G}\)</span> (Rasmussen et al., 2016), which uses the red and green bands from the image raster.</p>
 <p>Below we retrieve all the available plots for a particular date, then find and convert the plot boundary JSON into tuples.
 We will use these tuples to extract the data for our plot.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Setting up our options</span>
-<span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/bety/&quot;</span>,
-        <span class="dt">betydb_api_version =</span> <span class="st">&#39;v1&#39;</span>)
-
-<span class="co"># Making the query for our site</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Making the query for our site</span>
 sites &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">table     =</span> <span class="st">&quot;sites&quot;</span>,  
                       <span class="dt">sitename  =</span> <span class="st">&quot;MAC Field Scanner Season 6 Range 19 Column 1&quot;</span>)
 
@@ -353,32 +378,19 @@ site.poly &lt;-<span class="st"> </span><span class="kw">st_cast</span>(site.sha
 site.clip &lt;-<span class="st"> </span><span class="kw">as</span>(site.poly,<span class="st">&quot;Spatial&quot;</span>)</code></pre>
 <p>These are the names of the full field RGB data for the month of May.
 We will be extracting our plot data from these files.
-A compressed file containing these images can be found on <a href="https://drive.google.com/file/d/1UuVHHcyf9sxjX9fEUpD4qa9LGlBR0XnK/view?usp=sharing">Google Drive</a>.
-Be sure to extract the image files into a folder that’s accessible to the code below.</p>
-<pre class="sourceCode r"><code class="sourceCode r">image_files &lt;-<span class="st"> </span>
-<span class="st">   </span><span class="kw">c</span>(<span class="st">&#39;fullfield_L1_ua-mac_2018-05-01_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-02_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-03_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-05_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-06_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-08_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-09_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-10_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_-_copy_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-12_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-13_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-14_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-15_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-17_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-18_rgb_stereovis_ir_sensors_fullfield_sorghum6_sun_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-20_rgb_stereovis_ir_sensors_plots_sorghum6_shade_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-21_rgb_stereovis_ir_sensors_fullfield_sorghum6_shade_may2018_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-22_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-23_rgb_stereovis_ir_sensors_plots_sorghum6_sun_thumb.tif&#39;</span>,
-     <span class="st">&#39;fullfield_L1_ua-mac_2018-05-28_rgb_stereovis_ir_sensors_plots_sorghum6_shade_rgb_eastedge_mn_thumb.tif&#39;</span>
-     )</code></pre>
+A compressed file containing these images can be found on <a href="https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870?dataset=5c81709a4f0c78f6486d686c&amp;space=">Clowder</a>.
+The code below downloads the image files into a .zip file, which takes a few minutes, and then unzips that file so the image files are accessible.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span>(<span class="op">!</span><span class="kw">file.exists</span>(<span class="st">&quot;rgb_images.zip&quot;</span>)){
+  <span class="kw">download.file</span>(<span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/files/5c8175874f0c78f6486d6870/blob&quot;</span>, <span class="dt">destfile =</span> <span class="st">&quot;rgb_images.zip&quot;</span>)
+  <span class="kw">unzip</span>(<span class="st">&quot;rgb_images.zip&quot;</span>, <span class="dt">exdir =</span> <span class="st">&quot;.&quot;</span>)
+}</code></pre>
 <p>We will loop through these images, extract our plot data, and calculate the “greeness” of each extract.
 We are using the name of the file to extract the date for later.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(raster)
+
+<span class="co"># Get file paths for all image files</span>
+image_files &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="st">&quot;.&quot;</span>, <span class="dt">pattern =</span> <span class="st">&quot;*.tif&quot;</span>)
+image_files_paths &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;.&quot;</span>, image_files)
 
 <span class="co"># Extract the date from the file name</span>
 getDate &lt;-<span class="st"> </span><span class="cf">function</span>(file_name){
@@ -418,9 +430,9 @@ greenness_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(da
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">day =</span> <span class="kw">as.Date</span>(date))</code></pre>
 <p>We then pull in the canopy data for our charting purposes.</p>
 <pre class="sourceCode r"><code class="sourceCode r">trait_canopy_cover &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">table     =</span> <span class="st">&quot;search&quot;</span>, 
-                       <span class="dt">trait     =</span> <span class="st">&quot;canopy_cover&quot;</span>, 
-                       <span class="dt">date      =</span> <span class="st">&quot;~2018 May&quot;</span>,
-                       <span class="dt">limit     =</span>  <span class="st">&quot;none&quot;</span>)
+                                   <span class="dt">trait     =</span> <span class="st">&quot;canopy_cover&quot;</span>, 
+                                   <span class="dt">date      =</span> <span class="st">&quot;~2018 May&quot;</span>,
+                                   <span class="dt">limit     =</span>  <span class="st">&quot;none&quot;</span>)
                        
 trait_canopy_cover_day &lt;-<span class="st"> </span>trait_canopy_cover <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">day =</span> <span class="kw">as.Date</span>(raw_date))</code></pre>
@@ -433,6 +445,7 @@ The relationship between our greenness metric and average canopy cover are plott
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">mean_canopy_cover =</span> <span class="kw">mean</span>(mean), 
             <span class="dt">sd_canopy_cover =</span> <span class="kw">sd</span>(mean))
 sensor_trait_df &lt;-<span class="st"> </span><span class="kw">left_join</span>(trait_canopy_cover_daily, greenness_df, <span class="dt">by =</span> <span class="st">&quot;day&quot;</span>)
+
 <span class="kw">ggplot</span>(sensor_trait_df, <span class="kw">aes</span>(<span class="dt">x =</span> mean_canopy_cover, <span class="dt">y =</span> greeness)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre>
 
@@ -492,6 +505,19 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>
