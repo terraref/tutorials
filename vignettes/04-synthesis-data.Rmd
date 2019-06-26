@@ -22,7 +22,8 @@ library(traits)
 library(sf)
 library(stringr)
 options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'v1')
+        betydb_api_version = 'beta', 
+        betydb_key = '9999999999999999999999999999999999999999')
 ```
 
 ```{r get_trait_data, message = FALSE}
