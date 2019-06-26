@@ -1,5 +1,7 @@
 # Retrieve source RGB image files
 
+Contributors: Chris Schnaufer, Kimberly Huynh
+
 ## Learning Objective
 
 In this chapter you will learn:

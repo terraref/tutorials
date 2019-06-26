@@ -1,4 +1,6 @@
-# Accessing meteorological data
+# Overview of Accessing Meteorological Data {#met-overview}
+
+Contributors: Max Burnette and Kristina Riemer
 
 Objectives:
 
@@ -7,7 +9,9 @@ Objectives:
 Pre-requisites: 
 
   * Need to have R packages tidyverse, jsonlite, and convertr installed. 
-  * Need to have an internet connection. 
+  * Need to have an internet connection.
+  
+See also 
 
 ## The Maricopa Weather Station
 
@@ -52,7 +56,7 @@ data is located on [Clowder](https://terraref.ncsa.illinois.edu/clowder). The da
 then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
 , for Clowder. 
 
-### The structure of the Geostreams database
+### The structure of the Geostreams database {#geostreams-structure}
 
 The meteorological data that is collected for the TERRA REF project is contained 
 in multiple related tables, also know as a [relational database](https://datacarpentry.org/sql-socialsci/01-relational-database/index.html). 
@@ -222,6 +226,7 @@ spaces <- fromJSON(paste0(api_url, '/spaces'))
 print(spaces %>% select(id, name))
 ```
 
+
 ```{r list-of-datasets, eval = FALSE}
 
 # Get list of (at most 20) Datasets within that Space from Clowder
@@ -254,6 +259,7 @@ for (i in 1:length(sources)) {
 #### Using the netCDF 1/s data
 
 One use case getting the solar spectrum associated with a particular hyperspectral image.
+
 
 ```{r, eval = FALSE}
 time <- vector()

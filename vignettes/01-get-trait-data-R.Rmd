@@ -1,5 +1,7 @@
 # Accessing trait data in R 
 
+Contributor: Kimberly Huynh
+
 ## Learning Objectives
 
 In this chapter you will learn:
