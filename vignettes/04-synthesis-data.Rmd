@@ -174,9 +174,6 @@ Below we retrieve all the available plots for a particular date, then find and c
 We will use these tuples to extract the data for our plot.
 
 ```{r get_plot_boundary}
-# Setting up our options
-options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'v1')
 
 # Making the query for our site
 sites <- betydb_query(table     = "sites",  
