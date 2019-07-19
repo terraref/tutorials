@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Generating file lists by plot | TERRA REF Tutorials</title>
   <meta name="description" content="Chapter 9 Generating file lists by plot | TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.11.1 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.12.1 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Generating file lists by plot | TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-06-26" />
+<meta name="date" content="2019-07-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -55,7 +55,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -248,8 +247,8 @@ from the workbench or Globus.</p>
 <div id="getting-started-2" class="section level2">
 <h2><span class="header-section-number">9.2</span> Getting started</h2>
 <p>After installing terrautils, you should be able to import the <code>products</code> module.</p>
-<pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> terrautils.products <span class="im">import</span> get_sensor_list, unique_sensor_names
-<span class="im">from</span> terrautils.products <span class="im">import</span> get_file_listing, extract_file_paths</code></pre>
+<div class="sourceCode" id="cb59"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb59-1" data-line-number="1"><span class="im">from</span> terrautils.products <span class="im">import</span> get_sensor_list, unique_sensor_names</a>
+<a class="sourceLine" id="cb59-2" data-line-number="2"><span class="im">from</span> terrautils.products <span class="im">import</span> get_file_listing, extract_file_paths</a></code></pre></div>
 <p>The <code>get_sensor_list</code> and <code>get_file_listing</code> functions both require the <em>connection</em>,
 <em>url</em>, and <em>key</em> parameters. The <em>connection</em> can be ‘None’. The <em>url</em> (called host in the
 code) should be something like <code>https://terraref.ncsa.illinois.edu/clowder/</code>.
@@ -265,11 +264,11 @@ sensor list and provides a list of names suitable for use in the
 <code>get_file_listing</code> function.</p>
 <p>To use this tutorial you will need to sign up for Clowder, have your
 account approved, and then get an API key from the <a href="https://terraref.ncsa.illinois.edu/clowder">Clowder web interface</a>.</p>
-<pre class="sourceCode python"><code class="sourceCode python">url <span class="op">=</span> <span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/&#39;</span>
-key <span class="op">=</span> <span class="st">&#39;ENTER YOUR KEY HERE&#39;</span></code></pre>
-<pre class="sourceCode python"><code class="sourceCode python">sensors <span class="op">=</span> get_sensor_list(<span class="va">None</span>, url, key)
-names <span class="op">=</span> unique_sensor_names(sensors)
-<span class="bu">print</span>(names)</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb60-1" data-line-number="1">url <span class="op">=</span> <span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/&#39;</span></a>
+<a class="sourceLine" id="cb60-2" data-line-number="2">key <span class="op">=</span> <span class="st">&#39;ENTER YOUR KEY HERE&#39;</span></a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb61-1" data-line-number="1">sensors <span class="op">=</span> get_sensor_list(<span class="va">None</span>, url, key)</a>
+<a class="sourceLine" id="cb61-2" data-line-number="2">names <span class="op">=</span> unique_sensor_names(sensors)</a>
+<a class="sourceLine" id="cb61-3" data-line-number="3"><span class="bu">print</span>(names)</a></code></pre></div>
 <p>Names will now contain a list of sensor names available in the Clowder
 geostreams API. The list of returned sensor names could be something like the
 following:</p>
@@ -288,15 +287,15 @@ following:</p>
 <p>The geostreams API can be used to get a list of datasets that overlap a
 specific plot boundary and, optionally, limited by a time range. Iterating
 over the datasets allows the paths to all the files to be extracted.</p>
-<pre class="sourceCode python"><code class="sourceCode python">sensor <span class="op">=</span> <span class="st">&#39;Thermal IR GeoTIFFs Datasets&#39;</span>
-sitename <span class="op">=</span> <span class="st">&#39;MAC Field Scanner Season 1 Field Plot 101 W&#39;</span>
-key <span class="op">=</span> <span class="st">&#39;INSERT YOUR KEY HERE&#39;</span>
-datasets <span class="op">=</span> get_file_listing(<span class="va">None</span>, url, key, sensor, sitename)
-files <span class="op">=</span> extract_file_paths(datasets)</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb62-1" data-line-number="1">sensor <span class="op">=</span> <span class="st">&#39;Thermal IR GeoTIFFs Datasets&#39;</span></a>
+<a class="sourceLine" id="cb62-2" data-line-number="2">sitename <span class="op">=</span> <span class="st">&#39;MAC Field Scanner Season 1 Field Plot 101 W&#39;</span></a>
+<a class="sourceLine" id="cb62-3" data-line-number="3">key <span class="op">=</span> <span class="st">&#39;INSERT YOUR KEY HERE&#39;</span></a>
+<a class="sourceLine" id="cb62-4" data-line-number="4">datasets <span class="op">=</span> get_file_listing(<span class="va">None</span>, url, key, sensor, sitename)</a>
+<a class="sourceLine" id="cb62-5" data-line-number="5">files <span class="op">=</span> extract_file_paths(datasets)</a></code></pre></div>
 <p>Datasets can be further filtered using the <em>since</em> and <em>until</em> parameters
 of <code>get_file_listing</code> with a date string.</p>
-<pre class="sourceCode python"><code class="sourceCode python">dataset <span class="op">=</span> get_file_listing(<span class="va">None</span>, url, key, sensor, sitename, 
-        since<span class="op">=</span><span class="st">&#39;2016-06-01&#39;</span>, until<span class="op">=</span><span class="st">&#39;2016-06-10&#39;</span>)</code></pre>
+<div class="sourceCode" id="cb63"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb63-1" data-line-number="1">dataset <span class="op">=</span> get_file_listing(<span class="va">None</span>, url, key, sensor, sitename, </a>
+<a class="sourceLine" id="cb63-2" data-line-number="2">        since<span class="op">=</span><span class="st">&#39;2016-06-01&#39;</span>, until<span class="op">=</span><span class="st">&#39;2016-06-10&#39;</span>)</a></code></pre></div>
 </div>
 <div id="querying-the-api" class="section level2">
 <h2><span class="header-section-number">9.5</span> Querying the API</h2>
@@ -328,8 +327,8 @@ client.</p>
 <h3><span class="header-section-number">9.5.2</span> Finding plot ID</h3>
 <p>We can query the API to find the identifier associated with the name of a plot. For this example
 we use the variable name of SENSOR_DATA to indicate the name of the plot.</p>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="va">SENSOR_NAME=</span><span class="st">&quot;MAC Field Scanner Season 1 Field Plot 101 W&quot;</span>
-<span class="ex">curl</span> -o plot.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=</span><span class="va">${SENSOR_NAME}</span><span class="st">&quot;</span></code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb64-1" data-line-number="1"><span class="va">SENSOR_NAME=</span><span class="st">&quot;MAC Field Scanner Season 1 Field Plot 101 W&quot;</span></a>
+<a class="sourceLine" id="cb64-2" data-line-number="2"><span class="ex">curl</span> -o plot.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=</span><span class="va">${SENSOR_NAME}</span><span class="st">&quot;</span></a></code></pre></div>
 <p>This creates a file named <em>plot.json</em> containing the JSON object returned by the API. The JSON object has an
 ‘id’ parameter. This ID parameter can be used to specify the correct data stream.</p>
 </div>
@@ -337,62 +336,62 @@ we use the variable name of SENSOR_DATA to indicate the name of the plot.</p>
 <h3><span class="header-section-number">9.5.3</span> Finding stream ID within a plot</h3>
 <p>Using the sensor ID returned in the JSON from the previous call and the id of a sensor returned previously to get
 the stream id. The names of streams are are formatted as “<Sensor Group> Datasets (<Sensor ID>)”.</p>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="va">SENSOR_ID=</span>3355
-<span class="va">STREAM_NAME=</span><span class="st">&quot;Thermal IR GeoTIFFs Datasets (</span><span class="va">${SENSOR_ID}</span><span class="st">)&quot;</span>
-<span class="ex">curl</span> -o stream.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/streams?stream_name=</span><span class="va">${STREAM_NAME}</span><span class="st">&quot;</span></code></pre>
+<div class="sourceCode" id="cb65"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb65-1" data-line-number="1"><span class="va">SENSOR_ID=</span>3355</a>
+<a class="sourceLine" id="cb65-2" data-line-number="2"><span class="va">STREAM_NAME=</span><span class="st">&quot;Thermal IR GeoTIFFs Datasets (</span><span class="va">${SENSOR_ID}</span><span class="st">)&quot;</span></a>
+<a class="sourceLine" id="cb65-3" data-line-number="3"><span class="ex">curl</span> -o stream.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/streams?stream_name=</span><span class="va">${STREAM_NAME}</span><span class="st">&quot;</span></a></code></pre></div>
 <p>A file named <em>stream.json</em> will be created containing the returned JSON object. This JSON object has an ‘id’ parameter that
 contains the stream ID. You can use this ID parameter to get the datasets, and then datapoints, of interest.</p>
 </div>
 <div id="listing-clowder-dataset-ids-for-that-plot-sensor-stream" class="section level3">
 <h3><span class="header-section-number">9.5.4</span> Listing Clowder dataset IDs for that plot &amp; sensor stream</h3>
 <p>We now have a stream ID that we can use to list our datasets. The datasets in turn contain files of interest.</p>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="va">STREAM_ID=</span>11586
-<span class="ex">curl</span> -o datasets.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=</span><span class="va">${STREAM_ID}</span><span class="st">&quot;</span></code></pre>
+<div class="sourceCode" id="cb66"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb66-1" data-line-number="1"><span class="va">STREAM_ID=</span>11586</a>
+<a class="sourceLine" id="cb66-2" data-line-number="2"><span class="ex">curl</span> -o datasets.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=</span><span class="va">${STREAM_ID}</span><span class="st">&quot;</span></a></code></pre></div>
 <p>After the call succeeds, a file named <em>datasets.json</em> is created containing the returned JSON onject. As part of the
 JSON object there are one or more <code>properties</code> fields containing <em>source_dataset</em> parameters.</p>
-<pre class="sourceCode javascript"><code class="sourceCode javascript">properties<span class="op">:</span> <span class="op">{</span>
-    <span class="dt">dataset_name</span><span class="op">:</span> <span class="st">&quot;Thermal IR GeoTIFFs - 2016-05-09__12-07-57-990&quot;</span><span class="op">,</span>
-    <span class="dt">source_dataset</span><span class="op">:</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/datasets/59fc9e7d4f0c3383c73d2905&quot;</span>
-<span class="op">},</span></code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode javascript"><code class="sourceCode javascript"><a class="sourceLine" id="cb67-1" data-line-number="1">properties<span class="op">:</span> <span class="op">{</span></a>
+<a class="sourceLine" id="cb67-2" data-line-number="2">    <span class="dt">dataset_name</span><span class="op">:</span> <span class="st">&quot;Thermal IR GeoTIFFs - 2016-05-09__12-07-57-990&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb67-3" data-line-number="3">    <span class="dt">source_dataset</span><span class="op">:</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/datasets/59fc9e7d4f0c3383c73d2905&quot;</span></a>
+<a class="sourceLine" id="cb67-4" data-line-number="4"><span class="op">},</span></a></code></pre></div>
 <p>The URL of each <strong>source_dataset</strong> can be used to view the dataset in Clowder.</p>
 <p>The datasets can also be filtered by date. The following filters out datasets that are outside of the range of January 2, 2017 through June 20, 2017.</p>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">curl</span> -o datasets.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=</span><span class="va">${STREAM_ID}</span><span class="st">&amp;since=2017-01-02&amp;until=2017-06-10&quot;</span></code></pre>
+<div class="sourceCode" id="cb68"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb68-1" data-line-number="1"><span class="ex">curl</span> -o datasets.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=</span><span class="va">${STREAM_ID}</span><span class="st">&amp;since=2017-01-02&amp;until=2017-06-10&quot;</span></a></code></pre></div>
 </div>
 <div id="getting-file-paths-from-dataset" class="section level3">
 <h3><span class="header-section-number">9.5.5</span> Getting file paths from dataset</h3>
 <p>Now that we know what the dataset URLs are, we can use the URLs to query the API for file IDs in addition to their names and paths.</p>
 <p>Note the the URL has changed from our previous examples now that we’re using the URLs returned by the previous call.</p>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="va">SOURCE_DATASET=</span><span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/datasets/59fc9e7d4f0c3383c73d2905&quot;</span>
-<span class="ex">curl</span> -o files.json -X GET <span class="st">&quot;</span><span class="va">${SOURCE_DATASET}</span><span class="st">/files&quot;</span></code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb69-1" data-line-number="1"><span class="va">SOURCE_DATASET=</span><span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/datasets/59fc9e7d4f0c3383c73d2905&quot;</span></a>
+<a class="sourceLine" id="cb69-2" data-line-number="2"><span class="ex">curl</span> -o files.json -X GET <span class="st">&quot;</span><span class="va">${SOURCE_DATASET}</span><span class="st">/files&quot;</span></a></code></pre></div>
 <p>As before, we will have a file containing the returned JSON, named <em>files.json</em> in this case. The returned JSON consists of a list
 of the files in the dataset with their IDs, and other data if available:</p>
-<pre class="sourceCode javascript"><code class="sourceCode javascript">[
-    <span class="op">{</span>
-        <span class="dt">size</span><span class="op">:</span> <span class="st">&quot;346069&quot;</span><span class="op">,</span>
-        date<span class="op">-</span><span class="dt">created</span><span class="op">:</span> <span class="st">&quot;Fri Nov 03 11:51:13 CDT 2017&quot;</span><span class="op">,</span>
-        <span class="dt">id</span><span class="op">:</span> <span class="st">&quot;59fc9e814f0c3383c73d2962&quot;</span><span class="op">,</span>
-        <span class="dt">filepath</span><span class="op">:</span> <span class="st">&quot;/home/clowder/sites/ua-mac/Level_1/ir_geotiff/2016-05-09/2016-05-09__12-07-57-990/ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.png&quot;</span><span class="op">,</span>
-        <span class="dt">contentType</span><span class="op">:</span> <span class="st">&quot;image/png&quot;</span><span class="op">,</span>
-        <span class="dt">filename</span><span class="op">:</span> <span class="st">&quot;ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.png&quot;</span>
-    <span class="op">},</span>
-    <span class="op">{</span>
-        <span class="dt">size</span><span class="op">:</span> <span class="st">&quot;1231298&quot;</span><span class="op">,</span>
-        date<span class="op">-</span><span class="dt">created</span><span class="op">:</span> <span class="st">&quot;Fri Nov 03 11:51:16 CDT 2017&quot;</span><span class="op">,</span>
-        <span class="dt">id</span><span class="op">:</span> <span class="st">&quot;59fc9e844f0c3383c73d2980&quot;</span><span class="op">,</span>
-        <span class="dt">filepath</span><span class="op">:</span> <span class="st">&quot;/home/clowder/sites/ua-mac/Level_1/ir_geotiff/2016-05-09/2016-05-09__12-07-57-990/ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif&quot;</span><span class="op">,</span>
-        <span class="dt">contentType</span><span class="op">:</span> <span class="st">&quot;image/tiff&quot;</span><span class="op">,</span>
-        <span class="dt">filename</span><span class="op">:</span> <span class="st">&quot;ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif&quot;</span>
-    <span class="op">}</span>
-]</code></pre>
+<div class="sourceCode" id="cb70"><pre class="sourceCode javascript"><code class="sourceCode javascript"><a class="sourceLine" id="cb70-1" data-line-number="1">[</a>
+<a class="sourceLine" id="cb70-2" data-line-number="2">    <span class="op">{</span></a>
+<a class="sourceLine" id="cb70-3" data-line-number="3">        <span class="dt">size</span><span class="op">:</span> <span class="st">&quot;346069&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-4" data-line-number="4">        date<span class="op">-</span><span class="dt">created</span><span class="op">:</span> <span class="st">&quot;Fri Nov 03 11:51:13 CDT 2017&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-5" data-line-number="5">        <span class="dt">id</span><span class="op">:</span> <span class="st">&quot;59fc9e814f0c3383c73d2962&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-6" data-line-number="6">        <span class="dt">filepath</span><span class="op">:</span> <span class="st">&quot;/home/clowder/sites/ua-mac/Level_1/ir_geotiff/2016-05-09/2016-05-09__12-07-57-990/ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.png&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-7" data-line-number="7">        <span class="dt">contentType</span><span class="op">:</span> <span class="st">&quot;image/png&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-8" data-line-number="8">        <span class="dt">filename</span><span class="op">:</span> <span class="st">&quot;ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.png&quot;</span></a>
+<a class="sourceLine" id="cb70-9" data-line-number="9">    <span class="op">},</span></a>
+<a class="sourceLine" id="cb70-10" data-line-number="10">    <span class="op">{</span></a>
+<a class="sourceLine" id="cb70-11" data-line-number="11">        <span class="dt">size</span><span class="op">:</span> <span class="st">&quot;1231298&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-12" data-line-number="12">        date<span class="op">-</span><span class="dt">created</span><span class="op">:</span> <span class="st">&quot;Fri Nov 03 11:51:16 CDT 2017&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-13" data-line-number="13">        <span class="dt">id</span><span class="op">:</span> <span class="st">&quot;59fc9e844f0c3383c73d2980&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-14" data-line-number="14">        <span class="dt">filepath</span><span class="op">:</span> <span class="st">&quot;/home/clowder/sites/ua-mac/Level_1/ir_geotiff/2016-05-09/2016-05-09__12-07-57-990/ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-15" data-line-number="15">        <span class="dt">contentType</span><span class="op">:</span> <span class="st">&quot;image/tiff&quot;</span><span class="op">,</span></a>
+<a class="sourceLine" id="cb70-16" data-line-number="16">        <span class="dt">filename</span><span class="op">:</span> <span class="st">&quot;ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif&quot;</span></a>
+<a class="sourceLine" id="cb70-17" data-line-number="17">    <span class="op">}</span></a>
+<a class="sourceLine" id="cb70-18" data-line-number="18">]</a></code></pre></div>
 </div>
 <div id="retrieving-the-files" class="section level3">
 <h3><span class="header-section-number">9.5.6</span> Retrieving the files</h3>
 <p>Given that a large number of files may be contained in a dataset, it may be desireable to automate the process of pulling down files
 to the local system.</p>
 <p>For each file to be retrieved, the unique file ID is needed on the URL.</p>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="va">FILE_NAME=</span><span class="st">&quot;ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif&quot;</span>
-<span class="va">FILE_ID=</span>59fc9e844f0c3383c73d2980
-<span class="ex">curl</span> -o <span class="st">&quot;</span><span class="va">${FILE_NAME}</span><span class="st">&quot;</span> -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/files/</span><span class="va">${FILE_ID}</span><span class="st">&quot;</span></code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb71-1" data-line-number="1"><span class="va">FILE_NAME=</span><span class="st">&quot;ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif&quot;</span></a>
+<a class="sourceLine" id="cb71-2" data-line-number="2"><span class="va">FILE_ID=</span>59fc9e844f0c3383c73d2980</a>
+<a class="sourceLine" id="cb71-3" data-line-number="3"><span class="ex">curl</span> -o <span class="st">&quot;</span><span class="va">${FILE_NAME}</span><span class="st">&quot;</span> -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/files/</span><span class="va">${FILE_ID}</span><span class="st">&quot;</span></a></code></pre></div>
 <p>This call will cause the server to return the contents of the file identified in the URL. This file is then stored locally in *ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif*.</p>
 
 </div>

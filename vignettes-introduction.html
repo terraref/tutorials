@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Vignettes Introduction | TERRA REF Tutorials</title>
   <meta name="description" content="Chapter 2 Vignettes Introduction | TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.11.1 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.12.1 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Vignettes Introduction | TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-06-26" />
+<meta name="date" content="2019-07-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -55,7 +55,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -245,14 +244,14 @@ Information for getting a beta user account is available in the section on <a hr
 <h3><span class="header-section-number">2.1.1</span> R</h3>
 <p>In order to use the vignettes, you will need to have R installed along with the extra packages that are used.
 All of the packages except ‘trait’ are available on CRAN and can be installed using the <code>install.packages</code> funciton:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&#39;tidyverse&#39;</span>, <span class="st">&#39;jsonlite&#39;</span>, <span class="st">&#39;knitr&#39;</span>, <span class="st">&#39;lubridate&#39;</span>, <span class="st">&#39;raster&#39;</span>, <span class="st">&#39;sf&#39;</span>)</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&#39;tidyverse&#39;</span>, <span class="st">&#39;jsonlite&#39;</span>, <span class="st">&#39;knitr&#39;</span>, <span class="st">&#39;lubridate&#39;</span>, <span class="st">&#39;raster&#39;</span>, <span class="st">&#39;sf&#39;</span>)</a></code></pre></div>
 <p>Although ‘traits’ is also on CRAN, you need to download the TERRA REF version from GitHub to handle larger datasets:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&#39;devtools&#39;</span>)
-devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&#39;terraref/traits&#39;</span>)</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&#39;devtools&#39;</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&#39;terraref/traits&#39;</span>)</a></code></pre></div>
 </div>
 <div id="python" class="section level3">
 <h3><span class="header-section-number">2.1.2</span> Python</h3>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">pip</span> install terrautils</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="ex">pip</span> install terrautils</a></code></pre></div>
 
 </div>
 </div>

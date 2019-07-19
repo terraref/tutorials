@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 Accessing meteorological data | TERRA REF Tutorials</title>
   <meta name="description" content="Chapter 8 Accessing meteorological data | TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.11.1 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.12.1 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 Accessing meteorological data | TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-06-26" />
+<meta name="date" content="2019-07-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -55,7 +55,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -508,28 +507,28 @@ meteorological data and associated stream ids.</p>
 <p>Data can be downloaded from Clowder using the command line program Curl. If the
 following is typed into the commmand line, it will download the datapoints data
 that we’re interested in as a file which we have chosen to call <code>spectra.json</code>.</p>
-<pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">curl</span> -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431<span class="kw">&amp;</span><span class="va">since=</span>2017-01-02<span class="kw">&amp;</span><span class="va">until=</span>2017-01-31</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="ex">curl</span> -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431<span class="kw">&amp;</span><span class="va">since=</span>2017-01-02<span class="kw">&amp;</span><span class="va">until=</span>2017-01-31</a></code></pre></div>
 <div id="using-r" class="section level4">
 <h4><span class="header-section-number">8.1.6.1</span> Using R</h4>
 <p>The following code sets the defaults for showing R code.</p>
-<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">cache =</span> <span class="ot">FALSE</span>, <span class="dt">message =</span> <span class="ot">FALSE</span>)</code></pre>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">cache =</span> <span class="ot">FALSE</span>, <span class="dt">message =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>And this is how you can access the same data in R. This uses the jsonlite R package
 and desired URL to pull the data in. The data is in a dataframe with two nested
 dataframes, called <code>properties</code> and <code>geometries</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
-<span class="kw">library</span>(ggplot2)
-<span class="kw">library</span>(jsonlite)
-<span class="kw">library</span>(lubridate)
-<span class="kw">library</span>(magrittr)
-<span class="kw">library</span>(RCurl)
-<span class="kw">library</span>(ncdf4)
-<span class="kw">library</span>(ncdf.tools)</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2018-04-01&amp;until=2018-08-01&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb50-2" data-line-number="2"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb50-3" data-line-number="3"><span class="kw">library</span>(jsonlite)</a>
+<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="kw">library</span>(lubridate)</a>
+<a class="sourceLine" id="cb50-5" data-line-number="5"><span class="kw">library</span>(magrittr)</a>
+<a class="sourceLine" id="cb50-6" data-line-number="6"><span class="kw">library</span>(RCurl)</a>
+<a class="sourceLine" id="cb50-7" data-line-number="7"><span class="kw">library</span>(ncdf4)</a>
+<a class="sourceLine" id="cb50-8" data-line-number="8"><span class="kw">library</span>(ncdf.tools)</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2018-04-01&amp;until=2018-08-01&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>The <code>geometries</code> dataframe is then pulled out from these data, which contains
 the datapoints from this stream. This is combined with a transformed version of the
 end of the time period from the stream.</p>
-<pre class="sourceCode r"><code class="sourceCode r">weather_data &lt;-<span class="st"> </span>weather_all<span class="op">$</span>properties <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">ymd_hms</span>(weather_all<span class="op">$</span>end_time))</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1">weather_data &lt;-<span class="st"> </span>weather_all<span class="op">$</span>properties <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">ymd_hms</span>(weather_all<span class="op">$</span>end_time))</a></code></pre></div>
 </div>
 </div>
 </div>
@@ -537,30 +536,30 @@ end of the time period from the stream.</p>
 <h2><span class="header-section-number">8.2</span> Weather Plots</h2>
 <p>Create time series plot for one of the eight variables, wind speed, in the
 newly created dataframe.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">theme_set</span>(ggthemes<span class="op">::</span><span class="kw">theme_few</span>())
-<span class="kw">ggplot</span>(<span class="dt">data =</span> weather_data) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time, <span class="dt">y =</span> wind_speed), <span class="dt">size =</span> <span class="fl">0.7</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Day&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Wind speed (m/s)&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw">theme_set</span>(ggthemes<span class="op">::</span><span class="kw">theme_few</span>())</a>
+<a class="sourceLine" id="cb53-2" data-line-number="2"><span class="kw">ggplot</span>(<span class="dt">data =</span> weather_data) <span class="op">+</span></a>
+<a class="sourceLine" id="cb53-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> time, <span class="dt">y =</span> wind_speed), <span class="dt">size =</span> <span class="fl">0.7</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb53-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Day&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Wind speed (m/s)&quot;</span>)</a></code></pre></div>
 <div id="high-resolution-data-1s-spectroradiometer" class="section level3">
 <h3><span class="header-section-number">8.2.1</span> High resolution data (1/s) + spectroradiometer</h3>
 <p>This higher resolution weather data can be used for VNIR calibration, for example. But at 1/s it is very large!</p>
 <div id="download-data" class="section level4">
 <h4><span class="header-section-number">8.2.1.1</span> Download data</h4>
 <p>Here we will download the files using the Clowder API, but note that if you have access to the filesystem (on www.workbench.terraref.org or globus, you can directly access the data in the <code>sites/ua-mac/Level_1/EnvironmentLogger</code>. Folder</p>
-<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">eval =</span> <span class="ot">FALSE</span>)
-api_url &lt;-<span class="st"> &quot;https://terraref.ncsa.illinois.edu/clowder/api&quot;</span>
-output_dir &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;downloads&quot;</span>)
-<span class="kw">dir.create</span>(output_dir, <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Get Spaces from Clowder - without authentication, result will be Sample Data</span>
-spaces &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="kw">paste0</span>(api_url, <span class="st">&#39;/spaces&#39;</span>))
-<span class="kw">print</span>(spaces <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(id, name))</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Get list of (at most 20) Datasets within that Space from Clowder</span>
-datasets &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="kw">paste0</span>(api_url, <span class="st">&#39;/spaces/&#39;</span>, spaces<span class="op">$</span>id, <span class="st">&#39;/datasets&#39;</span>))
-<span class="kw">print</span>(datasets <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(id, name))</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Get list of Files within any EnvironmentLogger datasets and filter .nc files</span>
-files &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="kw">paste0</span>(api_url, <span class="st">&#39;/datasets/&#39;</span>, datasets<span class="op">$</span>id[<span class="kw">grepl</span>(<span class="st">&quot;EnvironmentLogger&quot;</span>, datasets<span class="op">$</span>name)], <span class="st">&#39;/files&#39;</span>))
-ncfiles &lt;-<span class="st"> </span>files[<span class="kw">grepl</span>(<span class="st">&#39;environmentlogger.nc&#39;</span>, files<span class="op">$</span>filename), ]
-<span class="kw">print</span>(ncfiles <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(id, filename))</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">eval =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb54-2" data-line-number="2">api_url &lt;-<span class="st"> &quot;https://terraref.ncsa.illinois.edu/clowder/api&quot;</span></a>
+<a class="sourceLine" id="cb54-3" data-line-number="3">output_dir &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;downloads&quot;</span>)</a>
+<a class="sourceLine" id="cb54-4" data-line-number="4"><span class="kw">dir.create</span>(output_dir, <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="co"># Get Spaces from Clowder - without authentication, result will be Sample Data</span></a>
+<a class="sourceLine" id="cb55-2" data-line-number="2">spaces &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="kw">paste0</span>(api_url, <span class="st">&#39;/spaces&#39;</span>))</a>
+<a class="sourceLine" id="cb55-3" data-line-number="3"><span class="kw">print</span>(spaces <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(id, name))</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1"><span class="co"># Get list of (at most 20) Datasets within that Space from Clowder</span></a>
+<a class="sourceLine" id="cb56-2" data-line-number="2">datasets &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="kw">paste0</span>(api_url, <span class="st">&#39;/spaces/&#39;</span>, spaces<span class="op">$</span>id, <span class="st">&#39;/datasets&#39;</span>))</a>
+<a class="sourceLine" id="cb56-3" data-line-number="3"><span class="kw">print</span>(datasets <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(id, name))</a></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1"><span class="co"># Get list of Files within any EnvironmentLogger datasets and filter .nc files</span></a>
+<a class="sourceLine" id="cb57-2" data-line-number="2">files &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="kw">paste0</span>(api_url, <span class="st">&#39;/datasets/&#39;</span>, datasets<span class="op">$</span>id[<span class="kw">grepl</span>(<span class="st">&quot;EnvironmentLogger&quot;</span>, datasets<span class="op">$</span>name)], <span class="st">&#39;/files&#39;</span>))</a>
+<a class="sourceLine" id="cb57-3" data-line-number="3">ncfiles &lt;-<span class="st"> </span>files[<span class="kw">grepl</span>(<span class="st">&#39;environmentlogger.nc&#39;</span>, files<span class="op">$</span>filename), ]</a>
+<a class="sourceLine" id="cb57-4" data-line-number="4"><span class="kw">print</span>(ncfiles <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(id, filename))</a></code></pre></div>
 </div>
 <div id="download-netcdf-1s-data-from-clowder" class="section level4">
 <h4><span class="header-section-number">8.2.1.2</span> Download netCDF 1/s data from Clowder</h4>
@@ -568,31 +567,31 @@ ncfiles &lt;-<span class="st"> </span>files[<span class="kw">grepl</span>(<span 
 <div id="using-the-netcdf-1s-data" class="section level4">
 <h4><span class="header-section-number">8.2.1.3</span> Using the netCDF 1/s data</h4>
 <p>One use case getting the solar spectrum associated with a particular hyperspectral image.</p>
-<pre class="sourceCode r"><code class="sourceCode r">time &lt;-<span class="st"> </span><span class="kw">vector</span>()
-vals &lt;-<span class="st"> </span><span class="kw">vector</span>()
-
-<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(outputs)) {
-  <span class="kw">print</span>(<span class="kw">paste0</span>(<span class="st">&quot;Scanning &quot;</span>, outputs[i]))
-  ncfile &lt;-<span class="st"> </span><span class="kw">nc_open</span>(outputs[i])
-  curr_time &lt;-<span class="st"> </span><span class="kw">list</span>()
-
-  metdata &lt;-<span class="st"> </span><span class="kw">list</span>()
-  <span class="cf">for</span>(var <span class="cf">in</span> <span class="kw">c</span>(<span class="kw">names</span>(ncfile<span class="op">$</span>dim), <span class="kw">names</span>(ncfile<span class="op">$</span>var))){
-    metdata[[var]] &lt;-<span class="st"> </span><span class="kw">ncvar_get</span>(ncfile, var)
-  }
-  <span class="kw">lapply</span>(metdata, dim)
-  
-  days &lt;-<span class="st"> </span><span class="kw">ncvar_get</span>(ncfile, <span class="dt">varid =</span> <span class="st">&quot;time&quot;</span>)
-  curr_time &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">ymd</span>(<span class="st">&quot;1970-01-01&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">seconds</span>(days <span class="op">*</span><span class="st"> </span><span class="dv">24</span> <span class="op">*</span><span class="st"> </span><span class="dv">60</span> <span class="op">*</span><span class="st"> </span><span class="dv">60</span>))
-  
-  time &lt;-<span class="st"> </span><span class="kw">c</span>(time, curr_time)
-  PAR &lt;-<span class="st"> </span><span class="kw">c</span>(vals, metdata<span class="op">$</span><span class="st">`</span><span class="dt">par_sensor/Sensor_Photosynthetically_Active_Radiation</span><span class="st">`</span>)
-}
-
-<span class="co">#ggplot() + </span>
-<span class="co">#  geom_line(aes(time, PAR)) + theme_bw()</span>
-
-<span class="kw">print</span>(ncfile)</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1">time &lt;-<span class="st"> </span><span class="kw">vector</span>()</a>
+<a class="sourceLine" id="cb58-2" data-line-number="2">vals &lt;-<span class="st"> </span><span class="kw">vector</span>()</a>
+<a class="sourceLine" id="cb58-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb58-4" data-line-number="4"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(outputs)) {</a>
+<a class="sourceLine" id="cb58-5" data-line-number="5">  <span class="kw">print</span>(<span class="kw">paste0</span>(<span class="st">&quot;Scanning &quot;</span>, outputs[i]))</a>
+<a class="sourceLine" id="cb58-6" data-line-number="6">  ncfile &lt;-<span class="st"> </span><span class="kw">nc_open</span>(outputs[i])</a>
+<a class="sourceLine" id="cb58-7" data-line-number="7">  curr_time &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb58-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb58-9" data-line-number="9">  metdata &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb58-10" data-line-number="10">  <span class="cf">for</span>(var <span class="cf">in</span> <span class="kw">c</span>(<span class="kw">names</span>(ncfile<span class="op">$</span>dim), <span class="kw">names</span>(ncfile<span class="op">$</span>var))){</a>
+<a class="sourceLine" id="cb58-11" data-line-number="11">    metdata[[var]] &lt;-<span class="st"> </span><span class="kw">ncvar_get</span>(ncfile, var)</a>
+<a class="sourceLine" id="cb58-12" data-line-number="12">  }</a>
+<a class="sourceLine" id="cb58-13" data-line-number="13">  <span class="kw">lapply</span>(metdata, dim)</a>
+<a class="sourceLine" id="cb58-14" data-line-number="14">  </a>
+<a class="sourceLine" id="cb58-15" data-line-number="15">  days &lt;-<span class="st"> </span><span class="kw">ncvar_get</span>(ncfile, <span class="dt">varid =</span> <span class="st">&quot;time&quot;</span>)</a>
+<a class="sourceLine" id="cb58-16" data-line-number="16">  curr_time &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">ymd</span>(<span class="st">&quot;1970-01-01&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">seconds</span>(days <span class="op">*</span><span class="st"> </span><span class="dv">24</span> <span class="op">*</span><span class="st"> </span><span class="dv">60</span> <span class="op">*</span><span class="st"> </span><span class="dv">60</span>))</a>
+<a class="sourceLine" id="cb58-17" data-line-number="17">  </a>
+<a class="sourceLine" id="cb58-18" data-line-number="18">  time &lt;-<span class="st"> </span><span class="kw">c</span>(time, curr_time)</a>
+<a class="sourceLine" id="cb58-19" data-line-number="19">  PAR &lt;-<span class="st"> </span><span class="kw">c</span>(vals, metdata<span class="op">$</span><span class="st">`</span><span class="dt">par_sensor/Sensor_Photosynthetically_Active_Radiation</span><span class="st">`</span>)</a>
+<a class="sourceLine" id="cb58-20" data-line-number="20">}</a>
+<a class="sourceLine" id="cb58-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb58-22" data-line-number="22"><span class="co">#ggplot() + </span></a>
+<a class="sourceLine" id="cb58-23" data-line-number="23"><span class="co">#  geom_line(aes(time, PAR)) + theme_bw()</span></a>
+<a class="sourceLine" id="cb58-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb58-25" data-line-number="25"><span class="kw">print</span>(ncfile)</a></code></pre></div>
 
 </div>
 </div>
