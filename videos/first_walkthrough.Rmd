@@ -1,15 +1,49 @@
 ---
-title: "First Walkthrough"
+title: "First Walkthrough Notes"
 author: "Kristina Riemer"
 output: github_document
 urlcolor: blue
 ---
 
-### Video 1: Objectives + TERRA REF Overview
+## Video 1: Objectives + TERRA REF Overview + Getting Started
 
-TBD
+#### Objectives
+These walkthroughs are a hands-on introduction to how to use data produced by TERRA REF project. 
 
-### Video 2: Downloading Trait Data
+The intended audience is community members and anyone interested in these data. 
+
+These live walkthroughs will be turned into video tutorials that can be viewed at any time. They will be put on YouTube, and I'll provide links once they're ready. 
+
+#### Project overview
+TERRA REF is a project funded by ARPA-E to gather phenomic and genomic data on plant crops. An extensive series of sensors are used to collect trait and image data on outdoor experimental plots. Weather stations also collect weather data. And crop genomes are being sequenced, with these genomic data being provided. 
+
+These tutorials are to make these data accessible and useable. I will provide an overview of how to use computational tools to get these data, and combine, plot, and analyze them. 
+
+We have written online tutorials [here](https://terraref.github.io/tutorials/). These walkthroughs and videos complement those materials, which are growing and improving continually. 
+
+#### VICE setup and use
+Launching TERRA REF app on VICE: 
+
+1. Google "Cyverse" and click link to website
+2. Select Products tab
+3. Under "Discovery Environment", select Launch button
+4. Hit "Log in with your CyVerse ID" button
+5. Log in with CyVerse credentials (username and password)
+6. Select "Apps", type in "terra", select "TERRA REF Rstudio 3.6.0", and "Use App"
+7. Click "Launch Analysis", hit Analysis button, and select arrow button in Analyses window
+8. Wait patiently
+9. Sign into RStudio using username: rstudio and password: rstudio1
+
+Reopen running TERRA REF instance: 
+
+1. Google "Cyverse" and click link to website
+2. Select Products tab
+3. Under "Discovery Environment", select Launch button
+4. Hit "Log in with your CyVerse ID" button
+5. Log in with CyVerse credentials (username and password)
+6. Open Analyses window and hit arrow button to open up RStudio
+
+## Video 2: Downloading Trait Data
 
 Use `traits` R package to download TERRA REF trait data. Package developed by rOpenSci more generally for downloading trait data. Implemented for several other trait databases in addition to TERRA REF. Package is on CRAN. 
 
@@ -40,7 +74,7 @@ season_4 <- betydb_query(sitename = "~Season 4",
 
 Each row is trait observation. Lots of info, including location (`lat`, `lon`), species, time, type of `trait`, and value (`mean`). 
 
-### Video 3: Available Traits
+## Video 3: Available Traits
 
 Look at which traits are available. Using popular data cleaning R package `dplyr`. 
 
@@ -61,7 +95,7 @@ canopy_height <- betydb_query(trait     = "canopy_height",
                               limit     =  250)
 ```
 
-### Video 4: Plot Trait Data
+## Video 4: Plot Trait Data
 
 Want to plot canopy height across time using `raw_date`. Column is in wrong format, so first use a function from `lubridate` package to transform. 
 
@@ -106,7 +140,7 @@ ggplot(data = season_4, aes(x = formatted_date, y = mean)) +
   facet_wrap(~trait, scales = "free_y")
 ```
 
-### Access API Key
+## Video 5: Access API Key
 
 Each beta user will have their own unique key. Do not share these with anyone. 
 
