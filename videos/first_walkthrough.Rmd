@@ -7,6 +7,8 @@ urlcolor: blue
 
 ## Video 1: Objectives + TERRA REF Overview + Getting Started
 
+have time to install everything/open up, put up instructions on screen from email
+
 #### Objectives
 These walkthroughs are a hands-on introduction to how to use data produced by TERRA REF project. 
 
@@ -42,6 +44,10 @@ Reopen running TERRA REF instance:
 4. Hit "Log in with your CyVerse ID" button
 5. Log in with CyVerse credentials (username and password)
 6. Open Analyses window and hit arrow button to open up RStudio
+
+Using R language within RStudio. Just like you'd use on your own computer when you open up RStudio except because this is within VICE, all the packages we need are already installed. 
+
+[if you're not ready, join at weather part]
 
 ## Video 2: Downloading Trait Data
 
@@ -149,3 +155,71 @@ Find the key:
 1. Log into betydb.org
 2. Go to data/users
 3. See your account there with API key listed
+
+## Video 6: Downloading Weather Data
+
+There's no R package for downloading TERRA REf weather data. 
+
+Data is on a platform called Clowder. It's in format called JSON. Use an R package that works with JSON data. `fromJSON` is function from that package that pulls data down and turns into R's data frame format. 
+
+```{r}
+library(jsonlite)
+```
+
+First specify URL where data comes from. Parts are from NCSA Clowder, using API and geostreams, then weather station with stream_id and since and until for date range. 
+
+Then read into `fromJSON`. This gets all available weather data for 2017. 
+
+```{r}
+weather_url <- "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31"
+weather <- fromJSON(weather_url, flatten = FALSE)
+```
+
+Subset of data is called properties, which contains what we want. Pull that out. Rows are weather observations, and columns are different weather variables. 
+
+```{r}
+weather_obs <- weather$properties
+```
+
+Want to get date, which is in original weather data frame. Take that column, change into correct format, and add to observations data frame. 
+
+```{r}
+weather_obs <- weather$properties %>% 
+  mutate(formatted_date = ymd_hms(weather$end_time))
+```
+
+## Video 7: Plot Single Weather Variable
+
+Want to look at air temperature across. Plot these data like we did before for trait data. Turns out these data are only for month of January in 2017. 
+
+```{r}
+ggplot(data = weather_obs, aes(x = formatted_date, y = air_temperature)) +
+  geom_point() +
+  labs(x = "Date", y = "Temperature (K)")
+```
+
+## Video 8: Plot All Weather Variables
+
+Want to plot all weather variables across time to see when they are available and what their values are like. 
+
+Need to rearrange the dataframe to do this in ggplot. Data are currently in wide format, will change into long format. That is, we want to have one column with the name of the weather variable and another column with the value for that variable. 
+
+First remove a couple of unneeded columns. Then turn variable header names into a new column `variable` and their values in a new `value` column. Last, the date column is included. 
+
+```{r}
+library(tidyr)
+weather_obs_long <- weather_obs %>% 
+  select(-source, -source_file) %>% 
+  gather(variable, value, -formatted_date)
+```
+
+All observations are plotted across time then. `facet_wrap` is used to create one plot per weather variable. 
+
+```{r}
+ggplot(data = weather_obs_long, aes(x = formatted_date, y = value)) +
+  geom_point() +
+  facet_wrap(~variable, scales = "free_y") +
+  labs(x = "Date", y = "Weather variable")
+```
+
+In addition to temperature, there's wind speed, rainfall (not much in Arizona), humidity, and radiation. 

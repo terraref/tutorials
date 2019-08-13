@@ -4,6 +4,9 @@ Kristina Riemer
 
 ## Video 1: Objectives + TERRA REF Overview + Getting Started
 
+have time to install everything/open up, put up instructions on screen
+from email
+
 #### Objectives
 
 These walkthroughs are a hands-on introduction to how to use data
@@ -57,6 +60,12 @@ Reopen running TERRA REF instance:
 4.  Hit “Log in with your CyVerse ID” button
 5.  Log in with CyVerse credentials (username and password)
 6.  Open Analyses window and hit arrow button to open up RStudio
+
+Using R language within RStudio. Just like you’d use on your own
+computer when you open up RStudio except because this is within VICE,
+all the packages we need are already installed.
+
+\[if you’re not ready, join at weather part\]
 
 ## Video 2: Downloading Trait Data
 
@@ -137,29 +146,62 @@ season_4 %>%
   print(n = Inf)
 ```
 
-    ## # A tibble: 20 x 1
-    ##    trait                           
-    ##    <chr>                           
-    ##  1 leaf_desiccation_present        
-    ##  2 lodging_present                 
-    ##  3 surface_temperature             
-    ##  4 leaf_stomatal_conductance       
-    ##  5 flag_leaf_emergence_time        
-    ##  6 flowering_time                  
-    ##  7 grain_stage_time                
-    ##  8 aboveground_dry_biomass         
-    ##  9 aboveground_biomass_moisture    
-    ## 10 aboveground_fresh_biomass       
-    ## 11 dry_matter_fraction             
-    ## 12 harvest_lodging_rating          
-    ## 13 leaf_temperature                
-    ## 14 stem_elongated_internodes_number
-    ## 15 canopy_height                   
-    ## 16 planter_seed_drop               
-    ## 17 stand_count                     
-    ## 18 panicle_height                  
-    ## 19 emergence_count                 
-    ## 20 seedling_emergence_rate
+    ## # A tibble: 53 x 1
+    ##    trait                        
+    ##    <chr>                        
+    ##  1 leaf_temperature             
+    ##  2 planter_seed_drop            
+    ##  3 seedling_emergence_rate      
+    ##  4 panicle_height               
+    ##  5 stand_count                  
+    ##  6 leaf_width                   
+    ##  7 leaf_length                  
+    ##  8 flag_leaf_emergence_time     
+    ##  9 flowering_time               
+    ## 10 stalk_diameter_fixed_height  
+    ## 11 stalk_diameter_minor_axis    
+    ## 12 stalk_diameter_major_axis    
+    ## 13 grain_stage_time             
+    ## 14 surface_temperature          
+    ## 15 canopy_height                
+    ## 16 relative_chlorophyll         
+    ## 17 absorbance_730               
+    ## 18 vH+                          
+    ## 19 light_intensity_PAR          
+    ## 20 SPAD_880                     
+    ## 21 SPAD_850                     
+    ## 22 SPAD_650                     
+    ## 23 SPAD_420                     
+    ## 24 LEF                          
+    ## 25 FoPrime                      
+    ## 26 FmPrime                      
+    ## 27 Phi2                         
+    ## 28 leaf_temperature_differential
+    ## 29 ECSt                         
+    ## 30 gH+                          
+    ## 31 FvP/FmP                      
+    ## 32 proximal_air_temperature     
+    ## 33 pitch                        
+    ## 34 leaf_angle_clamp_position    
+    ## 35 ambient_humidity             
+    ## 36 leaf_thickness               
+    ## 37 SPAD_730                     
+    ## 38 SPAD_605                     
+    ## 39 SPAD_530                     
+    ## 40 RFd                          
+    ## 41 qP                           
+    ## 42 qL                           
+    ## 43 NPQt                         
+    ## 44 Fs                           
+    ## 45 absorbance_940               
+    ## 46 absorbance_880               
+    ## 47 absorbance_605               
+    ## 48 absorbance_530               
+    ## 49 PhiNPQ                       
+    ## 50 PhiNO                        
+    ## 51 roll                         
+    ## 52 absorbance_850               
+    ## 53 absorbance_650
 
 Focus on one trait, canopy\_height, from more recent season.
 
@@ -245,3 +287,94 @@ Find the key:
 1.  Log into betydb.org
 2.  Go to data/users
 3.  See your account there with API key listed
+
+## Video 6: Downloading Weather Data
+
+There’s no R package for downloading TERRA REf weather data.
+
+Data is on a platform called Clowder. It’s in format called JSON. Use an
+R package that works with JSON data. `fromJSON` is function from that
+package that pulls data down and turns into R’s data frame format.
+
+``` r
+library(jsonlite)
+```
+
+First specify URL where data comes from. Parts are from NCSA Clowder,
+using API and geostreams, then weather station with stream\_id and since
+and until for date range.
+
+Then read into `fromJSON`. This gets all available weather data for
+2017.
+
+``` r
+weather_url <- "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31"
+weather <- fromJSON(weather_url, flatten = FALSE)
+```
+
+Subset of data is called properties, which contains what we want. Pull
+that out. Rows are weather observations, and columns are different
+weather variables.
+
+``` r
+weather_obs <- weather$properties
+```
+
+Want to get date, which is in original weather data frame. Take that
+column, change into correct format, and add to observations data frame.
+
+``` r
+weather_obs <- weather$properties %>% 
+  mutate(formatted_date = ymd_hms(weather$end_time))
+```
+
+## Video 7: Plot Single Weather Variable
+
+Want to look at air temperature across. Plot these data like we did
+before for trait data. Turns out these data are only for month of
+January in
+2017.
+
+``` r
+ggplot(data = weather_obs, aes(x = formatted_date, y = air_temperature)) +
+  geom_point() +
+  labs(x = "Date", y = "Temperature (K)")
+```
+
+![](first_walkthrough_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+## Video 8: Plot All Weather Variables
+
+Want to plot all weather variables across time to see when they are
+available and what their values are like.
+
+Need to rearrange the dataframe to do this in ggplot. Data are currently
+in wide format, will change into long format. That is, we want to have
+one column with the name of the weather variable and another column with
+the value for that variable.
+
+First remove a couple of unneeded columns. Then turn variable header
+names into a new column `variable` and their values in a new `value`
+column. Last, the date column is included.
+
+``` r
+library(tidyr)
+weather_obs_long <- weather_obs %>% 
+  select(-source, -source_file) %>% 
+  gather(variable, value, -formatted_date)
+```
+
+All observations are plotted across time then. `facet_wrap` is used to
+create one plot per weather variable.
+
+``` r
+ggplot(data = weather_obs_long, aes(x = formatted_date, y = value)) +
+  geom_point() +
+  facet_wrap(~variable, scales = "free_y") +
+  labs(x = "Date", y = "Weather variable")
+```
+
+![](first_walkthrough_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+In addition to temperature, there’s wind speed, rainfall (not much in
+Arizona), humidity, and radiation.
