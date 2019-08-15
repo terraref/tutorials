@@ -378,3 +378,155 @@ ggplot(data = weather_obs_long, aes(x = formatted_date, y = value)) +
 
 In addition to temperature, there’s wind speed, rainfall (not much in
 Arizona), humidity, and radiation.
+
+## Video 9: Calculate Heat Metric
+
+weather, same as
+before
+
+``` r
+weather_2018_url <- "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-01-01&until=2018-12-31"
+weather_2018 <- fromJSON(weather_2018_url, flatten = FALSE)
+
+weather_all <- weather_2018$properties %>% 
+  mutate(time = ymd_hms(weather_2018$end_time))
+```
+
+we want to calculate metric called growing degree days first convert to
+just day, like did for traits and convert air temp from kelvins to
+celsius
+
+``` r
+weather_daily <- weather_all %>% 
+  mutate(day = as.Date(time), 
+         air_temp_convert = air_temperature - 273.15)
+```
+
+get lowest and highest temp for each day first “subset” data by day
+column, takes all rows for each unique day together then new column for
+daily min and max temps
+
+``` r
+weather_daily <- weather_all %>% 
+  mutate(day = as.Date(time), 
+         air_temp_convert = air_temperature - 273.15) %>% 
+  group_by(day) %>% 
+  summarise(min_temp = min(air_temp_convert), 
+            max_temp = max(air_temp_convert))
+```
+
+then get mean of these in new column avg\_temp
+
+``` r
+weather_daily <- weather_all %>% 
+  mutate(day = as.Date(time), 
+         air_temp_convert = air_temperature - 273.15) %>% 
+  group_by(day) %>% 
+  summarise(min_temp = min(air_temp_convert), 
+            max_temp = max(air_temp_convert), 
+            avg_temp = (max_temp + min_temp) / 2)
+```
+
+use that average temp and a chosen base temp to calculate gdd gdd =
+accumulation of heat over time, only for temps above a base temperature
+
+if mean of min and max daily temp is more than 10 degrees, then take
+mean and subtract 10
+
+this gets amount of heat per day when exceeds threshold temp then want
+cumulative across year, so add each onto the last
+
+``` r
+base_temp <- 10
+gdd_daily <- weather_daily %>% 
+  mutate(gdd = ifelse(avg_temp > base_temp, avg_temp - base_temp, 0), 
+         gdd_cum = cumsum(gdd))
+```
+
+## Video 10: Combine Trait and Weather Data
+
+get trait data for canopy cover
+
+``` r
+cover <- betydb_query(trait = "canopy_cover", 
+                                   date = "~2018", 
+                                   limit = "none") #remove/add limit?
+```
+
+    ## 
+
+``` r
+cover_daily <- cover %>% 
+  mutate(day = as.Date(raw_date))
+```
+
+put them together based on day using join full join, so every day for
+both dataframes combined only using columns of interest
+
+``` r
+cover_gdd_daily <- full_join(cover_daily, gdd_daily, by = "day") %>% 
+  select(day, cultivar, mean, gdd_cum)
+```
+
+if there’s no values for either cover or gdd, puts NA there spotty
+coverage across days for both remove any row that has NA in any column
+
+``` r
+cover_gdd_daily <- full_join(cover_daily, gdd_daily, by = "day") %>% 
+  select(day, cultivar, mean, gdd_cum) %>% 
+  na.omit()
+```
+
+## Video 11: Relationship Between Trait and Weather Data
+
+what do we expect? more canopy cover with
+
+``` r
+single_cultivar <- cover_gdd_daily %>% 
+  filter(cultivar == "PI656026")
+```
+
+``` r
+ggplot(single_cultivar, aes(x = gdd_cum, y = mean)) +
+  geom_point()
+```
+
+![](first_walkthrough_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+
+``` r
+#function to do logistic growth model
+
+model_logistic_growth <- function(data){
+  #parameter estimates
+  c <- 90
+  a <- 0.1
+  y <- single_cultivar$mean[3]
+  g <- single_cultivar$gdd_cum[3]
+  b <- ((log((c/y) - 1)) - a)/g
+  #model
+  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)), 
+                             start = list(c = c, a = a, b = b),
+                             data = data)
+  #model coefficients
+  single_c <- coef(model)[1]
+  single_a <- coef(model)[2]
+  single_b <- coef(model)[3]
+  #canopy value predictions
+  mean_predict = single_c / (1 + exp(single_a + single_b * data$gdd_cum))
+  return(mean_predict)
+}
+cover_predictions <- model_logistic_growth(single_cultivar)
+
+single_cultivar$predictions <- cover_predictions
+
+ggplot(single_cultivar) +
+  geom_point(aes(x = gdd_cum, y = mean)) +
+  geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
+  labs(x = "Cumulative growing degree days", y = "Canopy Height")
+```
+
+![](first_walkthrough_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+
+inflection point = maximum growth rate given gdd
+
+could model for rest of cultivars and compare max growth rates
