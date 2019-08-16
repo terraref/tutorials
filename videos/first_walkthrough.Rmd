@@ -17,7 +17,7 @@ The intended audience is community members and anyone interested in these data.
 These live walkthroughs will be turned into video tutorials that can be viewed at any time. They will be put on YouTube, and I'll provide links once they're ready. 
 
 #### Project overview
-TERRA REF is a project funded by ARPA-E to gather phenomic and genomic data on plant crops. An extensive series of sensors are used to collect trait and image data on outdoor experimental plots. Weather stations also collect weather data. And crop genomes are being sequenced, with these genomic data being provided. 
+TERRA REF is a project funded by the Advanced Research Projects Agency for Energy (ARPA-E). The objective is to advance the science and technology of high throughput field phenotyping, which is the automated measurement of plants. TERRA REF has deployed an exceptionally large robot capable of collecting data from a range of sensors at 1 mm spatial resolution every other day. You can learn more about the project from the website, terraref.org. The suite of sensors include visible light cameras, hyperspectral cameras, a laser 3d scanner, and environmental data. In addition there are weather stations and high resolution genome sequences for hundreds of varieties of Sorghum being monitored. 
 
 These tutorials are to make these data accessible and useable. I will provide an overview of how to use computational tools to get these data, and combine, plot, and analyze them. 
 
