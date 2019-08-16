@@ -4,8 +4,11 @@ Kristina Riemer
 
 ## Video 1: Objectives + TERRA REF Overview + Getting Started
 
-have time to install everything/open up, put up instructions on screen
-from email
+  - They should take this time during the intro bit to install
+    everything and/or get RStudio (local or VICE) running.
+  - Put up instructions on screen from email for VICE.
+  - If this takes a while, can catch up during second weather section.
+  - Paste all links into chat on Zoom.
 
 #### Objectives
 
@@ -21,11 +24,16 @@ once they’re ready.
 
 #### Project overview
 
-TERRA REF is a project funded by ARPA-E to gather phenomic and genomic
-data on plant crops. An extensive series of sensors are used to collect
-trait and image data on outdoor experimental plots. Weather stations
-also collect weather data. And crop genomes are being sequenced, with
-these genomic data being provided.
+TERRA REF is a project funded by the Advanced Research Projects Agency
+for Energy (ARPA-E). The objective is to advance the science and
+technology of high throughput field phenotyping, which is the automated
+measurement of plants. TERRA REF has deployed an exceptionally large
+robot capable of collecting data from a range of sensors at 1 mm spatial
+resolution every other day. You can learn more about the project from
+the website, terraref.org. The suite of sensors include visible light
+cameras, hyperspectral cameras, a laser 3d scanner, and environmental
+data. In addition there are weather stations and high resolution genome
+sequences for hundreds of varieties of Sorghum being monitored.
 
 These tutorials are to make these data accessible and useable. I will
 provide an overview of how to use computational tools to get these data,
@@ -64,8 +72,6 @@ Reopen running TERRA REF instance:
 Using R language within RStudio. Just like you’d use on your own
 computer when you open up RStudio except because this is within VICE,
 all the packages we need are already installed.
-
-\[if you’re not ready, join at weather part\]
 
 ## Video 2: Downloading Trait Data
 
@@ -288,9 +294,13 @@ Find the key:
 2.  Go to data/users
 3.  See your account there with API key listed
 
+Change my key right away on monitor.
+
+Any questions?
+
 ## Video 6: Downloading Weather Data
 
-There’s no R package for downloading TERRA REf weather data.
+There’s no R package for downloading TERRA REF weather data.
 
 Data is on a platform called Clowder. It’s in format called JSON. Use an
 R package that works with JSON data. `fromJSON` is function from that
@@ -379,10 +389,16 @@ ggplot(data = weather_obs_long, aes(x = formatted_date, y = value)) +
 In addition to temperature, there’s wind speed, rainfall (not much in
 Arizona), humidity, and radiation.
 
+Any questions?
+
 ## Video 9: Calculate Heat Metric
 
-weather, same as
-before
+Now pull down different weather and trait data, combine them, and model
+their relationship.
+
+First pull down weather data for the entire year of 2018. Create new
+correctly formatted date column like before
+too.
 
 ``` r
 weather_2018_url <- "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-01-01&until=2018-12-31"
@@ -392,9 +408,15 @@ weather_all <- weather_2018$properties %>%
   mutate(time = ymd_hms(weather_2018$end_time))
 ```
 
-we want to calculate metric called growing degree days first convert to
-just day, like did for traits and convert air temp from kelvins to
-celsius
+We’ll calculate a metric from temperature called growing degree days.
+Basically a simple measure of how much heat plants have been exposed to
+over time during the year.
+
+First we just want the date, not including time of day. Pull out date
+using built-in `as.Date` and put into new column `day`.
+
+Also create new column with air temperature in Celcius instead of
+Kelvin.
 
 ``` r
 weather_daily <- weather_all %>% 
@@ -402,9 +424,13 @@ weather_daily <- weather_all %>%
          air_temp_convert = air_temperature - 273.15)
 ```
 
-get lowest and highest temp for each day first “subset” data by day
-column, takes all rows for each unique day together then new column for
-daily min and max temps
+Multiple temperature observations per day. We need to get the lowest and
+highest temperature from each day to calculate growing degree days.
+
+First use `group_by` to pull out all rows for each unique day. Then use
+`summarise` to do calculations on each subset of data. Use built-in
+`min` and `max` to do this to get lowest and highest temp for each day
+in their own columns.
 
 ``` r
 weather_daily <- weather_all %>% 
@@ -415,7 +441,8 @@ weather_daily <- weather_all %>%
             max_temp = max(air_temp_convert))
 ```
 
-then get mean of these in new column avg\_temp
+The value actually needed for GDD is the mean of lowest and highest
+temps, so add that calculation in as a new column.
 
 ``` r
 weather_daily <- weather_all %>% 
@@ -427,14 +454,27 @@ weather_daily <- weather_all %>%
             avg_temp = (max_temp + min_temp) / 2)
 ```
 
-use that average temp and a chosen base temp to calculate gdd gdd =
-accumulation of heat over time, only for temps above a base temperature
+GDD is measure of the accumulation of heat over time that a plant is
+exposed to, but only above a chosen base temperature. The amount of heat
+a plant is exposed to affects timing and ability to grow, produce
+flowers, ect.
 
-if mean of min and max daily temp is more than 10 degrees, then take
-mean and subtract 10
+Set a base temp as 10, then combine with average temp to get GDD.
 
-this gets amount of heat per day when exceeds threshold temp then want
-cumulative across year, so add each onto the last
+Use an `ifelse` to set that up. If the mean temp is above the base temp,
+then take mean temp and subtract base temp of 10 to indicate degrees of
+heat they’re exposed to that day. Anything below base temp gets no
+degrees.
+
+``` r
+base_temp <- 10
+gdd_daily <- weather_daily %>% 
+  mutate(gdd = ifelse(avg_temp > base_temp, avg_temp - base_temp, 0))
+```
+
+This is amount of heat each day they’re exposed to. We want to know
+total amount they’ve been exposed to over the year. Use built-in
+`cumsum` to add each day’s degrees onto total.
 
 ``` r
 base_temp <- 10
@@ -445,7 +485,12 @@ gdd_daily <- weather_daily %>%
 
 ## Video 10: Combine Trait and Weather Data
 
-get trait data for canopy cover
+Now that we have temperature-derived metric from trait data, want to
+pull down corresponding weather data. Do this like before, except choose
+based on data instead of season.
+
+Also only interested in the date and not time, so use same `as.Date`
+like from before to get a date column.
 
 ``` r
 cover <- betydb_query(trait = "canopy_cover", 
@@ -460,16 +505,26 @@ cover_daily <- cover %>%
   mutate(day = as.Date(raw_date))
 ```
 
-put them together based on day using join full join, so every day for
-both dataframes combined only using columns of interest
+Want to combine the growing degree day data frame with this canopy cover
+one. We want observations of both for each day.
+
+There’s a bunch of ways to combine two dataframes together. We’re using
+a full join here.
+
+Use `full_join`, and also include only necessary columns. Will use
+`cultivar` column later.
+
+Every observation from GDD and canopy data frames gets a row, which they
+share if they have a common date. Otherwise there’s an NA if there’s not
+one of the values for that date. This is because there are days where
+either cover or temperature were not observed.
 
 ``` r
 cover_gdd_daily <- full_join(cover_daily, gdd_daily, by = "day") %>% 
   select(day, cultivar, mean, gdd_cum)
 ```
 
-if there’s no values for either cover or gdd, puts NA there spotty
-coverage across days for both remove any row that has NA in any column
+Remove all of the rows with an NA in any column.
 
 ``` r
 cover_gdd_daily <- full_join(cover_daily, gdd_daily, by = "day") %>% 
@@ -479,23 +534,34 @@ cover_gdd_daily <- full_join(cover_daily, gdd_daily, by = "day") %>%
 
 ## Video 11: Relationship Between Trait and Weather Data
 
-what do we expect? more canopy cover with
+Now that we have all of our data together, we want to model the
+relationship between the two variables. This is because increasing
+amounts of heat provide energy to plants to grow, which will increase
+canopy cover.
+
+First we want to look at data for just one cultivar, as there are
+differences between cultivars in this relationship.
 
 ``` r
 single_cultivar <- cover_gdd_daily %>% 
   filter(cultivar == "PI656026")
 ```
 
+Before modeling any data, should look at it. With more heat, cover
+increases quite quickly before asymptoting.
+
 ``` r
 ggplot(single_cultivar, aes(x = gdd_cum, y = mean)) +
   geom_point()
 ```
 
-![](first_walkthrough_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](first_walkthrough_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+
+Seems like logistic growth model would be a good fit to these data.
+Wrote a function to model these data. Copy and paste function and point
+out parts.
 
 ``` r
-#function to do logistic growth model
-
 model_logistic_growth <- function(data){
   #parameter estimates
   c <- 90
@@ -515,18 +581,42 @@ model_logistic_growth <- function(data){
   mean_predict = single_c / (1 + exp(single_a + single_b * data$gdd_cum))
   return(mean_predict)
 }
+```
+
+Run the logistic model on the dataframe to get out predicted values of
+canopy cover for all GDD values. Add this to dataframe.
+
+``` r
 cover_predictions <- model_logistic_growth(single_cultivar)
-
 single_cultivar$predictions <- cover_predictions
+```
 
+Plot the data like before, and plot model as line using predicted values
+to compare. Looks like a good fit.
+
+``` r
 ggplot(single_cultivar) +
   geom_point(aes(x = gdd_cum, y = mean)) +
   geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
   labs(x = "Cumulative growing degree days", y = "Canopy Height")
 ```
 
-![](first_walkthrough_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](first_walkthrough_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
-inflection point = maximum growth rate given gdd
+Did this for one cultivar, could go ahead and repeat for each of the
+cultivars. The max slope of the model is the maximum growth rate for
+each cultivar, could compare these amongst cultivars to see which is
+growing best given this GDD.
 
-could model for rest of cultivars and compare max growth rates
+Any questions?
+
+Thanks for doing pre-walkthrough survey. Will email out post-walkthrough
+survey, if everyone can do it. Very helpful feedback to see if these are
+helpful.
+
+Entire session was recorded, will be putting these up as short videos on
+YouTube soon so everyone can use them. You can also reference notes for
+this session and look at the TERRA REF tutorials website.
+
+Will be doing three more of these on various other TERRA REF data,
+including image data.
