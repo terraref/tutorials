@@ -2,9 +2,12 @@ Second Walkthrough Notes
 ================
 Kristina Riemer
 
-Intro stuff, purpose is to review experimental design of TERRA REF and
-expose to two platforms where data are stored and how to access them.
-Focusing on image data, particularly RGB, as example.
+## Introduction
+
+The purpose of this walkthrough is to review the experimental design of
+TERRA REF, and show how to find and access data on the two platforms.
+The focus will be on image data, using RGB data from the project as an
+example.
 
 ## Video 1: Explore Data with Traitvis Web App
 
@@ -29,6 +32,10 @@ to look at data spatially. Shows long field in Maricopa, Arizona.
 Field is passed over by large robot called a gantry. Lot of equipment in
 hanging box to collect many types of data.
 
+Gantry goes systematically over entire field once a day. Some sensors
+take data every day, like 9,000 images from RGB camera. Others more
+intermittently, like hyperspectral images, because of data space limits.
+
 *second slide* + *table*
 
 Sensors include:
@@ -46,10 +53,6 @@ Sensors include:
 *rest of slides*
 
 See example data for some of these.
-
-Gantry goes systematically over entire field once a day. Some sensors
-take data every day, like 9,000 images from RGB camera. Others more
-intermittently, like hyperspectral images, because of data space limits.
 
 *traitvis webapp*
 
@@ -149,15 +152,6 @@ see at the top some RGB tifs that were collected this year.
 
 ## Video 4: Download with Python
 
-Working with data across plots and/or across time can be difficult
-because these files are large. They take a long time to download and
-process.
-
-Most researchers have this workflow. They download a few files, like RGB
-images, develop this algorithm or extraction method. They then work with
-TERRA REF team to implement their method in a processing pipeline for
-larger amounts of data.
-
 In addition to manually downloading data through Clowder or Globus, can
 get programmatically using Python. Will walk through this now, can
 follow along if you have the Vice app like I used last week.
@@ -228,7 +222,24 @@ designed for interacting with TERRA REF data. Documentation is
 [here](https://pypi.org/project/terrautils/). Don’t have time to get
 into that today.
 
+Working with data across plots and/or across time can be difficult
+because these files are large. They take a long time to download and
+process.
+
+Most researchers have this workflow. They download a few files, like RGB
+images, develop this algorithm or extraction method. They then work with
+TERRA REF team to implement their method in a processing pipeline for
+larger amounts of data.
+
 We’re trying to make these data more usable to anyone who wants to do
 that, so feedback on either of these interfaces or any of the
 documentation is very welcome. These data are on a large enough scale
 that there are storage and access challenges.
+
+In next week’s webinar, we will follow up on this work by getting some
+RGB images, calculating a greenness index, and combining with trait data
+like we worked with last week.
+
+I will be sending out an email with the followup survey, if everyone
+could take that, and notes from this session. This session was recorded
+and I will be posting it as YouTube videos soon.
