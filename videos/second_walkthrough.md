@@ -181,7 +181,7 @@ Can see if it works by running object, should return a 200 message.
 ``` python
 import requests
 
-file_url = 'https://terraref.ncsa.illinois.edu/clowder/files/5c5488fa4f0c4b0cbe7af98a'
+file_url = 'https://terraref.ncsa.illinois.edu/clowder/files/5c5488fa4f0c4b0cbe7af98a/blob'
 api_key = {'key': ''}
 file_request = requests.get(file_url, api_key)
 file_request
