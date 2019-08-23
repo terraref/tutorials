@@ -5,12 +5,59 @@ output: github_document
 urlcolor: blue
 ---
 
+2018-07-25__13-30-46-010
+* Clowder example data: https://terraref.ncsa.illinois.edu/clowder/files/5c5488fb4f0c436195ce9ac7?dataset=5c507cb74f0c436195ba8eb4&space=
+* Globus Level_1 data: https://app.globus.org/file-manager?origin_id=403204c4-6004-11e6-8316-22000b97daec&origin_path=%2Fua-mac%2FLevel_1%2Frgb_geotiff%2F2018-07-25%2F2018-07-25__13-30-46-010%2F
+
+https://terraref.ncsa.illinois.edu/clowder/files/5c5488fb4f0c436195ce9ac7?dataset=5c507cb74f0c436195ba8eb4&space=
+https://terraref.ncsa.illinois.edu/clowder/files/5c5492344f0c4b0cbe7b4705?dataset=5c54922f4f0cfd2aee0828f0&space=
+
+
+Season 6 Range 20 Column 1
+2018-07-25__13-30-49-010 (left)
+
+* Globus Level_1 path: /ua-mac/Level_1/rgb_geotiff/2018-07-25/2018-07-25__13-30-49-010/
+* Globus Level_1_Plots path: /ua-mac/Level_1_Plots/rgb_geotiff/2018-07-25/MAC Field Scanner Season 6 Range 20 Column 1/
+
+Outline: 
+* Traitvis website (for traits)
+  * Example: UA-MAC Season 6 Range 19 Column 9
+* Experimental design 
+  * Gantry
+  * Seasons/years
+  * Map of field (canopy cover to rgb images)
+  * Sensor data overview (table)
+  * Plots/images
+  * Choose example from public Clowder
+      * Example: 2018-06-02__14-12-05-077
+(could flip Globus and Clowder depending on what makes more sense)
+* Browsing data with Clowder
+  * Look at same public example in Clowder
+    * Example (optional?)
+  * Datasets organized into spaces and into collections
+    * Collections -> Season 6 (2018) [slow] -> RGB Camera Data (Season6 Samples) [slow] -> scroll down to third tif
+    * Spaces = "Sample Data 2019"
+  * Public vs private access
+  * Download manually and individually
+  * Download programmatically with Python using Vice app
+  * An example of greenness index? (or next one)
+  * Clowder is slow
+* Download more data with Globus
+  * All data, Clowder = UI
+  * Same data as on Clowder, but can get all for one day
+    * Example: 
+  * Instructions for getting Globus account (https://docs.terraref.org/user-manual/how-to-access-data/using-globus-sensor-and-genomics-data)
+  * Have to install Globus Connect Personal (https://docs.globus.org/how-to/globus-connect-personal-mac/) and then new endpoint on Globus to download
+  * Not "Download", it's "Transfer or Sync to" 
+* Limitations of current data infrastructure due to size
+
+terrautils? 
+
 python modules: 
 terrautils
 requests
 io
 
-## Video 1: 
 
 ```{shell, eval=FALSE}
 python3
@@ -89,4 +136,4 @@ with open('rgb_geotiff_L1_ua-mac_2018-06-02__14-12-05-077_left.tif', 'wb') as o:
 
 
 
-
+https://terraref.ncsa.illinois.edu/clowder/api/datasets?jtitle="" (fuzzy search)
