@@ -27,7 +27,7 @@ URL to a public published google sheet (you will need to provide this url in the
 
 # How to Run this Rmd
 
-Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will not encounter any errors when uploading your metadata. All experiments, sites, treatments, cutlivars, and citations can be uploaded successfully. 
+Knitting this markdown file will not upload any data to the test database. Being able to knit this file means that you will not encounter any errors when uploading your metadata. All experiments, sites, treatments, cultivars, and citations can be uploaded successfully.
 
 To actually commit additions to the test database, you will need to make an edit to this markdown file. 
 

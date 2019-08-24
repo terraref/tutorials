@@ -22,7 +22,7 @@ Information for getting a beta user account is available in the section on [User
 ### R
 
 In order to use the vignettes, you will need to have R installed along with the extra packages that are used. 
-All of the packages except 'trait' are available on CRAN and can be installed using the `install.packages` funciton:
+All of the packages except 'trait' are available on CRAN and can be installed using the `install.packages` function:
 
 ```r
 install.packages('tidyverse', 'jsonlite', 'knitr', 'lubridate', 'raster', 'sf')

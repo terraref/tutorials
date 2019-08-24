@@ -31,7 +31,7 @@ The 'genotypes' are based on five-hundred quasi-random parameterizations of a bi
 
 _Note that these data sets contain numerical artifacts and scientific reinterpretations for illustrative purpose._
 
-All of these simulated datasets are released with an unrestrive [copyright](https://creativecommons.org/publicdomain/zero/1.0/).  This means you can copy, modify, and share the data.  Please keep in mind that the data sets are not production quality - they have been developed solely to inspire and solicit feedback.
+All of these simulated datasets are released with an unrestrictive [copyright](https://creativecommons.org/publicdomain/zero/1.0/).  This means you can copy, modify, and share the data.  Please keep in mind that the data sets are not production quality - they have been developed solely to inspire and solicit feedback.
 
 
 ### Design of Simulation Experiment
@@ -72,7 +72,7 @@ Two-hundred and twenty-seven lines were grown at each site. Each line is identif
 
 The phenotypes associated with each genotype is in the file `phenotypes.csv`. 
 
-These 'phenotypes' are used as input parameters to the simulation model. We often refer to these as 'traits' (as opposed to biomass or growth rates, which are states and proceses). In this example, we assume that 'phenotypes' are time-invariant.
+These 'phenotypes' are used as input parameters to the simulation model. We often refer to these as 'traits' (as opposed to biomass or growth rates, which are states and processes). In this example, we assume that 'phenotypes' are time-invariant.
 
 
 | variable_id|name                           |standard_name                                                 |units                          |Description                                                                                                                                                                                                      |
@@ -293,7 +293,7 @@ Now, join the traits data frame with the new max_height data frame trait data we
 traits_height <- traits_wide %>% left_join(max_height, by = 'genotype')
 
 ```
-Which traits are related to height? We can discover this in a few way, for example, a pairs plot that shows correltations:
+Which traits are related to height? We can discover this in a few way, for example, a pairs plot that shows correlations:
 
 ```{r trait_pairs, fig.height = 8, fig.width = 8, warning = FALSE}
 ggpairs(traits_height %>% select(-genotype),  

@@ -4,7 +4,7 @@ will be derived from https://github.com/pi4-uiuc/2017-bootcamp/blob/master/conte
 
 ## On workbench
 
-On the TERRA REF Workbench, you have access to the database. These connnections will only work if you are on the workbench.
+On the TERRA REF Workbench, you have access to the database. These connections will only work if you are on the workbench.
 
 
 ## Using PostgresSQL Studio

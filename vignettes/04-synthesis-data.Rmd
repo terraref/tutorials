@@ -166,7 +166,7 @@ ggplot(data.frame(inf_points = unique(all_cultivars$inf_x))) +
 
 ## Get image data
 
-In this examnple we will extract our plot data from a series of images taken in May of Season 6, measure its "greeness" annd plot that against the plant heights from above in this vignette.
+In this example we will extract our plot data from a series of images taken in May of Season 6, measure its "greeness" annd plot that against the plant heights from above in this vignette.
 
 The chosen statistic here is the normalised green-red difference index, $\textrm{NGRDI}=\frac{R-G}/{R+G}$ (Rasmussen et al., 2016), which uses the red and green bands from the image raster.
 

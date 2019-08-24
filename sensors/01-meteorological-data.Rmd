@@ -147,7 +147,7 @@ The data represent 5 minute summaries aggregated from 1/s observations.
 ### Download data using the command line
 
 Data can be downloaded from Clowder using the command line program Curl. If the 
-following is typed into the commmand line, it will download the datapoints data 
+following is typed into the command line, it will download the datapoints data
 that we're interested in as a file which we have chosen to call `spectra.json`. 
 
 ```{sh eval=FALSE}

@@ -35,7 +35,7 @@ cameras, hyperspectral cameras, a laser 3d scanner, and environmental
 data. In addition there are weather stations and high resolution genome
 sequences for hundreds of varieties of Sorghum being monitored.
 
-These tutorials are to make these data accessible and useable. I will
+These tutorials are to make these data accessible and usable. I will
 provide an overview of how to use computational tools to get these data,
 and combine, plot, and analyze them.
 
@@ -415,7 +415,7 @@ over time during the year.
 First we just want the date, not including time of day. Pull out date
 using built-in `as.Date` and put into new column `day`.
 
-Also create new column with air temperature in Celcius instead of
+Also create new column with air temperature in Celsius instead of
 Kelvin.
 
 ``` r
