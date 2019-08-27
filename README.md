@@ -67,7 +67,7 @@ docker build -t terraref-tutorials:local .
 Run the container:
 
 ```bash
-docker run --rm -p 3000:3000 terraref-tutorials:tutorials
+docker run --rm -p 3000:3000 --name tutorial-preview terraref-tutorials:local
 ```
 
 This will generate the documentation and start a local web server to preview
