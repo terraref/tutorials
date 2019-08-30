@@ -39,3 +39,38 @@ Although we provide a few pre-configured computing environments, Workbench is de
 **To get started**, follow the [Workbench Quick Start](https://htmlpreview.github.io/?https://github.com/terraref/tutorials/blob/master/workbench/ndslabs_workbench_intro.html).
 
 This will walk you through the process of getting started with the first tutorials on how to access data.
+
+
+## To generate this documentation locally
+
+If you would like to contribute to this documentation you can preview your 
+changes by running the following command:
+
+```bash
+Rscript -e 'bookdown::render_book("index.Rmd")'
+```
+
+The output will be in the `docs` folder.
+
+There is also a Dockerfile for convenience. It requires installing Docker on 
+your computer:
+
+- [Docker for Mac](https://download.docker.com/mac/stable/Docker.dmg)
+- [Docker for Windows](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe) 
+
+Build the image:
+
+```bash
+docker build -t terraref-tutorials:local .
+```
+
+Run the container:
+
+```bash
+docker run --rm -p 3000:3000 --name tutorial-preview terraref-tutorials:local
+```
+
+This will generate the documentation and start a local web server to preview
+your changes. Open the preview URL in your browser: <http://localhost:3000/>
+
+Run `docker kill tutorial-preview` to kill the web server container. 
