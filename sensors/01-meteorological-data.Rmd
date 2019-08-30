@@ -1,0 +1,285 @@
+# Accessing meteorological data
+
+Objectives:
+
+  * This tutorial will walk through the steps required to access meteorological data from the Maricopa Agricultural Center.
+
+Pre-requisites: 
+
+  * Need to have R packages tidyverse, jsonlite, and convertr installed. 
+  * Need to have an internet connection. 
+
+## The Maricopa Weather Station
+
+### Meteorological data formats
+
+#### Dimensions:
+
+|CF standard-name | units |
+|:------------------------------------------|:------|
+| time | days since 1970-01-01 00:00:00 UTC|
+| longitude | degrees_east|
+| latitude |degrees_north|
+
+#### Variable names and units
+
+| CF standard-name                          | units | bety         | isimip       | cruncep | narr  | ameriflux |
+|:------------------------------------------|:------|:-------------|:-------------|:--------|:------|:----------|
+| air_temperature                       | K     | airT         | tasAdjust    | tair    | air   | TA (C)    |
+| air_pressure                          | Pa    | air_pressure |              |         |       | PRESS (KPa) |
+| mole_fraction_of_carbon_dioxide_in_air    | mol/mol |            |              |         |       | CO2       |
+| relative_humidity                         | % | relative_humidity | rhurs       | NA      | rhum  | RH        |
+| surface_downwelling_photosynthetic_photon_flux_in_air | mol m-2 s-1 | PAR |     |         |       | PAR *(NOT DONE)*          |
+| precipitation_flux                    |  kg m-2 s-1 | cccc   | prAdjust     | rain    | acpc  | PREC (mm/s)          |
+|                                           | degrees | wind_direction |          |         |       | WD        |
+| wind_speed                                | m/s   | Wspd         |              |         |       | WS        |
+
+
+* variable names are from [MsTMIP](http://nacp.ornl.gov/MsTMIP_variables.shtml).
+* standard_name is CF-convention standard names
+* units can be converted by udunits, so these can vary (e.g. the time denominator may change with time frequency of inputs)
+* soil moisture for the full column, rather than a layer, is soil_moisture_content
+
+For example, in the [MsTMIP-CRUNCEP](https://www.betydb.org/inputs/280) data, the variable `rain` should be `precipitation_rate`.
+We want to standardize the units as well as part of the `met2CF.<product>` step. I believe we want to use the CF "canonical" units but retain the MsTMIP units any time CF is ambiguous about the units.
+
+The key is to process each type of met data (site, reanalysis, forecast, climate scenario, etc) to the exact same standard. This way every operation after that (extract, gap fill, downscale, convert to a model, etc) will always have the exact same inputs. This will make everything else much simpler to code and allow us to avoid a lot of unnecessary data checking, tests, etc being repeated in every downstream function.
+
+### Using the API to get data
+
+In order to access the data, we need to contruct a URL that links to where the 
+data is located on [Clowder](https://terraref.ncsa.illinois.edu/clowder). The data is 
+then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
+, for Clowder. 
+
+### The structure of the Geostreams database
+
+The meteorological data that is collected for the TERRA REF project is contained 
+in multiple related tables, also know as a [relational database](https://datacarpentry.org/sql-socialsci/01-relational-database/index.html). 
+The first table contains data about the sensor that is collecting data. This is 
+then linked to a stream table, which contains information about a datastream 
+from the sensor. Sensors can have multiple datastreams. The actual weather data 
+is in the third table, the datapoint table. A visual representation of this 
+structure is shown below. 
+
+![](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
+
+In this vignette, we will be using data from a weather station at the Maricopa 
+Agricultural Center, with datapoints for the month of January 2017 from a 
+certain sensor. These data are five minute summaries aggregated from 
+observations taken every second. 
+
+### Creating the URLs for all data table types
+
+All URLs have the same beginning 
+(https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
+then additional information is added for each type of data table as shown below. 
+
+* Station: /sensors/sensor_name=[name]
+* Sensor: /sensors/[sensor number]/streams
+* Datapoints: /datapoints?stream_id=[datapoints number]&since=[start date]&until=[end date]
+
+A certain time period can be specified for the datapoints. 
+
+For example, below are the URLs for the particular data being used in this 
+vignette. These can be pasted into a browser to see how the data is stored as 
+text using JSON. 
+
+* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
+* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
+* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+
+Possible sensor numbers for a station are found on the page for that station 
+under "id:", and then datapoints numbers are found on the sensor page under 
+"stream_id:".
+
+The table belows lists the names of some stations that have available 
+meteorological data and associated stream ids. 
+
+| stream id | name                                     |
+|------------|------------------------------------------|
+| 3211        | UA-MAC AZMET Weather Station - weather  |
+| 3212        | UA-MAC AZMET Weather Station - irrigation     |
+| 46431        | UA-MAC AZMET Weather Station - weather (5 min)      |
+| 3208        | EnvironmentLogger sensor_weather_station |
+| 3207        | EnvironmentLogger sensor_par             |
+| 748        | EnvironmentLogger sensor_spectrum        |
+| 3210        | EnvironmentLogger sensor_co2             |
+| 4806       | UIUC Energy Farm SE                      |
+| 4807       | UIUC Energy Farm CEN                     |
+| 4805       | UIUC Energy Farm NE                      |
+
+
+Here is the json representation of a single five-minute observation:
+
+```
+[
+   {
+      "geometry":{
+         "type":"Point",
+         "coordinates":[
+            33.0745666667,
+            -111.9750833333,
+            0
+         ]
+      },
+      "start_time":"2016-08-30T00:06:24-07:00",
+      "type":"Feature",
+      "end_time":"2016-08-30T00:10:00-07:00",
+      "properties":{
+         "precipitation_rate":0.0,
+         "wind_speed":1.6207870370370374,
+         "surface_downwelling_shortwave_flux_in_air":0.0,
+         "northward_wind":0.07488770951583902,
+         "relative_humidity":26.18560185185185,
+         "air_temperature":300.17606481481516,
+         "eastward_wind":1.571286062845733,
+         "surface_downwelling_photosynthetic_photon_flux_in_air":0.0
+      }
+   },
+```
+
+
+### Querying weather sensor data stream
+
+The data represent 5 minute summaries aggregated from 1/s observations.
+
+### Download data using the command line
+
+Data can be downloaded from Clowder using the command line program Curl. If the 
+following is typed into the commmand line, it will download the datapoints data 
+that we're interested in as a file which we have chosen to call `spectra.json`. 
+
+```{sh eval=FALSE}
+curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+```
+
+#### Using R
+
+The following code sets the defaults for showing R code. 
+```{r met-setup}
+knitr::opts_chunk$set(cache = FALSE, message = FALSE)
+```
+
+And this is how you can access the same data in R. This uses the jsonlite R package 
+and desired URL to pull the data in. The data is in a dataframe with two nested
+dataframes, called `properties` and `geometries`. 
+
+```{r met-geostream}
+library(dplyr)
+library(ggplot2)
+library(jsonlite)
+library(lubridate)
+library(magrittr)
+library(RCurl)
+library(ncdf4)
+library(ncdf.tools)
+```
+
+```{r get-weather-fromJSON}
+weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01', flatten = FALSE)
+```
+
+The `geometries` dataframe is then pulled out from these data, which contains
+the datapoints from this stream. This is combined with a transformed version of the
+end of the time period from the stream. 
+
+```{r met-datapoints2}
+weather_data <- weather_all$properties %>% 
+  mutate(time = ymd_hms(weather_all$end_time))
+```
+
+## Weather Plots
+
+Create time series plot for one of the eight variables, wind speed, in the 
+newly created dataframe. 
+
+```{r weather}
+theme_set(ggthemes::theme_few())
+ggplot(data = weather_data) +
+  geom_point(aes(x = time, y = wind_speed), size = 0.7) +
+  labs(x = "Day", y = "Wind speed (m/s)")
+```
+
+### High resolution data (1/s) + spectroradiometer
+
+This higher resolution weather data can be used for VNIR calibration, for example. But at 1/s it is very large!
+
+#### Download data
+
+Here we will download the files using the Clowder API, but note that if you have access to the filesystem (on www.workbench.terraref.org or globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger`. Folder
+
+```{r met-setup2}
+knitr::opts_chunk$set(eval = FALSE)
+api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+output_dir <- file.path(tempdir(), "downloads")
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+```
+
+```{r query-clowder}
+# Get Spaces from Clowder - without authentication, result will be Sample Data
+spaces <- fromJSON(paste0(api_url, '/spaces'))
+print(spaces %>% select(id, name))
+```
+
+```{r list-of-datasets, eval = FALSE}
+
+# Get list of (at most 20) Datasets within that Space from Clowder
+datasets <- fromJSON(paste0(api_url, '/spaces/', spaces$id, '/datasets'))
+print(datasets %>% select(id, name))
+```
+
+```{r list-of-files, eval = FALSE}
+# Get list of Files within any EnvironmentLogger datasets and filter .nc files
+files <- fromJSON(paste0(api_url, '/datasets/', datasets$id[grepl("EnvironmentLogger", datasets$name)], '/files'))
+ncfiles <- files[grepl('environmentlogger.nc', files$filename), ]
+print(ncfiles %>% select(id, filename))
+```
+
+#### Download netCDF 1/s data from Clowder
+
+
+```{r nc-download, echo=FALSE, eval = FALSE}
+sources <- paste0(api_url, '/files/', ncfiles$id)
+outputs <- paste0(output_dir, ncfiles$filename)
+
+for (i in 1:length(sources)) {
+  print(paste0("Downloading ", sources[i], " to ", outputs[i]))
+  f <- CFILE(outputs[i], mode = "wb")
+  curlPerform(url = sources[i], writedata = f@ref)
+  RCurl::close(f)
+}
+```
+
+#### Using the netCDF 1/s data
+
+One use case getting the solar spectrum associated with a particular hyperspectral image.
+
+```{r, eval = FALSE}
+time <- vector()
+vals <- vector()
+
+for (i in 1:length(outputs)) {
+  print(paste0("Scanning ", outputs[i]))
+  ncfile <- nc_open(outputs[i])
+  curr_time <- list()
+
+  metdata <- list()
+  for(var in c(names(ncfile$dim), names(ncfile$var))){
+    metdata[[var]] <- ncvar_get(ncfile, var)
+  }
+  lapply(metdata, dim)
+  
+  days <- ncvar_get(ncfile, varid = "time")
+  curr_time <- as.numeric(ymd("1970-01-01") + seconds(days * 24 * 60 * 60))
+  
+  time <- c(time, curr_time)
+  PAR <- c(vals, metdata$`par_sensor/Sensor_Photosynthetically_Active_Radiation`)
+}
+
+#ggplot() + 
+#  geom_line(aes(time, PAR)) + theme_bw()
+
+print(ncfile)
+```
+
