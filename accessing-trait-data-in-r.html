@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-09-06" />
+<meta name="date" content="2019-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -131,7 +131,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#technical-requirements"><i class="fa fa-check"></i><b>1.1.1</b> Technical Requirements</a></li>
 <li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#user-accounts"><i class="fa fa-check"></i><b>1.1.2</b> User Accounts and permission to access TERRA REF data</a></li>
 </ul></li>
-<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#ways-of-acessing-data"><i class="fa fa-check"></i><b>1.2</b> Ways of Acessing Data</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#ways-of-accessing-data"><i class="fa fa-check"></i><b>1.2</b> Ways of Accessing Data</a></li>
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i><b>1.3</b> Other Resources</a><ul>
 <li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#finding-help"><i class="fa fa-check"></i><b>1.3.1</b> Finding help</a></li>
 </ul></li>
@@ -241,7 +241,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="introduction" class="section level2">
 <h2><span class="header-section-number">3.2</span> Introduction</h2>
 <p>In this chapter, we go over how to query TERRA REF trait data using the <a href="https://github.com/ropensci/traits"><code>traits</code></a> package. The <code>traits</code> package is a way to query for various sources of species trait data, including <a href="https://www.betydb.org/">BETYdb</a>, <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>, <a href="http://coraltraits.org/">Coral Traits Disease</a> and others. In this chapter we use BETYdb as our trait source, as it contains the TERRA REF data that we are interested in.</p>
-<p>Our example will show how to query for season 6 data <!-- what is a season? need to define this for users> --> and visualize canopy height. In addition to the <code>traits</code> package we will also be using some of the <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> packages, which allow us to maniupulate the data in an efficient, understandable way. If you are unfamiliar with <code>tidyverse</code> syntax, we recommend checking out some of the resources <a href="https://www.tidyverse.org/learn/">here</a>.</p>
+<p>Our example will show how to query for season 6 data <!-- what is a season? need to define this for users> --> and visualize canopy height. In addition to the <code>traits</code> package we will also be using some of the <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> packages, which allow us to manipulate the data in an efficient, understandable way. If you are unfamiliar with <code>tidyverse</code> syntax, we recommend checking out some of the resources <a href="https://www.tidyverse.org/learn/">here</a>.</p>
 </div>
 <div id="query-for-available-traits" class="section level2">
 <h2><span class="header-section-number">3.3</span> Query for available traits</h2>
@@ -298,7 +298,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">3.4</span> Querying a specific trait</h2>
 <div id="querying-season-6-canopy-height-data" class="section level3">
 <h3><span class="header-section-number">3.4.1</span> Querying season 6 canopy height data</h3>
-<p>You may find after constructing a general query as above that you want to only query a specific trait. Here, we query for the canopy height trait by adding the key-value pair <code>trait = &quot;canopy_height&quot;</code> to our query function. Note that the limit is also set to return only 250 records, shown here for demostration purposes.</p>
+<p>You may find after constructing a general query as above that you want to only query a specific trait. Here, we query for the canopy height trait by adding the key-value pair <code>trait = &quot;canopy_height&quot;</code> to our query function. Note that the limit is also set to return only 250 records, shown here for demonstration purposes.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">canopy_height &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">trait     =</span> <span class="st">&quot;canopy_height&quot;</span>, </a>
 <a class="sourceLine" id="cb10-2" data-line-number="2">                              <span class="dt">sitename  =</span> <span class="st">&quot;~Season 6&quot;</span>,</a>
 <a class="sourceLine" id="cb10-3" data-line-number="3">                              <span class="dt">limit     =</span>  <span class="dv">250</span>)</a></code></pre></div>

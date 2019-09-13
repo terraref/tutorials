@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-09-06" />
+<meta name="date" content="2019-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -131,7 +131,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#technical-requirements"><i class="fa fa-check"></i><b>1.1.1</b> Technical Requirements</a></li>
 <li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#user-accounts"><i class="fa fa-check"></i><b>1.1.2</b> User Accounts and permission to access TERRA REF data</a></li>
 </ul></li>
-<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#ways-of-acessing-data"><i class="fa fa-check"></i><b>1.2</b> Ways of Acessing Data</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#ways-of-accessing-data"><i class="fa fa-check"></i><b>1.2</b> Ways of Accessing Data</a></li>
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i><b>1.3</b> Other Resources</a><ul>
 <li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#finding-help"><i class="fa fa-check"></i><b>1.3.1</b> Finding help</a></li>
 </ul></li>
@@ -256,10 +256,10 @@ The <em>key</em> is a unique access key for the Clowder API.</p>
 </div>
 <div id="getting-the-sensor-list" class="section level2">
 <h2><span class="header-section-number">9.3</span> Getting the sensor list</h2>
-<p>The first thing to get is the sensor name. This can be retreived using the
+<p>The first thing to get is the sensor name. This can be retrieved using the
 <code>get_sensor_list</code> function. This function returns the full record which may
 be useful in some cases but primarily includes sensor names that include
-a plot id number. The utility function <code>unique_sensor_names</code> accpets the
+a plot id number. The utility function <code>unique_sensor_names</code> accepts the
 sensor list and provides a list of names suitable for use in the
 <code>get_file_listing</code> function.</p>
 <p>To use this tutorial you will need to sign up for Clowder, have your
@@ -306,7 +306,7 @@ TODO: move this to a separate tutorial page focused on using curl
 of requests against the API it’s possible to determine the files of interest and then download them.</p>
 <p>Each of the API URL’s have the same beginning (<a href="https://terraref.ncsa.illinois.edu/clowder/api" class="uri">https://terraref.ncsa.illinois.edu/clowder/api</a>),
 followed by the data needed for a specific request. As we step through the process you will be able
-to see how then end of the URL changes depending upon the reuqest.</p>
+to see how then end of the URL changes depending upon the request.</p>
 <p>Below is what the API looks like as a URL. Try pasting it into your browser.</p>
 <p><a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=MAC%20Field%20Scanner%20Season%201%20Field%20Plot%20101%20W">https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W</a></p>
 <p>This will return data for the requested plot including its id. This id (or identifier) can then be used for
@@ -347,7 +347,7 @@ contains the stream ID. You can use this ID parameter to get the datasets, and t
 <p>We now have a stream ID that we can use to list our datasets. The datasets in turn contain files of interest.</p>
 <div class="sourceCode" id="cb66"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb66-1" data-line-number="1"><span class="va">STREAM_ID=</span>11586</a>
 <a class="sourceLine" id="cb66-2" data-line-number="2"><span class="ex">curl</span> -o datasets.json -X GET <span class="st">&quot;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=</span><span class="va">${STREAM_ID}</span><span class="st">&quot;</span></a></code></pre></div>
-<p>After the call succeeds, a file named <em>datasets.json</em> is created containing the returned JSON onject. As part of the
+<p>After the call succeeds, a file named <em>datasets.json</em> is created containing the returned JSON object. As part of the
 JSON object there are one or more <code>properties</code> fields containing <em>source_dataset</em> parameters.</p>
 <div class="sourceCode" id="cb67"><pre class="sourceCode javascript"><code class="sourceCode javascript"><a class="sourceLine" id="cb67-1" data-line-number="1">properties<span class="op">:</span> <span class="op">{</span></a>
 <a class="sourceLine" id="cb67-2" data-line-number="2">    <span class="dt">dataset_name</span><span class="op">:</span> <span class="st">&quot;Thermal IR GeoTIFFs - 2016-05-09__12-07-57-990&quot;</span><span class="op">,</span></a>
@@ -386,7 +386,7 @@ of the files in the dataset with their IDs, and other data if available:</p>
 </div>
 <div id="retrieving-the-files" class="section level3">
 <h3><span class="header-section-number">9.5.6</span> Retrieving the files</h3>
-<p>Given that a large number of files may be contained in a dataset, it may be desireable to automate the process of pulling down files
+<p>Given that a large number of files may be contained in a dataset, it may be desirable to automate the process of pulling down files
 to the local system.</p>
 <p>For each file to be retrieved, the unique file ID is needed on the URL.</p>
 <div class="sourceCode" id="cb71"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb71-1" data-line-number="1"><span class="va">FILE_NAME=</span><span class="st">&quot;ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif&quot;</span></a>
