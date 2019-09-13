@@ -13,7 +13,7 @@ In this chapter you will learn:
 
 In this chapter, we go over how to query TERRA REF trait data using the [`traits`](https://github.com/ropensci/traits) package. The `traits` package is a way to query for various sources of species trait data, including [BETYdb](https://www.betydb.org/), [NCBI](http://www.ncbi.nlm.nih.gov/), [Coral Traits Disease](http://coraltraits.org/) and others. In this chapter we use BETYdb as our trait source, as it contains the TERRA REF data that we are interested in.
 
-Our example will show how to query for season 6 data <!-- what is a season? need to define this for users> --> and visualize canopy height. In addition to the `traits` package we will also be using some of the [`tidyverse`](https://www.tidyverse.org/) packages, which allow us to maniupulate the data in an efficient, understandable way. If you are unfamiliar with `tidyverse` syntax, we recommend checking out some of the resources [here](https://www.tidyverse.org/learn/).
+Our example will show how to query for season 6 data <!-- what is a season? need to define this for users> --> and visualize canopy height. In addition to the `traits` package we will also be using some of the [`tidyverse`](https://www.tidyverse.org/) packages, which allow us to manipulate the data in an efficient, understandable way. If you are unfamiliar with `tidyverse` syntax, we recommend checking out some of the resources [here](https://www.tidyverse.org/learn/).
 
 
 
@@ -99,7 +99,7 @@ kable(traits)
 
 ### Querying season 6 canopy height data
 
-You may find after constructing a general query as above that you want to only query a specific trait. Here, we query for the canopy height trait by adding the key-value pair `trait = "canopy_height"` to our query function. Note that the limit is also set to return only 250 records, shown here for demostration purposes.
+You may find after constructing a general query as above that you want to only query a specific trait. Here, we query for the canopy height trait by adding the key-value pair `trait = "canopy_height"` to our query function. Note that the limit is also set to return only 250 records, shown here for demonstration purposes.
 
 ```{r traits-vig-canopy-query, message = FALSE}
 

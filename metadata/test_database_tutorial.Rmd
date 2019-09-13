@@ -11,7 +11,7 @@ The purpose of this tutorial is to demonstrate how to set up a local instance of
 
 You will want to set up this test database when preparing to upload data to the master database.
 
-You should make sure that your data can be succesfully uploaded to the test database before trying to upload to master.
+You should make sure that your data can be successfully uploaded to the test database before trying to upload to master.
 
 # Requirements:
 
@@ -41,7 +41,7 @@ After initial set up, you will only need to run step 4 to restart the database.
 
 ## Step 1: Clone bety repository
 
-In a directory of your chioce, clone the bety repository from github and cd to the bety folder:
+In a directory of your choice, clone the bety repository from github and cd to the bety folder:
 
 ```sh
 git clone https://github.com/PecanProject/bety.git
@@ -107,7 +107,7 @@ Open a new tab in the terminal and connect to the test database using:
 ```sh
 psql -h localhost -p 5433 -U bety
 ```
-You should see the following prompt if you have succesfully logged into the test database:
+You should see the following prompt if you have successfully logged into the test database:
 ```sh
 psql (11.2, server 9.5.16)
 Type "help" for help.

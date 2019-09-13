@@ -58,7 +58,7 @@ These data are summarized from camera data, can see that by unselecting "Heat Ma
 
 We can download these individual files. TERRA REF data are on two platforms. We pulled data from the first platform Clowder last week. Other platform is called Globus, let's work with that first. 
 
-All data are on Globus. Go to [website](globus.org) and log in. Need to set up account and get acccess to Terraref collection. Instructions are [here](https://docs.terraref.org/user-manual/how-to-access-data/using-globus-sensor-and-genomics-data). 
+All data are on Globus. Go to [website](globus.org) and log in. Need to set up account and get access to Terraref collection. Instructions are [here](https://docs.terraref.org/user-manual/how-to-access-data/using-globus-sensor-and-genomics-data).
 
 In File Manager section. Click "Start here", "Shared With You" tab, and then "Terraref" option. This gives access to a bunch of files for the project. 
 

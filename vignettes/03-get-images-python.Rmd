@@ -25,7 +25,7 @@ All the `terrautils` functions are now available in Python, although we will onl
 ## Retrieving sensor names
 
 In this section we retrieve the names of different sensor types that are available. 
-This will allow you to understand what files may be avaialable other than just those containing RBG image data.
+This will allow you to understand what files may be available other than just those containing RBG image data.
 
 In order to run Python functions, including those from the `terrautils` library, within this Rmarkdown, we have to install and set up `reticulate`. 
 
