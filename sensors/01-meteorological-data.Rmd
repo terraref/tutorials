@@ -98,8 +98,9 @@ meteorological data and associated stream ids.
 
 | stream id | name                                     |
 |------------|------------------------------------------|
+| 3211        | UA-MAC AZMET Weather Station - weather  |
 | 3212        | UA-MAC AZMET Weather Station - irrigation     |
-| 46431        | Weather Observations (5 min bins)      |
+| 46431        | UA-MAC AZMET Weather Station - weather (5 min)      |
 | 3208        | EnvironmentLogger sensor_weather_station |
 | 3207        | EnvironmentLogger sensor_par             |
 | 748        | EnvironmentLogger sensor_spectrum        |
