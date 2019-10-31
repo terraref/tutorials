@@ -27,6 +27,7 @@ library(traits)
 library(ggplot2)
 library(ggthemes)
 library(dplyr)
+library(lubridate)
 ```
 
 ```{r}
@@ -94,18 +95,18 @@ canopy_height <- betydb_query(table     = 'search',
                                limit     = 'none')
 ```
 
-First let's fix the `raw_date` column so that it is represented as a actual date object using `lubridate::ymd_hms`.
+First let's fix the `raw_date` column so that it is represented as an actual date object using `lubridate::ymd_hms`. It is also converted to the correct time zone with `with_tz`, another `lubridate` function. 
 
 ```{r}
 canopy_height <- canopy_height %>% 
-  mutate(raw_date = ymd_hms(raw_date))
+  mutate(trans_date = with_tz(ymd_hms(raw_date), "America/Phoenix"))
 ```
 
 
 ```{r plot_height}
 
 ggplot(data = canopy_height,
-       aes(x = raw_date, y = mean)) +
+       aes(x = trans_date, y = mean)) +
   geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
   xlab("Date") + ylab("Plant Height") +
   guides(color = guide_legend(title = 'Genotype')) +
