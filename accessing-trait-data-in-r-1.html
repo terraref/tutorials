@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-10-28" />
+<meta name="date" content="2019-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -246,7 +246,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="kw">library</span>(traits)</a>
 <a class="sourceLine" id="cb38-2" data-line-number="2"><span class="kw">library</span>(ggplot2)</a>
 <a class="sourceLine" id="cb38-3" data-line-number="3"><span class="kw">library</span>(ggthemes)</a>
-<a class="sourceLine" id="cb38-4" data-line-number="4"><span class="kw">library</span>(dplyr)</a></code></pre></div>
+<a class="sourceLine" id="cb38-4" data-line-number="4"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb38-5" data-line-number="5"><span class="kw">library</span>(lubridate)</a></code></pre></div>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">theme_set</span>(<span class="kw">theme_bw</span>())</a></code></pre></div>
 <p>Create a file that contains your API key. If you have signed up for access to the TERRA REF database, your API key will have been sent to you in an email. You will need this personal key <em>and</em> permissions to access the trait data. If you receive empty (NULL) datasets, it is likely that you do not have permissions.</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="co"># This should be done once with the key sent to you in your email</span></a>
@@ -284,11 +285,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb44-2" data-line-number="2">                               <span class="dt">trait     =</span> <span class="st">&quot;canopy_height&quot;</span>,</a>
 <a class="sourceLine" id="cb44-3" data-line-number="3">                               <span class="dt">sitename  =</span> <span class="st">&quot;~Season 6&quot;</span>,</a>
 <a class="sourceLine" id="cb44-4" data-line-number="4">                               <span class="dt">limit     =</span> <span class="st">&#39;none&#39;</span>)</a></code></pre></div>
-<p>First let’s fix the <code>raw_date</code> column so that it is represented as a actual date object using <code>lubridate::ymd_hms</code>.</p>
+<p>First let’s fix the <code>raw_date</code> column so that it is represented as an actual date object using <code>lubridate::ymd_hms</code>. It is also converted to the correct time zone with <code>with_tz</code>, another <code>lubridate</code> function.</p>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">canopy_height &lt;-<span class="st"> </span>canopy_height <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb45-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">raw_date =</span> <span class="kw">ymd_hms</span>(raw_date))</a></code></pre></div>
+<a class="sourceLine" id="cb45-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">trans_date =</span> <span class="kw">with_tz</span>(<span class="kw">ymd_hms</span>(raw_date), <span class="st">&quot;America/Phoenix&quot;</span>))</a></code></pre></div>
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> canopy_height,</a>
-<a class="sourceLine" id="cb46-2" data-line-number="2">       <span class="kw">aes</span>(<span class="dt">x =</span> raw_date, <span class="dt">y =</span> mean)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">       <span class="kw">aes</span>(<span class="dt">x =</span> trans_date, <span class="dt">y =</span> mean)) <span class="op">+</span></a>
 <a class="sourceLine" id="cb46-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>, <span class="dt">position =</span> <span class="kw">position_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>)) <span class="op">+</span></a>
 <a class="sourceLine" id="cb46-4" data-line-number="4"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Date&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="st">&quot;Plant Height&quot;</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb46-5" data-line-number="5"><span class="st">  </span><span class="kw">guides</span>(<span class="dt">color =</span> <span class="kw">guide_legend</span>(<span class="dt">title =</span> <span class="st">&#39;Genotype&#39;</span>)) <span class="op">+</span></a>

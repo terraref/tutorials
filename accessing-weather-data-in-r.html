@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-10-28" />
+<meta name="date" content="2019-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -253,9 +253,9 @@ The data is read in by the <code>fromJSON</code> function as a dataframe that al
 <a class="sourceLine" id="cb13-6" data-line-number="6"></a>
 <a class="sourceLine" id="cb13-7" data-line-number="7">weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>The <code>geometries</code> dataframe is then pulled out from these data, which contains the datapoints from this stream.
-This is combined with a transformed version of the end of the time period from the stream.</p>
+This is combined with a transformed version of the end of the time period in the correct time zone from the stream.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">weather_data &lt;-<span class="st"> </span>weather_all<span class="op">$</span>properties <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">ymd_hms</span>(weather_all<span class="op">$</span>end_time))</a></code></pre></div>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">with_tz</span>(<span class="kw">ymd_hms</span>(weather_all<span class="op">$</span>end_time), <span class="st">&quot;America/Phoenix&quot;</span>))</a></code></pre></div>
 <p>The temperature data, which is five minute averages for the entire month of January 2017, is used to calculate the growing degree days for each day.
 Growing degree days is a measurement that is used to predict when certain plant developmental phases happen.
 This new dataframe will be used in the last vignette to synthesize the trait, weather, and image data.</p>

@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-10-28" />
+<meta name="date" content="2019-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -527,7 +527,7 @@ dataframes, called <code>properties</code> and <code>geometries</code>.</p>
 the datapoints from this stream. This is combined with a transformed version of the
 end of the time period from the stream.</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1">weather_data &lt;-<span class="st"> </span>weather_all<span class="op">$</span>properties <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">ymd_hms</span>(weather_all<span class="op">$</span>end_time))</a></code></pre></div>
+<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">time =</span> <span class="kw">with_tz</span>(<span class="kw">ymd_hms</span>(weather_all<span class="op">$</span>end_time), <span class="st">&quot;America/Phoenix&quot;</span>))</a></code></pre></div>
 </div>
 </div>
 </div>
