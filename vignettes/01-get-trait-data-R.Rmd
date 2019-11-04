@@ -59,12 +59,12 @@ season_4 <- betydb_query(sitename  = "~Season 4",
 
 The return value for the `betydb_query` function is just a `data.frame` so we can work with it like any other `data.frame` in R.
 
-Let's plot a time series of all traits returned. First you might notice that the relevant date columns in the `season_4` data.frame are returned as characters instead of a date format. Before plotting, let's get our `raw_date` column into a proper date format using functions from `dplyr` and `lubridate`.
+Let's plot a time series of all traits returned. First you might notice that the relevant date columns in the `season_4` data.frame are returned as characters instead of a date format. Before plotting, let's get our `raw_date` column into a proper date format and time zone using functions from `dplyr` and `lubridate`.
 
 
 ```{r traits-vig-s4-summary-reformat-date, message = FALSE}
 season_4 <- season_4 %>%
-  mutate(raw_date = ymd_hms(raw_date))
+  mutate(trans_date = with_tz(ymd_hms(raw_date), "America/Phoenix"))
 ```
 
 ### Plot season 4 summary
@@ -73,8 +73,8 @@ Now we can create a plot of all of the trait data collected during season 4, inc
 
 ```{r traits-vig-s4-summary-plot-data, fig.height = 15, fig.width = 7}
 ggplot(data = season_4) +
-  geom_point(aes(x = raw_date, y = mean, color = method_name), shape = '.') +
-  geom_line(aes(x = raw_date, y = mean, group = cultivar, color = method_name)) +
+  geom_point(aes(x = trans_date, y = mean, color = method_name), shape = '.') +
+  geom_line(aes(x = trans_date, y = mean, group = cultivar, color = method_name)) +
   facet_wrap(~trait, ncol = 4, scales = "free_y") +
   xlab("Date") + 
   ylab("Mean trait value") + 
@@ -116,7 +116,7 @@ As before, we need to reformat the raw date column.
 
 ```{r traits-vig-fix-date}
 canopy_height <- canopy_height %>% 
-  mutate(raw_date = ymd_hms(raw_date))
+  mutate(trans_date = with_tz(ymd_hms(raw_date), "America/Phoenix"))
 ```
 
 And we can generate a time series plot of just the canopy height data.
@@ -125,7 +125,7 @@ And we can generate a time series plot of just the canopy height data.
 
 #plot a time series of canopy height 
 ggplot(data = canopy_height,
-       aes(x = raw_date, y = mean)) +
+       aes(x = trans_date, y = mean)) +
   geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
   xlab("Date") +
   ylab("Plant height (cm)") +

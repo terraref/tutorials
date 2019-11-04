@@ -185,7 +185,7 @@ end of the time period from the stream.
 
 ```{r met-datapoints2}
 weather_data <- weather_all$properties %>% 
-  mutate(time = ymd_hms(weather_all$end_time))
+  mutate(time = with_tz(ymd_hms(weather_all$end_time), "America/Phoenix"))
 ```
 
 ## Weather Plots

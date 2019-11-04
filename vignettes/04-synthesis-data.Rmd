@@ -32,13 +32,14 @@ trait_canopy_cover <- betydb_query(table     = "search",
                       date      = "~2018",
                       limit     =  "none")
 trait_canopy_cover_day = trait_canopy_cover %>% 
-  mutate(day = as.Date(raw_date))
+  mutate(trans_date = with_tz(ymd_hms(raw_date), "America/Phoenix"), 
+         day = as.Date(raw_date))
 ```
 
 ```{r get_weather_data}
 weather <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-01-01&until=2018-12-31', flatten = FALSE)
 weather <- weather$properties %>% 
-  mutate(time = ymd_hms(weather$end_time))
+  mutate(time = with_tz(ymd_hms(weather$end_time), "America/Phoenix"))
 daily_values = weather %>% 
   mutate(day = as.Date(time), 
          air_temp_converted = air_temperature - 273.15) %>% 
@@ -256,7 +257,8 @@ trait_canopy_cover <- betydb_query(table     = "search",
                                    limit     =  "none")
                        
 trait_canopy_cover_day <- trait_canopy_cover %>% 
-  mutate(day = as.Date(raw_date))
+  mutate(trans_date = with_tz(ymd_hms(raw_date), "America/Phoenix"), 
+         day = as.Date(raw_date))
 ```
 
 We now need to add the height data to the data set to plot.
