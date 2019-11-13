@@ -8,7 +8,7 @@ the API key that will be used in this tutorial.
 
 The terrautils python package has a new `products` module that aids in connecting
 plot boundaries stored within betydb with the file-based data products available
-from the workbench or Globus.
+from Globus.
 
 * if are using Rstudio and want to run the Python code chunks, the R package "reticulate" is required
 * use `pip3 install terrautils` to install the terrautils Python library

@@ -35,7 +35,53 @@ At a minimum, you should have:
 * Software:
     + Software requirements vary with the tutorials, and may be complex
 
-### User Accounts and permission to access TERRA REF data {#user-accounts}
+### Installation instructions {#installation-instructions}
+
+**Option 1** The recommended and easier option is to use our [VICE](https://learning.cyverse.org/projects/vice/en/latest/getting_started/about.html) app on [CyVerse](https://cyverse.org/)'s [Discovery Environment](https://de.cyverse.org/de/) platform. All necessary programs and libraries are installed and accessed using RStudio. You'll need a CyVerse account; follow instructions below to set up. 
+
+Launching TERRA REF app on VICE: 
+
+1. Google "Cyverse" and click link to website
+2. Select Products tab
+3. Under "Discovery Environment", select Launch button
+4. Hit "Log in with your CyVerse ID" button
+5. Log in with CyVerse credentials (username and password)
+6. Select "Apps", type in "terra", select "TERRA REF Rstudio 3.6.0", and "Use App"
+7. Click "Launch Analysis", hit Analysis button, and select arrow button in Analyses window
+8. Wait patiently
+9. Sign into RStudio using username: rstudio and password: rstudio1
+
+Reopen running TERRA REF instance: 
+
+1. Google "Cyverse" and click link to website
+2. Select Products tab
+3. Under "Discovery Environment", select Launch button
+4. Hit "Log in with your CyVerse ID" button
+5. Log in with CyVerse credentials (username and password)
+6. Open Analyses window and hit arrow button to open up RStudio
+
+**Option 2** Everything necessary can be installed locally instead of using the VICE app. 
+You will need to [install R](https://www.r-project.org/) and a handful of R packages. 
+
+All of the packages except `traits` are available on CRAN and can be installed using the `install.packages` function:
+
+```r
+install.packages('tidyverse', 'jsonlite', 'knitr', 'lubridate', 'raster', 'sf')
+```
+
+Although `traits` is also on CRAN, you need to download the TERRA REF version from GitHub to handle larger datasets: 
+
+```r
+install.packages('devtools')
+devtools::install_github('terraref/traits')
+```
+You will additionally need to [install Python](https://www.python.org/downloads/) and the `terrautils` library, as below: 
+
+```sh
+pip install terrautils
+```
+
+### User accounts and permission to access TERRA REF data {#user-accounts}
 
 The first few chapters in the 'vignettes' section use publicly available sample data sets.
 Subsequent sections are also written to use publicly available data sets, but some of the examples require data that requires users to sign up.
