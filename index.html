@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>TERRA REF Tutorials</title>
   <meta name="description" content="TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.14.1 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.15.1 and GitBook 2.6.7" />
 
   <meta property="og:title" content="TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-11-04" />
+<meta name="date" content="2019-11-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -132,7 +132,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Overview</a><ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#pre-requisites"><i class="fa fa-check"></i><b>1.1</b> Pre-requisites</a><ul>
 <li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#technical-requirements"><i class="fa fa-check"></i><b>1.1.1</b> Technical Requirements</a></li>
-<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#user-accounts"><i class="fa fa-check"></i><b>1.1.2</b> User Accounts and permission to access TERRA REF data</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#installation-instructions"><i class="fa fa-check"></i><b>1.1.2</b> Installation instructions</a></li>
+<li class="chapter" data-level="1.1.3" data-path="index.html"><a href="index.html#user-accounts"><i class="fa fa-check"></i><b>1.1.3</b> User accounts and permission to access TERRA REF data</a></li>
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#ways-of-accessing-data"><i class="fa fa-check"></i><b>1.2</b> Ways of Accessing Data</a></li>
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i><b>1.3</b> Other Resources</a><ul>
@@ -140,12 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="part"><span><b>Section 1: Vignettes</b></span></li>
-<li class="chapter" data-level="2" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html"><i class="fa fa-check"></i><b>2</b> Vignettes Introduction</a><ul>
-<li class="chapter" data-level="2.1" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html#prerequisites"><i class="fa fa-check"></i><b>2.1</b> Prerequisites</a><ul>
-<li class="chapter" data-level="2.1.1" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html#r"><i class="fa fa-check"></i><b>2.1.1</b> R</a></li>
-<li class="chapter" data-level="2.1.2" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html#python"><i class="fa fa-check"></i><b>2.1.2</b> Python</a></li>
-</ul></li>
-</ul></li>
+<li class="chapter" data-level="2" data-path="vignettes-introduction.html"><a href="vignettes-introduction.html"><i class="fa fa-check"></i><b>2</b> Vignettes Introduction</a></li>
 <li class="chapter" data-level="3" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html"><i class="fa fa-check"></i><b>3</b> Accessing trait data in R</a><ul>
 <li class="chapter" data-level="3.1" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#learning-objectives"><i class="fa fa-check"></i><b>3.1</b> Learning Objectives</a></li>
 <li class="chapter" data-level="3.2" data-path="accessing-trait-data-in-r.html"><a href="accessing-trait-data-in-r.html#introduction"><i class="fa fa-check"></i><b>3.2</b> Introduction</a></li>
@@ -233,7 +229,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">TERRA REF Tutorials</h1>
 <p class="author"><em>David LeBauer and others</em></p>
-<p class="date"><em>2019-11-04</em></p>
+<p class="date"><em>2019-11-13</em></p>
 </div>
 <div id="overview" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Overview</h1>
@@ -261,8 +257,42 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul>
 </div>
+<div id="installation-instructions" class="section level3">
+<h3><span class="header-section-number">1.1.2</span> Installation instructions</h3>
+<p><strong>Option 1</strong> The recommended and easier option is to use our <a href="https://learning.cyverse.org/projects/vice/en/latest/getting_started/about.html">VICE</a> app on <a href="https://cyverse.org/">CyVerse</a>’s <a href="https://de.cyverse.org/de/">Discovery Environment</a> platform. All necessary programs and libraries are installed and accessed using RStudio. You’ll need a CyVerse account; follow instructions below to set up.</p>
+<p>Launching TERRA REF app on VICE:</p>
+<ol style="list-style-type: decimal">
+<li>Google “Cyverse” and click link to website</li>
+<li>Select Products tab</li>
+<li>Under “Discovery Environment”, select Launch button</li>
+<li>Hit “Log in with your CyVerse ID” button</li>
+<li>Log in with CyVerse credentials (username and password)</li>
+<li>Select “Apps”, type in “terra”, select “TERRA REF Rstudio 3.6.0”, and “Use App”</li>
+<li>Click “Launch Analysis”, hit Analysis button, and select arrow button in Analyses window</li>
+<li>Wait patiently</li>
+<li>Sign into RStudio using username: rstudio and password: rstudio1</li>
+</ol>
+<p>Reopen running TERRA REF instance:</p>
+<ol style="list-style-type: decimal">
+<li>Google “Cyverse” and click link to website</li>
+<li>Select Products tab</li>
+<li>Under “Discovery Environment”, select Launch button</li>
+<li>Hit “Log in with your CyVerse ID” button</li>
+<li>Log in with CyVerse credentials (username and password)</li>
+<li>Open Analyses window and hit arrow button to open up RStudio</li>
+</ol>
+<p><strong>Option 2</strong> Everything necessary can be installed locally instead of using the VICE app.
+You will need to <a href="https://www.r-project.org/">install R</a> and a handful of R packages.</p>
+<p>All of the packages except <code>traits</code> are available on CRAN and can be installed using the <code>install.packages</code> function:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&#39;tidyverse&#39;</span>, <span class="st">&#39;jsonlite&#39;</span>, <span class="st">&#39;knitr&#39;</span>, <span class="st">&#39;lubridate&#39;</span>, <span class="st">&#39;raster&#39;</span>, <span class="st">&#39;sf&#39;</span>)</a></code></pre></div>
+<p>Although <code>traits</code> is also on CRAN, you need to download the TERRA REF version from GitHub to handle larger datasets:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&#39;devtools&#39;</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&#39;terraref/traits&#39;</span>)</a></code></pre></div>
+<p>You will additionally need to <a href="https://www.python.org/downloads/">install Python</a> and the <code>terrautils</code> library, as below:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="ex">pip</span> install terrautils</a></code></pre></div>
+</div>
 <div id="user-accounts" class="section level3">
-<h3><span class="header-section-number">1.1.2</span> User Accounts and permission to access TERRA REF data</h3>
+<h3><span class="header-section-number">1.1.3</span> User accounts and permission to access TERRA REF data</h3>
 <p>The first few chapters in the ‘vignettes’ section use publicly available sample data sets.
 Subsequent sections are also written to use publicly available data sets, but some of the examples require data that requires users to sign up.
 To sign up, you will need to 1) fill out the TERRA REF Beta user questionnaire (<a href="https://terraref.org/beta">terraref.org/beta</a>) and 2) request access to specific databases.</p>
@@ -338,12 +368,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -355,6 +384,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },

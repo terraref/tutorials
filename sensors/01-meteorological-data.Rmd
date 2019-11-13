@@ -206,7 +206,7 @@ This higher resolution weather data can be used for VNIR calibration, for exampl
 
 #### Download data
 
-Here we will download the files using the Clowder API, but note that if you have access to the filesystem (on www.workbench.terraref.org or globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger`. Folder
+Here we will download the files using the Clowder API, but note that if you have access to the filesystem on Globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger` folder. 
 
 ```{r met-setup2}
 knitr::opts_chunk$set(eval = FALSE)
