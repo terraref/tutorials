@@ -45,7 +45,7 @@ Launching TERRA REF app on VICE:
 2. Click "Log in with your CyVerse ID" and log in using your CyVerse username and password
 3. Hit "Launch Analysis" button in pop up window, and select arrow button in Analyses window
 4. Wait patiently
-3. Sign into RStudio using username: rstudio and password: rstudio1
+5. Sign into RStudio using username: rstudio and password: rstudio1
 
 Reopen running TERRA REF instance: 
 
