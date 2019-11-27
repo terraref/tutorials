@@ -41,26 +41,20 @@ At a minimum, you should have:
 
 Launching TERRA REF app on VICE: 
 
-1. Google "Cyverse" and click link to website
-2. Select Products tab
-3. Under "Discovery Environment", select Launch button
-4. Hit "Log in with your CyVerse ID" button
-5. Log in with CyVerse credentials (username and password)
-6. Select "Apps", type in "terra", select "TERRA REF Rstudio 3.6.0", and "Use App"
-7. Click "Launch Analysis", hit Analysis button, and select arrow button in Analyses window
-8. Wait patiently
-9. Sign into RStudio using username: rstudio and password: rstudio1
+1. Click this button <a href="https://de.cyverse.org/de/?type=quick-launch&quick-launch-id=27203e0f-e2a1-4846-be0c-e97cb6ef60f2&app-id=041dd9c4-b964-11e9-a238-008cfa5ae621" target="_blank"><img src="https://de.cyverse.org/Powered-By-CyVerse-blue.svg"></a>
+2. Click "Log in with your CyVerse ID" and log in using your CyVerse username and password
+3. Hit "Launch Analysis" button in pop up window, and select arrow button in Analyses window
+4. Wait patiently
+5. Sign into RStudio using username: rstudio and password: rstudio1
 
 Reopen running TERRA REF instance: 
 
-1. Google "Cyverse" and click link to website
-2. Select Products tab
-3. Under "Discovery Environment", select Launch button
-4. Hit "Log in with your CyVerse ID" button
-5. Log in with CyVerse credentials (username and password)
-6. Open Analyses window and hit arrow button to open up RStudio
+1. Open the [CyVerse Discovery Environment](https://de.cyverse.org/de/)
+2. Log in
+3. Open Analyses window and hit arrow button to open up RStudio
 
 **Option 2** Everything necessary can be installed locally instead of using the VICE app. 
+
 You will need to [install R](https://www.r-project.org/) and a handful of R packages. 
 
 All of the packages except `traits` are available on CRAN and can be installed using the `install.packages` function:
@@ -123,4 +117,3 @@ options(warn = -1)
 knitr::opts_chunk$set(cache = TRUE, message = FALSE, eval = FALSE)
 ggplot2::theme_set(ggthemes::theme_few())
 ```
-
