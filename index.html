@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>TERRA REF Tutorials</title>
   <meta name="description" content="TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.15.1 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.16.2 and GitBook 2.6.7" />
 
   <meta property="og:title" content="TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2019-11-13" />
+<meta name="date" content="2019-11-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -229,7 +229,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">TERRA REF Tutorials</h1>
 <p class="author"><em>David LeBauer and others</em></p>
-<p class="date"><em>2019-11-13</em></p>
+<p class="date"><em>2019-11-27</em></p>
 </div>
 <div id="overview" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Overview</h1>
@@ -262,27 +262,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><strong>Option 1</strong> The recommended and easier option is to use our <a href="https://learning.cyverse.org/projects/vice/en/latest/getting_started/about.html">VICE</a> app on <a href="https://cyverse.org/">CyVerse</a>’s <a href="https://de.cyverse.org/de/">Discovery Environment</a> platform. All necessary programs and libraries are installed and accessed using RStudio. You’ll need a CyVerse account; follow instructions below to set up.</p>
 <p>Launching TERRA REF app on VICE:</p>
 <ol style="list-style-type: decimal">
-<li>Google “Cyverse” and click link to website</li>
-<li>Select Products tab</li>
-<li>Under “Discovery Environment”, select Launch button</li>
-<li>Hit “Log in with your CyVerse ID” button</li>
-<li>Log in with CyVerse credentials (username and password)</li>
-<li>Select “Apps”, type in “terra”, select “TERRA REF Rstudio 3.6.0”, and “Use App”</li>
-<li>Click “Launch Analysis”, hit Analysis button, and select arrow button in Analyses window</li>
+<li>Click this button <a href="https://de.cyverse.org/de/?type=quick-launch&quick-launch-id=27203e0f-e2a1-4846-be0c-e97cb6ef60f2&app-id=041dd9c4-b964-11e9-a238-008cfa5ae621" target="_blank"><img src="https://de.cyverse.org/Powered-By-CyVerse-blue.svg"></a></li>
+<li>Click “Log in with your CyVerse ID” and log in using your CyVerse username and password</li>
+<li>Hit “Launch Analysis” button in pop up window, and select arrow button in Analyses window</li>
 <li>Wait patiently</li>
 <li>Sign into RStudio using username: rstudio and password: rstudio1</li>
 </ol>
 <p>Reopen running TERRA REF instance:</p>
 <ol style="list-style-type: decimal">
-<li>Google “Cyverse” and click link to website</li>
-<li>Select Products tab</li>
-<li>Under “Discovery Environment”, select Launch button</li>
-<li>Hit “Log in with your CyVerse ID” button</li>
-<li>Log in with CyVerse credentials (username and password)</li>
+<li>Open the <a href="https://de.cyverse.org/de/">CyVerse Discovery Environment</a></li>
+<li>Log in</li>
 <li>Open Analyses window and hit arrow button to open up RStudio</li>
 </ol>
-<p><strong>Option 2</strong> Everything necessary can be installed locally instead of using the VICE app.
-You will need to <a href="https://www.r-project.org/">install R</a> and a handful of R packages.</p>
+<p><strong>Option 2</strong> Everything necessary can be installed locally instead of using the VICE app.</p>
+<p>You will need to <a href="https://www.r-project.org/">install R</a> and a handful of R packages.</p>
 <p>All of the packages except <code>traits</code> are available on CRAN and can be installed using the <code>install.packages</code> function:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&#39;tidyverse&#39;</span>, <span class="st">&#39;jsonlite&#39;</span>, <span class="st">&#39;knitr&#39;</span>, <span class="st">&#39;lubridate&#39;</span>, <span class="st">&#39;raster&#39;</span>, <span class="st">&#39;sf&#39;</span>)</a></code></pre></div>
 <p>Although <code>traits</code> is also on CRAN, you need to download the TERRA REF version from GitHub to handle larger datasets:</p>
