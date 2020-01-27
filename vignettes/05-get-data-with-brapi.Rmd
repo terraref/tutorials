@@ -1,0 +1,67 @@
+# Downloading data with BrAPI R package
+
+## Objective: To be able to demonstrate how to get all TERRA REF data available via BrAPI
+
+- Define BrAPI
+- Describe `brapi` R package for using API
+
+```{r, eval=FALSE}
+library(brapi)
+```
+
+# Exploring available data
+
+The function `ba_calls` from `brapi` is supposed to show which functionalities are available for our data base. 
+
+```{r, eval=FALSE}
+terraref <- ba_db()$terraref
+ba_calls(terraref)
+```
+This returns no data and some warnings, as below: 
+
+```{shell}
+Unknown or uninitialised column: 'datatypes'.Unknown or uninitialised column: 'methods'.Unknown or uninitialised column: 'versions'.No encoding supplied: defaulting to UTF-8.
+```
+
+These errors come from two sources: 
+
+1. The GET call using authentication when our server doesn't require any
+2. For showing the type of data, our server uses the current API version of the key (`dataTypes`) while the R package uses the older version (`datatypes`)
+
+This can be fixed in the R package code base by doing the following: 
+
+**Remove authorization argument**
+
+This is in `brapiGET` function in the `httr::GET` line. 
+
+*Current*
+```{r, eval=FALSE}
+  res <- httr::GET(url = url, httr::timeout(25),
+        httr::add_headers("Authorization" =
+                            paste("Bearer", con$token)))
+```
+
+*New*
+```{r, eval=FALSE}
+  res <- httr::GET(url = url, httr::timeout(25))
+```
+
+**Fix case**
+
+This is in `ba_calls` function in the `out$datatypes` line. 
+
+*Current*
+```{r, eval=FALSE}
+      out$datatypes <- vapply(X = out$datatypes, FUN = paste, FUN.VALUE = "",
+                              collapse = "; ")
+```
+
+*New*
+```{r, eval=FALSE}
+      out$datatypes <- vapply(X = out$dataTypes, FUN = paste, FUN.VALUE = "",
+                              collapse = "; ")
+```
+
+Note: the latter does break for the example database used for BrAPI, sweetpotatobase, because the server still uses `datatypes`.
+
+Once these two changes are made, they can implemented locally by rebuilding the `brapi` R package by running `devtools::install(".")` from inside the `brapi` folder. 

@@ -1,0 +1,165 @@
+---
+title: "Fourth Walkthrough Notes"
+author: "Kristina Riemer"
+output: github_document
+urlcolor: blue
+---
+
+Objectives: introduction to what BrAPI is and how it works, and then looking at and accessing the TERRA REF data available through BrAPI
+
+## Video 1: BrAPI intro
+
+The [BrAPI website](https://brapi.docs.apiary.io) is a very useful, well-laid out resource for learning about and using this API. 
+
+BrAPI stands for Breeding API. It is a free and open source tool. 
+
+The purpose of BrAPI is to provide standardization of large amounts of phenotypic and genotypic data for planting breeding research. It is a grassroots effort that is used around the globe and is a community development project. 
+
+In general, an API is a way of storing data online and accessing it. For example, when you type in a website URL in your browser, you are using an API to view the website's data. 
+
+BrAPI is an API that stores plant breeding phenotype and genotype data for a growing number of databases. It uses a RESTful format, which is a certain convention and set of guidelines for how to create APIs that is popular. Data are accessed and put up with HTTP verbs. Outputs are all in the JSON format. This is a lot of jargon that we'll be going through more thoroughly. 
+
+Some of the other intended downstream uses of BrAPI, besides data storage and format consistency, includes: 
+
+* integration with field data collection apps
+* automating visualization and analysis
+* integrating breeding data datasets
+
+## Video 2: Browsing BrAPI Data with BRAVA
+
+One way to look through the databases that use BrAPI are with the [API validator](http://webapps.ipk-gatersleben.de/brapivalidator/). It's called BRAVA. Purpose is for people using BrAPI to check that their implementation works. 
+
+But can also look through databases. Under BrAPI resources, lists some of the databases. Sweetpotatobase is one that's well tested. TERRA REF is actually not here right now. 
+
+Go to "Test your own" tab. Put TERRA REF URL into Server URL line: https://brapi.workbench.terraref.org/brapi/v1
+
+All BrAPI URLS have same format. Server name for specific database (brapi.workbench.terraref.org), then brapi, and finally version. 
+
+Current major version of BrAPI is 1, minor versions from 1.1 - 1.3. Leave on v1.3 for "BrAPI Version". Hit "Test it now!" button and wait. 
+
+Returns all the different categories of TERRA REF data available. BrAPI only has trait and genotype data for TERRA REF, and metadata for those data. These data are rearranged differently than on Clowder and Globus also. 
+
+There are about a dozen categories, also called endpoints. Ones for type of crop, locations where data collected, seasons, and which studies conducted. 
+
+They all use the GET HTTP verb. This means that you can point at the endpoint and get a response of data. Can also specify parameters in request to endpoint to get subset of data. There are other verbs, like POST and DELETE, but those aren't used here. 
+
+## Video 3: TERRA REF BrAPI JSON Structure
+
+Can look at these categories of data in browser. Use base URL and add on name of category. Start with "Calls", it contains info about all TERRA REF categories. 
+
+Returns a JSON. JSON is a text file format that's both machine and human readable. It stores data and metadata. Like Python dictionaries, made up of key with a corresponding value. 
+
+Each JSON returned by BrAPI have same structure. Have metadata section and result section. Metadata contains additional data files with empty square brackets if there are none. Information about how many pages are shown in the current version, which we'll change later. And status will have errors in structure if any. 
+
+Data are in result section. Each piece of data in calls is for each TERRA REF endpoint. Shows what kind of data each returns, which is JSON for all, what verb can be used, which is GET for all, and which minor version of BrAPI it's compatible with. 
+
+Looking at nicer interface of the JSON. Click on Raw Data tab to look at actual JSON contents. Formatting is structure with curly and square brackets for different parts. Key and values separated by colon. 
+
+## Video 4: Get Trait Data With BrAPI and R
+
+Go back to JSON tab. Look at TERRA REF trait data to start with. This is in the observationunits endpoint, scroll down to it. 
+
+Look at this JSON in same way, by adding endpoint name to end of base URL: https://brapi.workbench.terraref.org/brapi/v1/observationunits. Metadata at top. Click on result, then data, then 0. Each of these holds a single observation. 
+
+Let's actually download these data into R to use them. 
+
+I'm going to do this in the CyVerse Discovery Environment, in the TERRA REF RStudio app that I've used all in previous webinars. Could also do on local computer. 
+
+There is an R package that is in development for accessing data through BrAPI, including TERRA REF. We're not going to use it here. 
+
+We're instead going to use an R package that we used before to get weather data from Clowder, `jsonlite`. The purpose of this package is to pull down JSON files from the web and turn them into R objects. 
+
+In a new R script, read in the library. Using `fromJSON` with the URL we just typed in to pull down the data. 
+
+Look at this, which is a list of lists. There are the same groupings as seen in the JSON in the browser. 
+
+```{r}
+library(jsonlite)
+pheno_all <- fromJSON("https://brapi.workbench.terraref.org/brapi/v1/observationunits")
+```
+
+We want the actual trait observations, so will use the $ operator to get out the data chunk. Returns a dataframe that contains information about the plots. This has the season and plot in observationUnitName column and experimental treatment in observationtreatment. 
+```{r}
+pheno_plots <- pheno_all$result$data
+```
+
+There can be multiple rows for each plot, as the same plot could be sampled many times in a season. Each row has one observation in observations column. Let's pull these out. 
+
+Get observations column, but it's in another list of lists. Use do.call on each object of the list and put them together by row using `rbind`. 
+
+```{r}
+pheno_obs_list <- pheno_plots$observations
+pheno_obs <- do.call(rbind, pheno_obs_list)
+```
+
+This contains the time of the data collection, the type of variable collected, and the value. Anyone know why these values are zero? Go to traitvis.workbench.terraref.org, season 6, canopy cover, and map. Range 1 Column 1 is plot in lower left corner, they might not be growing anything there. 
+
+## Video 5: Using Parameters with BrAPI URLs
+
+First though, you'll notice there are only 1,000 of these rows. That's because there are limits on the amount of data that the base URL returns. There can be a lot, getting it all at once can cause crashes. 
+
+Go back to [browser window for observationunits JSON](https://brapi.workbench.terraref.org/brapi/v1/observationunits). Under pagination in metadata, the pageSize is set at 1,000. That means the default is 1,000 records returned at one time. There are more than 2 million possible records in the totalCount though. 
+
+Can subset different parts of data in an API by specifying a parameter in the URL. Added on to end. For example, could return only first ten records by adding ?pageSize=10. Can also specify page parameter, which is page to start on, e.g., page=15. By combining these can return any set of pages. For example, page=10000&pageSize=10. This will return the 10000 page and the following 9 pages. These are now in the sixth season. 
+
+Can just get these data into a dataframe using this new URL. 
+
+## Video 6: Cleaning & Plotting Trait Data from BrAPI
+
+Can pull down, rearrange/clean, and plot these data like before. 
+
+Let's say we subset the data to one plot in season 4. Use `dplyr` for this. Have to go back to plots dataframe and subset that first. Getting a plot that's more in the middle of the field. 
+
+```{r}
+library(dplyr)
+pheno_plot <- pheno_plots %>% 
+  filter(observationUnitName == "MAC Field Scanner Season 4 Range 2 Column 16")
+```
+
+This only has 34 observations. Pull out trait names and values again. Combine the two steps into one line. 
+
+Under `observationVariableName`, there are two types of values. Canopy cover, like before, and also surface temperature which was taken by another instrument on the gantry. 
+
+```{r}
+pheno_plot_obs <- do.call(rbind, pheno_plot$observations)
+```
+
+Let's plot these two variables across time like before. Use `lubridate` to get date into better format, and `ggplot2` with `facet_wrap` to plot variables separately. Both canopy cover and temp increased across summer. 
+
+```{r}
+library(lubridate)
+pheno_plot_obs <- pheno_plot_obs %>% 
+  mutate(formatted_date = ymd_hms(observationTimeStamp))
+
+library(ggplot2)
+ggplot(pheno_plot_obs, aes(x = formatted_date, y = value)) +
+  geom_point() +
+  facet_wrap(~observationVariableName, scales = "free_y")
+```
+
+Might to be easier to combine these two dataframes in a different way. 
+
+## Video 7: Accessing Genotype Data Using BrAPI
+
+I said genotype data is also available in BrAPI for TERRA REF. Go to browser and replace endpoint with germplasm. Under result and data, each observation is for a different genotype of plant. 
+
+Can pull these into R like for the trait data. Use this URL and `fromJSON`. Same format as before, but can get observation with one step. This also only returns 1,000 pages/observations, can subset by page parameters like before. 
+
+```{r}
+geno_all <- fromJSON("https://brapi.workbench.terraref.org/brapi/v1/germplasm")
+geno_obs <- geno_all$result$data
+```
+
+Some possibly important columns are genus and species ones. The xref.source column also links to the page in the BETYdb for that cultivar. 
+
+```{r}
+head(geno_obs$xref)
+```
+
+You'll notice the "Name" section on BETYdb, which corresponds to the accessionNumber column in the data. This is what links to the actual genotypic data, which is located elsewhere. 
+
+These data are also stored in another CyVerse program called the Data Commons. Navigate to CyVerse Products and select Data Commons. Browse Data/Community Released -> terraref -> genomics -> derived_data -> bap -> resquencing -> danforth_center -> version1
+
+The gvfc folder has individual files, which contain accessionNumber. Copy and paste first row's from R and control+F for the file. These VCF files, which stands for varianct call format. They contain single nucleotide polymorphisms (SNPs). 
+ 
+Backing up one level, the hapmap folder contains a file that combines all of those other files. 

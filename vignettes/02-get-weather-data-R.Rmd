@@ -4,7 +4,7 @@
 
 This vignette shows how to read weather data for the month of January 2017 from the [weather station](https://cals-mac.arizona.edu/weather-station) at the University of Arizona's [Maricopa Agricultural Center](http://cals-mac.arizona.edu/) into R. 
 These data are stored online on the data management system Clowder, which is accessed using an API. 
-More detailed information about the structure of the database and how API URLs are created is available in the [weather tutorial]("sensors/01-meteorological-data.Rmd"). 
+More detailed information about the structure of the database and how API URLs are created is available in the [weather tutorial](sensors/01-meteorological-data.Rmd).
 Data across time for one weather variable, temperature, is plotted in R. 
 Then all eight of the weather variables have their times series plotted. 
 
@@ -26,11 +26,11 @@ weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostrea
 ```
 
 The `geometries` dataframe is then pulled out from these data, which contains the datapoints from this stream. 
-This is combined with a transformed version of the end of the time period from the stream. 
+This is combined with a transformed version of the end of the time period in the correct time zone from the stream. 
 
 ```{r met-datapoints}
 weather_data <- weather_all$properties %>% 
-  mutate(time = ymd_hms(weather_all$end_time))
+  mutate(time = with_tz(ymd_hms(weather_all$end_time), "America/Phoenix"))
 ```
 
 The temperature data, which is five minute averages for the entire month of January 2017, is used to calculate the growing degree days for each day. 

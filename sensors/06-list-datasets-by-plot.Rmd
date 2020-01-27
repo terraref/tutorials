@@ -2,13 +2,13 @@
 
 ## Pre-requisites: 
 
-* if you have not already done so, you will need to 1) sign up for the [beta user program](terraref.org/beta) and 2) 
-sign up and be approved for access to the the [sensor data portal](terraref.ncsa.illinois.edu/clowder) in order to get 
+* if you have not already done so, you will need to 1) sign up for the [beta user program](https://terraref.org/beta) and 2)
+sign up and be approved for access to the the [sensor data portal](https://terraref.ncsa.illinois.edu/clowder) in order to get
 the API key that will be used in this tutorial. 
 
 The terrautils python package has a new `products` module that aids in connecting
 plot boundaries stored within betydb with the file-based data products available
-from the workbench or Globus.
+from Globus.
 
 * if are using Rstudio and want to run the Python code chunks, the R package "reticulate" is required
 * use `pip3 install terrautils` to install the terrautils Python library
@@ -28,10 +28,10 @@ The *key* is a unique access key for the Clowder API.
 
 ## Getting the sensor list
 
-The first thing to get is the sensor name. This can be retreived using the
+The first thing to get is the sensor name. This can be retrieved using the
 `get_sensor_list` function. This function returns the full record which may
 be useful in some cases but primarily includes sensor names that include
-a plot id number. The utility function `unique_sensor_names` accpets the 
+a plot id number. The utility function `unique_sensor_names` accepts the
 sensor list and provides a list of names suitable for use in the 
 `get_file_listing` function.
 
@@ -96,7 +96,7 @@ of requests against the API it's possible to determine the files of interest and
 
 Each of the API URL's have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api), 
 followed by the data needed for a specific request. As we step through the process you will be able
-to see how then end of the URL changes depending upon the reuqest.
+to see how then end of the URL changes depending upon the request.
 
 Below is what the API looks like as a URL. Try pasting it into your browser.
 
@@ -156,7 +156,7 @@ STREAM_ID=11586
 curl -o datasets.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}"
 ```
 
-After the call succeeds, a file named *datasets.json* is created containing the returned JSON onject. As part of the
+After the call succeeds, a file named *datasets.json* is created containing the returned JSON object. As part of the
 JSON object there are one or more `properties` fields containing *source_dataset* parameters.
 
 ```{javascript eval=FALSE}
@@ -211,7 +211,7 @@ of the files in the dataset with their IDs, and other data if available:
 
 ### Retrieving the files
 
-Given that a large number of files may be contained in a dataset, it may be desireable to automate the process of pulling down files
+Given that a large number of files may be contained in a dataset, it may be desirable to automate the process of pulling down files
 to the local system.
 
 For each file to be retrieved, the unique file ID is needed on the URL.

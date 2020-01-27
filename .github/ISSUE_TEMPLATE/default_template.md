@@ -1,4 +1,4 @@
-*Fill out this issue by completing the items below. Not every item may be relevent to you, so feel free to make changes*
+*Fill out this issue by completing the items below. Not every item may be relevant to you, so feel free to make changes*
 
 #### The tutorial or vignette name
 Name:

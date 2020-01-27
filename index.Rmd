@@ -12,7 +12,7 @@ documentclass: book
 
 This book is intended to quickly introduce users to TERRA REF data through a series of tutorials. TERRA REF has many types of data, and most can be  accessed in multiple ways. Although this makes it more complicated to learn (and teach!), the objective is to provide users with the flexibility to access data in the most useful way.
 
-The first section walks the user through the steps of downloading and combining three different types of data: plot level phenotypes, meteorological data, and images. Subesquent sections provide more detailed examples that show how to access a larger variety of data and meta-data.
+The first section walks the user through the steps of downloading and combining three different types of data: plot level phenotypes, meteorological data, and images. Subsequent sections provide more detailed examples that show how to access a larger variety of data and meta-data.
 
 For those who are eager to see what is on deck, there are additional tutorials under development in the [tutorials repository](https://github.com/terraref/tutorials) on GitHub. These can be found in the traits, sensors, and genomics subfolders. Users are encouraged to revise and contribute new content.
 
@@ -20,31 +20,71 @@ For those who are eager to see what is on deck, there are additional tutorials u
 
 While we assume that readers will have some familiarity with the nature of the problem - remote sensing of crop plants - for the most part, these tutorials assume that the user will bring their own scientific questions and a sense of curiosity and are eager to learn. 
 
-These tutorials are aimed at users who are familiar with or willing to learn programming languages including R (particularly for accessing plot level trait data) and Python (primarily for accessing environmental data and sensor data). In addition, there are examples of using SQL for more sophisticated database queries as well as the bash terminal.
+These tutorials are aimed at users who are familiar with or willing to learn programming languages including R (particularly for accessing plot level trait data) and Python (primarily for accessing environmental data and sensor data). In addition, there are examples of using SQL for more sophisticated database queries, as well as the Bash terminal.
 
-Some of the lessons only require a web browser; others will assume familarity with programming at the command line in (typically only one of) Python, R, and / or SQL. You should be willing to find help (see finding help, below).
+Some of the lessons only require a web browser; others will assume familiarity with programming at the command line in (typically only one of) Python, R, and / or SQL. You should be willing to find help (see finding help, below).
 
 ### Technical Requirements
 
 At a minimum, you should have:
 
 * An internet connection
-* Web Browser
+* Web browser
 * Access to the data that you are using
     + The tutorials will state which databases you will need access to
 * Software:
     + Software requirements vary with the tutorials, and may be complex
 
-### User Accounts and permission to access TERRA REF data {#user-accounts}
+### Installation instructions {#installation-instructions}
+
+**Option 1** The recommended and easier option is to use our [VICE](https://learning.cyverse.org/projects/vice/en/latest/getting_started/about.html) app on [CyVerse](https://cyverse.org/)'s [Discovery Environment](https://de.cyverse.org/de/) platform. All necessary programs and libraries are installed and accessed using RStudio. You'll need a CyVerse account; follow instructions below to set up. 
+
+Launching TERRA REF app on VICE: 
+
+1. Click this button <a href="https://de.cyverse.org/de/?type=quick-launch&quick-launch-id=27203e0f-e2a1-4846-be0c-e97cb6ef60f2&app-id=041dd9c4-b964-11e9-a238-008cfa5ae621" target="_blank"><img src="https://de.cyverse.org/Powered-By-CyVerse-blue.svg"></a>
+2. Click "Log in with your CyVerse ID" and log in using your CyVerse username and password
+3. Hit "Launch Analysis" button in pop up window, and select arrow button in Analyses window
+4. Wait patiently
+5. Sign into RStudio using username: rstudio and password: rstudio1
+
+Reopen running TERRA REF instance: 
+
+1. Open the [CyVerse Discovery Environment](https://de.cyverse.org/de/)
+2. Log in
+3. Open Analyses window and hit arrow button to open up RStudio
+
+**Option 2** Everything necessary can be installed locally instead of using the VICE app. 
+
+You will need to [install R](https://www.r-project.org/) and a handful of R packages. 
+
+All of the packages except `traits` are available on CRAN and can be installed using the `install.packages` function:
+
+```r
+install.packages('tidyverse', 'jsonlite', 'knitr', 'lubridate', 'raster', 'sf')
+```
+
+Although `traits` is also on CRAN, you need to download the TERRA REF version from GitHub to handle larger datasets: 
+
+```r
+install.packages('devtools')
+devtools::install_github('terraref/traits')
+```
+You will additionally need to [install Python](https://www.python.org/downloads/) and the `terrautils` library, as below: 
+
+```sh
+pip install terrautils
+```
+
+### User accounts and permission to access TERRA REF data {#user-accounts}
 
 The first few chapters in the 'vignettes' section use publicly available sample data sets.
 Subsequent sections are also written to use publicly available data sets, but some of the examples require data that requires users to sign up.
-To sign up, you will need to 1) fill out the TERRA REF Beta user questionaire ([terraref.org/beta](terraref.org/beta)) and 2) request access to specific databases.
+To sign up, you will need to 1) fill out the TERRA REF Beta user questionnaire ([terraref.org/beta](https://terraref.org/beta)) and 2) request access to specific databases.
 
-<!-- Not sure where this goes, either in documentation or perhaps in an appendix. But I don't think this belongs in the introduction. Perhaps after the vignettes chaper 
+<!-- Not sure where this goes, either in documentation or perhaps in an appendix. But I don't think this belongs in the introduction. Perhaps after the vignettes chapter
 -->
 
-## Ways of Acessing Data
+## Ways of Accessing Data
 
 * Web Interfaces
     + [Clowder](https://docs.terraref.org/user-manual/how-to-access-data/using-clowder-sensor-and-genoomics-data) (sensor and genomic data)
@@ -61,7 +101,7 @@ To sign up, you will need to 1) fill out the TERRA REF Beta user questionaire ([
 
 The TERRA REF website: [terraref.org](http://terraref.org/)
 
-The TERRA REF Technical Documentation: [docs.terraref.org](docs.terraref.org)
+The TERRA REF Technical Documentation: [docs.terraref.org](https://docs.terraref.org)
 
 
 ### Finding help
@@ -77,4 +117,3 @@ options(warn = -1)
 knitr::opts_chunk$set(cache = TRUE, message = FALSE, eval = FALSE)
 ggplot2::theme_set(ggthemes::theme_few())
 ```
-
