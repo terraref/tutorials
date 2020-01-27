@@ -125,8 +125,9 @@ And we can generate a time series plot of just the canopy height data.
 
 #plot a time series of canopy height 
 ggplot(data = canopy_height,
-       aes(x = raw_date, y = mean)) +
+       aes(x = raw_date, y = mean, color = cultivar)) +
   geom_point(size = 0.5, position = position_jitter(width = 0.1)) +
+  geom_smooth(size = 0.1) +
   xlab("Date") +
   ylab("Plant height (cm)") +
   ggtitle("Sorghum canopy height, Season 6 TERRA REF") +
