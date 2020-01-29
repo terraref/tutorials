@@ -4,10 +4,10 @@
 
 ### Web interface
 
-* Sign up for an account at https://terraref.ncsa.illinois.edu/bety
+* Sign up for an account at https://terraref.org/bety
 * Sign up for the TERRA REF [beta user program](https://docs.google.com/forms/d/e/1FAIpQLScIUJL_OSL9BvBOdlczErds3aOg5Lwz4NIdNQnUiXdsLsYdhw/viewform)
 * Wait for database access to be granted
-* Your API key will be sent in the email. It can also be found - and regenerated - by navigating to the Users page (data --> [users](https://terraref.ncsa.illinois.edu/bety/users)) in the web interface.
+* Your API key will be sent in the email. It can also be found - and regenerated - by navigating to the Users page (data --> [users](https://terraref.org/bety/users)) in the web interface.
 
 TODO add signup info from handout
 
@@ -18,7 +18,7 @@ On the Welcome page there is a search option for trait and yield data. This tool
 
 ### Download search results as as csv file from the web interface
 
-* Point your browser to https://terraref.ncsa.illinois.edu/bety/
+* Point your browser to https://terraref.org/bety/
 * login 
 * enter "NDVI" in the search box
 * on the next page you will see the results of this search 

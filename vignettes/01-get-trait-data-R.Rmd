@@ -39,9 +39,8 @@ library(knitr)
 The function that is used to query BETYdb is called `betydb_query`. To reduce the number of arguments needed to pass into this function, we can set some global options using `options`. In this case, we will set the URL used in the query, and the API version.
 
 ```{r traits-vig-bety-opt}
-options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'beta',
-        betydb_key = '9999999999999999999999999999999999999999')
+options(betydb_url = "https://terraref.org/bety/",
+        betydb_api_version = 'v1')
 ```
 
 

@@ -30,7 +30,7 @@ source("https://raw.githubusercontent.com/PecanProject/pecan/develop/models/bioc
 writeLines("
 <pecan>
   <clowder>
-    <hostname>terraref.ncsa.illinois.edu</hostname>
+    <hostname>terraref.org</hostname>
     <user>user@illinois.edu</user>
     <password>ask</password>
   </clowder>

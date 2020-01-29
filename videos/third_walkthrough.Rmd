@@ -25,7 +25,7 @@ plot(single_RGB)
 
 That's just a single image taken in that particular plot on the first of May. If we want all the images from a day combined, there's processed data files that hold that in Clowder.
 
-Go to [https://terraref.ncsa.illinois.edu/clowder/](https://terraref.ncsa.illinois.edu/clowder/) to access Clowder. We're using all public images so do not need to log in. Navigate to a file by going Spaces -> Sample Data 2019 -> (may have to "View All Datasets") Season 6 May 2018 full field RGB Geotiffs -> click on first one.
+Go to [https://terraref.org/clowder/](https://terraref.org/clowder/) to access Clowder. We're using all public images so do not need to log in. Navigate to a file by going Spaces -> Sample Data 2019 -> (may have to "View All Datasets") Season 6 May 2018 full field RGB Geotiffs -> click on first one.
 
 This is called a mosiac. Combines all the images from that day, even if they aren't continous. This is a lower resolution version of all images, it would be a much larger file if not. The file we just plotted is within this. 
 
@@ -37,7 +37,7 @@ Go to Vice app. In command line (Terminal tab), start up Python. First set up co
 python3
 import requests
 
-file_url = 'https://terraref.ncsa.illinois.edu/clowder/api/files/5c81a03e4f0c0ca8052b2635?dataset=5c81709a4f0c78f6486d686c&space=5c50512a4f0c436195b9ad67'
+file_url = 'https://terraref.org/clowder/api/files/5c81a03e4f0c0ca8052b2635?dataset=5c81709a4f0c78f6486d686c&space=5c50512a4f0c436195b9ad67'
 api_key = {'key': ''}
 file_request = requests.get(file_url, api_key)
 file_request
@@ -73,9 +73,8 @@ First get plot vector. Now pulling site info from Bety, like we did for trait da
 
 ```{r, eval=FALSE}
 library(traits)
-options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
-        betydb_api_version = 'beta', 
-        betydb_key = '9999999999999999999999999999999999999999')
+options(betydb_url = "https://terraref.org/bety/",
+        betydb_api_version = 'v1')
 
 plot_data <- betydb_query(table     = "sites",  
                       sitename  = "MAC Field Scanner Season 6 Range 19 Column 10")
@@ -163,7 +162,7 @@ This will take a minute because it's doing what we did before for three files.
 
 ```{python, eval=FALSE}
 for file in files: 
-  file_request = requests.get('https://terraref.ncsa.illinois.edu/clowder/api/files/' + file["id"], api_key)
+  file_request = requests.get('https://terraref.org/clowder/api/files/' + file["id"], api_key)
   with open(file["filename"], 'wb') as object: 
     for chunk in file_request.iter_content(chunk_size=2014): 
       if chunk: 

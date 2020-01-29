@@ -3,7 +3,7 @@
 ## Pre-requisites: 
 
 * if you have not already done so, you will need to 1) sign up for the [beta user program](https://terraref.org/beta) and 2)
-sign up and be approved for access to the the [sensor data portal](https://terraref.ncsa.illinois.edu/clowder) in order to get
+sign up and be approved for access to the the [sensor data portal](https://terraref.org/clowder) in order to get
 the API key that will be used in this tutorial. 
 
 The terrautils python package has a new `products` module that aids in connecting
@@ -23,7 +23,7 @@ from terrautils.products import get_file_listing, extract_file_paths
 
 The `get_sensor_list` and `get_file_listing` functions both require the *connection*,
 *url*, and *key* parameters. The *connection* can be 'None'. The *url* (called host in the
-code) should be something like `https://terraref.ncsa.illinois.edu/clowder/`.
+code) should be something like `https://terraref.org/clowder/`.
 The *key* is a unique access key for the Clowder API.
 
 ## Getting the sensor list
@@ -36,10 +36,10 @@ sensor list and provides a list of names suitable for use in the
 `get_file_listing` function.
 
 To use this tutorial you will need to sign up for Clowder, have your 
-account approved, and then get an API key from the [Clowder web interface](https://terraref.ncsa.illinois.edu/clowder).
+account approved, and then get an API key from the [Clowder web interface](https://terraref.org/clowder).
 
 ```{python eval = FALSE}
-url = 'https://terraref.ncsa.illinois.edu/clowder/'
+url = 'https://terraref.org/clowder/'
 key = 'ENTER YOUR KEY HERE'
 ```
 
@@ -94,13 +94,13 @@ TODO: move this to a separate tutorial page focused on using curl
 The source files behind the data are available for downloading through the API. By executing a series
 of requests against the API it's possible to determine the files of interest and then download them.
 
-Each of the API URL's have the same beginning (https://terraref.ncsa.illinois.edu/clowder/api), 
+Each of the API URL's have the same beginning (https://terraref.org/clowder/api), 
 followed by the data needed for a specific request. As we step through the process you will be able
 to see how then end of the URL changes depending upon the request.
 
 Below is what the API looks like as a URL. Try pasting it into your browser.
 
-[https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W](https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W)
+[https://terraref.org/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W](https://terraref.org/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W)
 
 This will return data for the requested plot including its id. This id (or identifier) can then be used for 
 additional queries against the API.
@@ -127,7 +127,7 @@ we use the variable name of SENSOR_DATA to indicate the name of the plot.
 
 ``` {sh eval=FALSE}
 SENSOR_NAME="MAC Field Scanner Season 1 Field Plot 101 W"
-curl -o plot.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=${SENSOR_NAME}"
+curl -o plot.json -X GET "https://terraref.org/clowder/api/geostreams/sensors?sensor_name=${SENSOR_NAME}"
 ```
 
 This creates a file named *plot.json* containing the JSON object returned by the API. The JSON object has an 
@@ -141,7 +141,7 @@ the stream id. The names of streams are are formatted as "<Sensor Group> Dataset
 ``` {sh eval=FALSE}
 SENSOR_ID=3355
 STREAM_NAME="Thermal IR GeoTIFFs Datasets (${SENSOR_ID})"
-curl -o stream.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/streams?stream_name=${STREAM_NAME}"
+curl -o stream.json -X GET "https://terraref.org/clowder/api/geostreams/streams?stream_name=${STREAM_NAME}"
 ```
 
 A file named *stream.json* will be created containing the returned JSON object. This JSON object has an 'id' parameter that
@@ -153,7 +153,7 @@ We now have a stream ID that we can use to list our datasets. The datasets in tu
 
 ``` {sh eval=FALSE}
 STREAM_ID=11586
-curl -o datasets.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}"
+curl -o datasets.json -X GET "https://terraref.org/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}"
 ```
 
 After the call succeeds, a file named *datasets.json* is created containing the returned JSON object. As part of the
@@ -162,7 +162,7 @@ JSON object there are one or more `properties` fields containing *source_dataset
 ```{javascript eval=FALSE}
 properties: {
     dataset_name: "Thermal IR GeoTIFFs - 2016-05-09__12-07-57-990",
-    source_dataset: "https://terraref.ncsa.illinois.edu/clowder/datasets/59fc9e7d4f0c3383c73d2905"
+    source_dataset: "https://terraref.org/clowder/datasets/59fc9e7d4f0c3383c73d2905"
 },
 ```
 
@@ -171,7 +171,7 @@ The URL of each **source_dataset** can be used to view the dataset in Clowder.
 The datasets can also be filtered by date. The following filters out datasets that are outside of the range of January 2, 2017 through June 20, 2017.
 
 ``` {sh eval=FALSE}
-curl -o datasets.json -X GET "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}&since=2017-01-02&until=2017-06-10"
+curl -o datasets.json -X GET "https://terraref.org/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}&since=2017-01-02&until=2017-06-10"
 ```
 
 ### Getting file paths from dataset
@@ -181,7 +181,7 @@ Now that we know what the dataset URLs are, we can use the URLs to query the API
 Note the the URL has changed from our previous examples now that we're using the URLs returned by the previous call.
 
 ``` {sh eval=FALSE}
-SOURCE_DATASET="https://terraref.ncsa.illinois.edu/clowder/datasets/59fc9e7d4f0c3383c73d2905"
+SOURCE_DATASET="https://terraref.org/clowder/datasets/59fc9e7d4f0c3383c73d2905"
 curl -o files.json -X GET "${SOURCE_DATASET}/files"
 ```
 
@@ -219,7 +219,7 @@ For each file to be retrieved, the unique file ID is needed on the URL.
 ``` {sh eval=FALSE}
 FILE_NAME="ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif"
 FILE_ID=59fc9e844f0c3383c73d2980
-curl -o "${FILE_NAME}" -X GET "https://terraref.ncsa.illinois.edu/clowder/api/files/${FILE_ID}"
+curl -o "${FILE_NAME}" -X GET "https://terraref.org/clowder/api/files/${FILE_ID}"
 ```
 
 This call will cause the server to return the contents of the file identified in the URL. This file is then stored locally in *ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif*.

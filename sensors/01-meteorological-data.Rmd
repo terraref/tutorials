@@ -48,7 +48,7 @@ The key is to process each type of met data (site, reanalysis, forecast, climate
 ### Using the API to get data
 
 In order to access the data, we need to contruct a URL that links to where the 
-data is located on [Clowder](https://terraref.ncsa.illinois.edu/clowder). The data is 
+data is located on [Clowder](https://terraref.org/clowder). The data is 
 then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
 , for Clowder. 
 
@@ -72,7 +72,7 @@ observations taken every second.
 ### Creating the URLs for all data table types
 
 All URLs have the same beginning 
-(https://terraref.ncsa.illinois.edu/clowder/api/geostreams), 
+(https://terraref.org/clowder/api/geostreams), 
 then additional information is added for each type of data table as shown below. 
 
 * Station: /sensors/sensor_name=[name]
@@ -85,9 +85,9 @@ For example, below are the URLs for the particular data being used in this
 vignette. These can be pasted into a browser to see how the data is stored as 
 text using JSON. 
 
-* Station: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
-* Sensor: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams
-* Datapoints: https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+* Station: https://terraref.org/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
+* Sensor: https://terraref.org/clowder/api/geostreams/sensors/438/streams
+* Datapoints: https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 
 Possible sensor numbers for a station are found on the page for that station 
 under "id:", and then datapoints numbers are found on the sensor page under 
@@ -150,7 +150,7 @@ following is typed into the command line, it will download the datapoints data
 that we're interested in as a file which we have chosen to call `spectra.json`. 
 
 ```{sh eval=FALSE}
-curl -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+curl -o spectra.json -X GET https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
 ```
 
 #### Using R
@@ -176,7 +176,7 @@ library(ncdf.tools)
 ```
 
 ```{r get-weather-fromJSON}
-weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01', flatten = FALSE)
+weather_all <- fromJSON('https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01', flatten = FALSE)
 ```
 
 The `geometries` dataframe is then pulled out from these data, which contains
@@ -210,7 +210,7 @@ Here we will download the files using the Clowder API, but note that if you have
 
 ```{r met-setup2}
 knitr::opts_chunk$set(eval = FALSE)
-api_url <- "https://terraref.ncsa.illinois.edu/clowder/api"
+api_url <- "https://terraref.org/clowder/api"
 output_dir <- file.path(tempdir(), "downloads")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 ```

@@ -11,7 +11,7 @@ The purpose of this walkthrough is to review the experimental design of TERRA RE
 
 ## Video 1: Explore Data with Traitvis Web App
 
-Go to [website](https://traitvis.workbench.terraref.org/), which takes a minute to load. Displays plots of various data across collection time. 
+Go to [website](https://terraref.org/traitvis), which takes a minute to load. Displays plots of various data across collection time. 
 
 As example, we'll look at data from Season 6, which we looked at last week, by going to "MAC Season 6" tab. 
 
@@ -74,7 +74,7 @@ Globus is good for downloading a bunch of images, from a particular date and/or 
 
 ## Video 4: Downloading RGB Files from Clowder
 
-Second platform is Clowder, which is better for browsing through files. Website is [here](https://terraref.ncsa.illinois.edu/clowder/). You can follow along, these are publicly accessible files. Clowder is an interface on top of Globus. 
+Second platform is Clowder, which is better for browsing through files. Website is [here](https://terraref.org/clowder/). You can follow along, these are publicly accessible files. Clowder is an interface on top of Globus. 
 
 All data are organized in several ways. In spaces, collections, or datasets. We can find same RGB tif from before. Under "Explore" tab, select "Collections". Look at "Season 6 (2018)", which takes a minute to load. Then "RGB Camera Data (Season6 Samples)". Scroll down to third file, can see it's the one from the same date and time as before. 
 
@@ -109,7 +109,7 @@ Can see if it works by running object, should return a 200 message.
 ```{python, eval=FALSE}
 import requests
 
-file_url = 'https://terraref.ncsa.illinois.edu/clowder/files/5c5488fa4f0c4b0cbe7af98a/blob'
+file_url = 'https://terraref.org/clowder/files/5c5488fa4f0c4b0cbe7af98a/blob'
 api_key = {'key': ''}
 file_request = requests.get(file_url, api_key)
 file_request

@@ -67,9 +67,8 @@ Specify:
 - Using public API key to access data, will show later how to access your own API key to get to more data
 
 ```{r}
-options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/", 
-        betydb_api_version = 'beta', 
-        betydb_key = '9999999999999999999999999999999999999999')
+options(betydb_url = "https://terraref.org/bety/", 
+        betydb_api_version = 'v1')
 ```
 
 Function from `traits` is `betydb_query`. Getting first 1000 rows of data from fourth season. Can get all by not setting `limit` argument, but it takes a while. 
@@ -176,7 +175,7 @@ First specify URL where data comes from. Parts are from NCSA Clowder, using API 
 Then read into `fromJSON`. This gets all available weather data for 2017. 
 
 ```{r}
-weather_url <- "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31"
+weather_url <- "https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31"
 weather <- fromJSON(weather_url, flatten = FALSE)
 ```
 
@@ -238,7 +237,7 @@ Now pull down different weather and trait data, combine them, and model their re
 First pull down weather data for the entire year of 2018. Create new correctly formatted date column like before too. 
 
 ```{r}
-weather_2018_url <- "https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-01-01&until=2018-12-31"
+weather_2018_url <- "https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-01-01&until=2018-12-31"
 weather_2018 <- fromJSON(weather_2018_url, flatten = FALSE)
 
 weather_all <- weather_2018$properties %>% 
