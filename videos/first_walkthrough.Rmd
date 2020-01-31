@@ -152,7 +152,7 @@ Each beta user will have their own unique key. Do not share these with anyone.
 
 Find the key: 
 
-1. Log into betydb.org
+1. Log into terraref.org/bety 
 2. Go to data/users
 3. See your account there with API key listed
 
