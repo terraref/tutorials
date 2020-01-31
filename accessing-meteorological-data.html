@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 Accessing meteorological data | TERRA REF Tutorials</title>
   <meta name="description" content="Chapter 8 Accessing meteorological data | TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.16.5 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17.2 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 Accessing meteorological data | TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2020-01-06" />
+<meta name="date" content="2020-01-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -378,7 +378,7 @@ We want to standardize the units as well as part of the <code>met2CF.&lt;product
 <div id="using-the-api-to-get-data" class="section level3">
 <h3><span class="header-section-number">8.1.2</span> Using the API to get data</h3>
 <p>In order to access the data, we need to contruct a URL that links to where the
-data is located on <a href="https://terraref.ncsa.illinois.edu/clowder">Clowder</a>. The data is
+data is located on <a href="https://terraref.org/clowder">Clowder</a>. The data is
 then pulled down using the API, which <a href="https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82">“receives requests and sends responses”</a>
 , for Clowder.</p>
 </div>
@@ -400,7 +400,7 @@ observations taken every second.</p>
 <div id="creating-the-urls-for-all-data-table-types" class="section level3">
 <h3><span class="header-section-number">8.1.4</span> Creating the URLs for all data table types</h3>
 <p>All URLs have the same beginning
-(<a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams</a>),
+(<a href="https://terraref.org/clowder/api/geostreams" class="uri">https://terraref.org/clowder/api/geostreams</a>),
 then additional information is added for each type of data table as shown below.</p>
 <ul>
 <li>Station: /sensors/sensor_name=[name]</li>
@@ -412,9 +412,9 @@ then additional information is added for each type of data table as shown below.
 vignette. These can be pasted into a browser to see how the data is stored as
 text using JSON.</p>
 <ul>
-<li>Station: <a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station</a></li>
-<li>Sensor: <a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams/sensors/438/streams</a></li>
-<li>Datapoints: <a href="https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31" class="uri">https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31</a></li>
+<li>Station: <a href="https://terraref.org/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station" class="uri">https://terraref.org/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station</a></li>
+<li>Sensor: <a href="https://terraref.org/clowder/api/geostreams/sensors/438/streams" class="uri">https://terraref.org/clowder/api/geostreams/sensors/438/streams</a></li>
+<li>Datapoints: <a href="https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31" class="uri">https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31</a></li>
 </ul>
 <p>Possible sensor numbers for a station are found on the page for that station
 under “id:”, and then datapoints numbers are found on the sensor page under
@@ -502,7 +502,7 @@ meteorological data and associated stream ids.</p>
 <p>Data can be downloaded from Clowder using the command line program Curl. If the
 following is typed into the command line, it will download the datapoints data
 that we’re interested in as a file which we have chosen to call <code>spectra.json</code>.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="ex">curl</span> -o spectra.json -X GET https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431<span class="kw">&amp;</span><span class="va">since=</span>2017-01-02<span class="kw">&amp;</span><span class="va">until=</span>2017-01-31</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="ex">curl</span> -o spectra.json -X GET https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431<span class="kw">&amp;</span><span class="va">since=</span>2017-01-02<span class="kw">&amp;</span><span class="va">until=</span>2017-01-31</a></code></pre></div>
 <div id="using-r" class="section level4">
 <h4><span class="header-section-number">8.1.6.1</span> Using R</h4>
 <p>The following code sets the defaults for showing R code.</p>
@@ -518,7 +518,7 @@ dataframes, called <code>properties</code> and <code>geometries</code>.</p>
 <a class="sourceLine" id="cb50-6" data-line-number="6"><span class="kw">library</span>(RCurl)</a>
 <a class="sourceLine" id="cb50-7" data-line-number="7"><span class="kw">library</span>(ncdf4)</a>
 <a class="sourceLine" id="cb50-8" data-line-number="8"><span class="kw">library</span>(ncdf.tools)</a></code></pre></div>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2018-04-01&amp;until=2018-08-01&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2018-04-01&amp;until=2018-08-01&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>The <code>geometries</code> dataframe is then pulled out from these data, which contains
 the datapoints from this stream. This is combined with a transformed version of the
 end of the time period from the stream.</p>
@@ -542,7 +542,7 @@ newly created dataframe.</p>
 <h4><span class="header-section-number">8.2.1.1</span> Download data</h4>
 <p>Here we will download the files using the Clowder API, but note that if you have access to the filesystem on Globus, you can directly access the data in the <code>sites/ua-mac/Level_1/EnvironmentLogger</code> folder.</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">eval =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb54-2" data-line-number="2">api_url &lt;-<span class="st"> &quot;https://terraref.ncsa.illinois.edu/clowder/api&quot;</span></a>
+<a class="sourceLine" id="cb54-2" data-line-number="2">api_url &lt;-<span class="st"> &quot;https://terraref.org/clowder/api&quot;</span></a>
 <a class="sourceLine" id="cb54-3" data-line-number="3">output_dir &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;downloads&quot;</span>)</a>
 <a class="sourceLine" id="cb54-4" data-line-number="4"><span class="kw">dir.create</span>(output_dir, <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="co"># Get Spaces from Clowder - without authentication, result will be Sample Data</span></a>

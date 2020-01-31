@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 7 Accessing Trait Data in R | TERRA REF Tutorials</title>
   <meta name="description" content="Chapter 7 Accessing Trait Data in R | TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.16.5 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17.2 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 7 Accessing Trait Data in R | TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2020-01-06" />
+<meta name="date" content="2020-01-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -261,12 +261,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb41-2" data-line-number="2">                             <span class="dt">genus =</span> <span class="st">&quot;Sorghum&quot;</span>,</a>
 <a class="sourceLine" id="cb41-3" data-line-number="3">                             <span class="dt">api_version =</span> <span class="st">&#39;v1&#39;</span>,</a>
 <a class="sourceLine" id="cb41-4" data-line-number="4">                             <span class="dt">limit =</span> <span class="st">&#39;none&#39;</span>,</a>
-<a class="sourceLine" id="cb41-5" data-line-number="5">                             <span class="dt">betyurl =</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/bety/&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb41-5" data-line-number="5">                             <span class="dt">betyurl =</span> <span class="st">&quot;https://terraref.org/bety/&quot;</span>)</a></code></pre></div>
 </div>
 <div id="r---setting-options-for-the-traits-package" class="section level4">
 <h4><span class="header-section-number">7.1.1.2</span> R - setting options for the traits package</h4>
 <p>Notice all of the arguments that the <code>betydb_query</code> function requires? We can change this by setting the default connection options thus:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/bety/&quot;</span>,</a>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.org/bety/&quot;</span>,</a>
 <a class="sourceLine" id="cb42-2" data-line-number="2">        <span class="dt">betydb_api_version =</span> <span class="st">&#39;v1&#39;</span>)</a></code></pre></div>
 <p>Now the same query can be reduced to:</p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">sorghum_info &lt;-<span class="st"> </span><span class="kw">betydb_query</span>(<span class="dt">table =</span> <span class="st">&#39;species&#39;</span>,</a>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 4 Accessing weather data in R | TERRA REF Tutorials</title>
   <meta name="description" content="Chapter 4 Accessing weather data in R | TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.16.5 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17.2 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 4 Accessing weather data in R | TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2020-01-06" />
+<meta name="date" content="2020-01-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -247,7 +247,7 @@ The data is read in by the <code>fromJSON</code> function as a dataframe that al
 <a class="sourceLine" id="cb13-4" data-line-number="4"><span class="kw">library</span>(lubridate)</a>
 <a class="sourceLine" id="cb13-5" data-line-number="5"><span class="kw">library</span>(tidyr)</a>
 <a class="sourceLine" id="cb13-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb13-7" data-line-number="7">weather_all &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(<span class="st">&#39;https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&amp;since=2017-01-02&amp;until=2017-01-31&#39;</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>The <code>geometries</code> dataframe is then pulled out from these data, which contains the datapoints from this stream.
 This is combined with a transformed version of the end of the time period in the correct time zone from the stream.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">weather_data &lt;-<span class="st"> </span>weather_all<span class="op">$</span>properties <span class="op">%&gt;%</span><span class="st"> </span></a>

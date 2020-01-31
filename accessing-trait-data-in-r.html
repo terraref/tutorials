@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 3 Accessing trait data in R | TERRA REF Tutorials</title>
   <meta name="description" content="Chapter 3 Accessing trait data in R | TERRA REF Tutorials" />
-  <meta name="generator" content="bookdown 0.16.5 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17.2 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 3 Accessing trait data in R | TERRA REF Tutorials" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="David LeBauer and others" />
 
 
-<meta name="date" content="2020-01-06" />
+<meta name="date" content="2020-01-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -257,9 +257,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="setting-options" class="section level3">
 <h3><span class="header-section-number">3.3.2</span> Setting options</h3>
 <p>The function that is used to query BETYdb is called <code>betydb_query</code>. To reduce the number of arguments needed to pass into this function, we can set some global options using <code>options</code>. In this case, we will set the URL used in the query, and the API version.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.ncsa.illinois.edu/bety/&quot;</span>,</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">        <span class="dt">betydb_api_version =</span> <span class="st">&#39;beta&#39;</span>,</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">        <span class="dt">betydb_key =</span> <span class="st">&#39;9999999999999999999999999999999999999999&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">betydb_url =</span> <span class="st">&quot;https://terraref.org/bety/&quot;</span>,</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">        <span class="dt">betydb_api_version =</span> <span class="st">&#39;v1&#39;</span>)</a></code></pre></div>
 </div>
 <div id="querying-available-traits" class="section level3">
 <h3><span class="header-section-number">3.3.3</span> Querying available traits</h3>
@@ -312,10 +311,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb12-2" data-line-number="2"><span class="kw">ggplot</span>(<span class="dt">data =</span> canopy_height,</a>
 <a class="sourceLine" id="cb12-3" data-line-number="3">       <span class="kw">aes</span>(<span class="dt">x =</span> trans_date, <span class="dt">y =</span> mean)) <span class="op">+</span></a>
 <a class="sourceLine" id="cb12-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>, <span class="dt">position =</span> <span class="kw">position_jitter</span>(<span class="dt">width =</span> <span class="fl">0.1</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Date&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Plant height (cm)&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Sorghum canopy height, Season 6 TERRA REF&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">size =</span> <span class="fl">0.1</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Date&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Plant height (cm)&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Sorghum canopy height, Season 6 TERRA REF&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
 
 </div>
 </div>
