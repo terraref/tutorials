@@ -19,12 +19,12 @@ library(traits)
 
 ## Connect to the TERRA REF Trait database
 
-Unlike the first two tutorials, now we will be querying real data from the public TERRA REF database. So we will use a new URL, https://terraref.ncsa.illinois.edu/bety/, and we will need to use our own private key.
+Unlike the first two tutorials, now we will be querying real data from the public TERRA REF database. So we will use a new URL, https://terraref.org/bety/, and we will need to use our own private key.
 
 ```{r terraref-connect-options}
 
 options(betydb_key = readLines('.betykey', warn = FALSE),
-        betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+        betydb_url = "https://terraref.org/bety/",
         betydb_api_version = 'v1')
 ```
 ### Query data from the Danforth Phenotyping Facility

@@ -10,7 +10,7 @@ It contains trait (phenotype) data at the plot or plant level as well as meta da
 
 ### Introduction to BETYdb 
 
-The TERRA REF trait database (terraref.ncsa.illinois.edu/bety) uses the BETYdb data schema (structure) and web application.
+The TERRA REF trait database (terraref.org/bety) uses the BETYdb data schema (structure) and web application.
 The BETYdb software is actively used and developed by the [TERRA Reference](http://terraref.org) program as well as by the [PEcAn project](http://pecanproject.org).
 
 For more information about BETYdb, see the following:

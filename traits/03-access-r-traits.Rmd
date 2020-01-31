@@ -62,7 +62,7 @@ sorghum_info <- betydb_query(table = 'species',
                              genus = "Sorghum",
                              api_version = 'v1',
                              limit = 'none',
-                             betyurl = "https://terraref.ncsa.illinois.edu/bety/")
+                             betyurl = "https://terraref.org/bety/")
 
 ```
 
@@ -71,7 +71,7 @@ sorghum_info <- betydb_query(table = 'species',
 Notice all of the arguments that the `betydb_query` function requires? We can change this by setting the default connection options thus:
 
 ```{r 03-set-up, echo = TRUE}
-options(betydb_url = "https://terraref.ncsa.illinois.edu/bety/",
+options(betydb_url = "https://terraref.org/bety/",
         betydb_api_version = 'v1')
 ```
 

@@ -22,7 +22,7 @@ library(jsonlite)
 library(lubridate)
 library(tidyr)
 
-weather_all <- fromJSON('https://terraref.ncsa.illinois.edu/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
+weather_all <- fromJSON('https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31', flatten = FALSE)
 ```
 
 The `geometries` dataframe is then pulled out from these data, which contains the datapoints from this stream. 

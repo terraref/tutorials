@@ -5,9 +5,9 @@ will be derived from https://github.com/pi4-uiuc/2017-bootcamp/blob/master/conte
 ## Using PostgresSQL Studio
 
 
-Lets connect to the terraref instance of betydb. Until now we have been accessing betydb.org. Now we will access (a copy of) the database behind `terraref.ncsa.illinois.edu/bety`
+Lets connect to the terraref instance of betydb. Until now we have been accessing betydb.org. Now we will access (a copy of) the database behind `terraref.org/bety`
 
-This connection is only available on the local *ncsa.illinois.edu network, and can be accessed through the NDS Labs workbench.
+This connection is only available on the local network, so will require either installing a local copy of the database or ssh access.
 
 ```
 Host: bety6.ncsa.illinois.edu

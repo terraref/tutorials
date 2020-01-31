@@ -45,7 +45,7 @@ An API key is not needed to access public data includes sample datasets and meta
 
 ### Components of a URL query
 
-* Base url: `terraref.ncsa.illinois.edu/bety`
+* Base url: `terraref.org/bety`
 * Path to the api: `/api/v1`
 * API endpoint: `/search` or `traits` or `sites`. For BETYdb, these are the names of database tables. 
 * Query parameters: `genus=Sorghum`
@@ -57,23 +57,23 @@ An API key is not needed to access public data includes sample datasets and meta
 
 First, lets construct a query by putting together a URL.
 
-1. start with the database url: `terraref.ncsa.illinois.edu/bety`
+1. start with the database url: `terraref.org/bety`
   * this url brings you to the home page
 2. Add the path to the API, `/api/v1`
-  * now we have terraref.ncsa.illinois.edu/bety/api/v1, which points to the API documentation for additional detail on available options
+  * now we have terraref.org/bety/api/v1, which points to the API documentation for additional detail on available options
 3. Add the name of the table you want to query. Lets start with `variables`
-  * terraref.ncsa.illinois.edu/bety/api/v1/variables
+  * terraref.org/bety/api/v1/variables
 4. Add query terms by appending a `?` and combining with `&`. These can be done in any order. For example:
   * `type=trait` where the variable type is 'trait'
   * `name=~height` where the variable name contains 'height'
 5. Assembling all of this, you have a complete query:
-  * `terraref.ncsa.illinois.edu/bety/api/v1/variables?type=trait&name=~height`
+  * `terraref.org/bety/api/v1/variables?type=trait&name=~height`
   * This will query all trait variables that have 'height' in their name.
   * Does it return the expected values? There should be two.
   
 ## Your Turn
 
-> What will the URL https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum return?
+> What will the URL https://terraref.org/bety/api/v1/species?genus=Sorghum return?
 
 
 > Write a URL that will query the database for sites with "Field Scanner" in the name field. Hint: combine two terms with a `+` as in `Field+Scanner`
@@ -86,14 +86,14 @@ Type the following command into a bash shell (the `-o` option names the output f
 
 ```sh
 curl -o sorghum.json \
-   "https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum"
+   "https://terraref.org/bety/api/v1/species?genus=Sorghum"
 ```
 
 If you want to write the query without exposing the key in plain text, you can construct it like this:
 
 ```sh
 curl -o sorghum.json \
-    "https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum"
+    "https://terraref.org/bety/api/v1/species?genus=Sorghum"
 ```
 
 ## Using the R jsonlite package to access the API with a URL query 
@@ -107,7 +107,7 @@ library(jsonlite)
 
 ```{r text-api, warning = FALSE}
 sorghum.json <- readLines(
-  paste0("https://terraref.ncsa.illinois.edu/bety/api/v1/species?genus=Sorghum&key=", 
+  paste0("https://terraref.org/bety/api/v1/species?genus=Sorghum&key=", 
          readLines('.betykey')))
          
 ## print(sorghum.json) 

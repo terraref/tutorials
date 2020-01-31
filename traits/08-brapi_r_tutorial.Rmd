@@ -1,0 +1,85 @@
+---
+title: "Accessing TERRA REF data using the brapi R package"
+author: "Reinhard Simon"
+author: "David LeBauer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+---
+
+# Objective
+
+Here demonstrate the use of the brapi R package to query data from the TERRA REF traits database (terraref.org/bety) using the Breeder's API (BrAPI).
+
+What is BrAPI?
+
+Data are public and no login credentials are needed.
+
+```{r, message=TRUE, warning=TRUE}
+
+library(brapi)
+terraref <- ba_db()$terraref
+print(terraref)
+
+
+# show verbose server feedback
+ba_show_info(TRUE)
+
+```
+
+## Listing available calls
+
+The BrAPI specification does not require all endpoints to be implemented, and TERRA REF provides a subset of endpoints focused on genotypes, experimental metadata, and phenotypes. The `ba_calls()` function lists the functionality supported by the server.
+
+```{r}
+z <- ba_calls(terraref)
+```
+
+## Function Arguments
+
+* `con`: Always the first argument, provides database connection information as a list. To query terraref, we will use `con = terraref`, which we returned above from `ba_db()$terraref` (try `print(ba_db())` to see some of the other crop databases that you can query).
+* `rclass`: the last argument is always the class of object returned. The default type is a 'tibble', althought you can also request `data.frame`, `json`, or `list`.
+* Other parameters are of class 'character'. Exceptions are: the con parameter is always a list; the parameters 'page' and 'pageSize' if applicable are integers. For details see individual functions.
+
+## Getting phenotypic data
+
+The brapi models trial data in a three layer hierarchy: a) breeding program which has b) trials that c) may consist of one or more studies at one or more locations. A study at one location is also often referred to as a fieldbook.
+
+### Which breeding programs are there?
+
+```{r}
+ba_crops(terraref)
+```
+
+
+### Which studies are there?
+
+```{r}
+ba_studies_search(sp_base, programDbId = "140")
+```
+
+### Get a study (or fieldbook)
+
+```{r, message=FALSE, warning=FALSE}
+# Currently not working!!!
+#dt = ba_studies_table(sp_base, 
+#                      studyDbId = "151")
+```
+
+```{r, echo=FALSE}
+#library(DT)
+#datatable(
+#  dt,
+#  options=list(pageLength = 5, scrollX = TRUE)
+#  )
+```
+
+
+
+
+
+
+
+
+
+
+
