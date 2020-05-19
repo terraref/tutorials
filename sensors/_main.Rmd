@@ -1,0 +1,1142 @@
+# Accessing meteorological data
+
+Objectives:
+
+  * This tutorial will walk through the steps required to access meteorological data from the Maricopa Agricultural Center.
+
+Pre-requisites: 
+
+  * Need to have R packages tidyverse, jsonlite, and convertr installed. 
+  * Need to have an internet connection. 
+
+## The Maricopa Weather Station
+
+### Meteorological data formats
+
+#### Dimensions:
+
+|CF standard-name | units |
+|:------------------------------------------|:------|
+| time | days since 1970-01-01 00:00:00 UTC|
+| longitude | degrees_east|
+| latitude |degrees_north|
+
+#### Variable names and units
+
+| CF standard-name                          | units | bety         | isimip       | cruncep | narr  | ameriflux |
+|:------------------------------------------|:------|:-------------|:-------------|:--------|:------|:----------|
+| air_temperature                       | K     | airT         | tasAdjust    | tair    | air   | TA (C)    |
+| air_pressure                          | Pa    | air_pressure |              |         |       | PRESS (KPa) |
+| mole_fraction_of_carbon_dioxide_in_air    | mol/mol |            |              |         |       | CO2       |
+| relative_humidity                         | % | relative_humidity | rhurs       | NA      | rhum  | RH        |
+| surface_downwelling_photosynthetic_photon_flux_in_air | mol m-2 s-1 | PAR |     |         |       | PAR *(NOT DONE)*          |
+| precipitation_flux                    |  kg m-2 s-1 | cccc   | prAdjust     | rain    | acpc  | PREC (mm/s)          |
+|                                           | degrees | wind_direction |          |         |       | WD        |
+| wind_speed                                | m/s   | Wspd         |              |         |       | WS        |
+
+
+* variable names are from [MsTMIP](http://nacp.ornl.gov/MsTMIP_variables.shtml).
+* standard_name is CF-convention standard names
+* units can be converted by udunits, so these can vary (e.g. the time denominator may change with time frequency of inputs)
+* soil moisture for the full column, rather than a layer, is soil_moisture_content
+
+For example, in the [MsTMIP-CRUNCEP](https://www.betydb.org/inputs/280) data, the variable `rain` should be `precipitation_rate`.
+We want to standardize the units as well as part of the `met2CF.<product>` step. I believe we want to use the CF "canonical" units but retain the MsTMIP units any time CF is ambiguous about the units.
+
+The key is to process each type of met data (site, reanalysis, forecast, climate scenario, etc) to the exact same standard. This way every operation after that (extract, gap fill, downscale, convert to a model, etc) will always have the exact same inputs. This will make everything else much simpler to code and allow us to avoid a lot of unnecessary data checking, tests, etc being repeated in every downstream function.
+
+### Using the API to get data
+
+In order to access the data, we need to contruct a URL that links to where the 
+data is located on [Clowder](https://terraref.org/clowder). The data is 
+then pulled down using the API, which ["receives requests and sends responses"](https://medium.freecodecamp.org/what-is-an-api-in-english-please-b880a3214a82)
+, for Clowder. 
+
+### The structure of the Geostreams database
+
+The meteorological data that is collected for the TERRA REF project is contained 
+in multiple related tables, also know as a [relational database](https://datacarpentry.org/sql-socialsci/01-relational-database/index.html). 
+The first table contains data about the sensor that is collecting data. This is 
+then linked to a stream table, which contains information about a datastream 
+from the sensor. Sensors can have multiple datastreams. The actual weather data 
+is in the third table, the datapoint table. A visual representation of this 
+structure is shown below. 
+
+![](https://cloud.githubusercontent.com/assets/9286213/16991300/b2f2b09a-4e60-11e6-96b7-8b63c3d1f995.jpg)
+
+In this vignette, we will be using data from a weather station at the Maricopa 
+Agricultural Center, with datapoints for the month of January 2017 from a 
+certain sensor. These data are five minute summaries aggregated from 
+observations taken every second. 
+
+### Creating the URLs for all data table types
+
+All URLs have the same beginning 
+(https://terraref.org/clowder/api/geostreams), 
+then additional information is added for each type of data table as shown below. 
+
+* Station: /sensors/sensor_name=[name]
+* Sensor: /sensors/[sensor number]/streams
+* Datapoints: /datapoints?stream_id=[datapoints number]&since=[start date]&until=[end date]
+
+A certain time period can be specified for the datapoints. 
+
+For example, below are the URLs for the particular data being used in this 
+vignette. These can be pasted into a browser to see how the data is stored as 
+text using JSON. 
+
+* Station: https://terraref.org/clowder/api/geostreams/sensors?sensor_name=UA-MAC+AZMET+Weather+Station
+* Sensor: https://terraref.org/clowder/api/geostreams/sensors/438/streams
+* Datapoints: https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+
+Possible sensor numbers for a station are found on the page for that station 
+under "id:", and then datapoints numbers are found on the sensor page under 
+"stream_id:".
+
+The table belows lists the names of some stations that have available 
+meteorological data and associated stream ids. 
+
+| stream id | name                                     |
+|------------|------------------------------------------|
+| 3212        | Irrigation Observations     |
+| 46431        | Weather Observations (5 min bins)     |
+| 3208        | EnvironmentLogger sensor_weather_station |
+| 3207        | EnvironmentLogger sensor_par             |
+| 748        | EnvironmentLogger sensor_spectrum        |
+| 3210        | EnvironmentLogger sensor_co2             |
+| 4806       | UIUC Energy Farm SE                      |
+| 4807       | UIUC Energy Farm CEN                     |
+| 4805       | UIUC Energy Farm NE                      |
+
+
+Here is the json representation of a single five-minute observation:
+
+```
+[
+   {
+      "geometry":{
+         "type":"Point",
+         "coordinates":[
+            33.0745666667,
+            -111.9750833333,
+            0
+         ]
+      },
+      "start_time":"2016-08-30T00:06:24-07:00",
+      "type":"Feature",
+      "end_time":"2016-08-30T00:10:00-07:00",
+      "properties":{
+         "precipitation_rate":0.0,
+         "wind_speed":1.6207870370370374,
+         "surface_downwelling_shortwave_flux_in_air":0.0,
+         "northward_wind":0.07488770951583902,
+         "relative_humidity":26.18560185185185,
+         "air_temperature":300.17606481481516,
+         "eastward_wind":1.571286062845733,
+         "surface_downwelling_photosynthetic_photon_flux_in_air":0.0
+      }
+   },
+```
+
+
+### Querying weather sensor data stream
+
+The data represent 5 minute summaries aggregated from 1/s observations.
+
+### Download data using the command line
+
+Data can be downloaded from Clowder using the command line program Curl. If the 
+following is typed into the command line, it will download the datapoints data
+that we're interested in as a file which we have chosen to call `spectra.json`. 
+
+```{sh eval=FALSE}
+curl -o spectra.json -X GET https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2017-01-02&until=2017-01-31
+```
+
+#### Using R
+
+The following code sets the defaults for showing R code. 
+```{r met-setup}
+knitr::opts_chunk$set(cache = FALSE, message = FALSE)
+```
+
+And this is how you can access the same data in R. This uses the jsonlite R package 
+and desired URL to pull the data in. The data is in a dataframe with two nested
+dataframes, called `properties` and `geometries`. 
+
+```{r met-geostream}
+library(dplyr)
+library(ggplot2)
+library(jsonlite)
+library(lubridate)
+library(magrittr)
+library(RCurl)
+library(ncdf4)
+library(ncdf.tools)
+```
+
+```{r get-weather-fromJSON}
+weather_all <- fromJSON('https://terraref.org/clowder/api/geostreams/datapoints?stream_id=46431&since=2018-04-01&until=2018-08-01', flatten = FALSE)
+```
+
+The `geometries` dataframe is then pulled out from these data, which contains
+the datapoints from this stream. This is combined with a transformed version of the
+end of the time period from the stream. 
+
+```{r met-datapoints2}
+weather_data <- weather_all$properties %>% 
+  mutate(time = with_tz(ymd_hms(weather_all$end_time), "America/Phoenix"))
+```
+
+## Weather Plots
+
+Create time series plot for one of the eight variables, wind speed, in the 
+newly created dataframe. 
+
+```{r weather}
+theme_set(ggthemes::theme_few())
+ggplot(data = weather_data) +
+  geom_point(aes(x = time, y = wind_speed), size = 0.7) +
+  labs(x = "Day", y = "Wind speed (m/s)")
+```
+
+### High resolution data (1/s) + spectroradiometer
+
+This higher resolution weather data can be used for VNIR calibration, for example. But at 1/s it is very large!
+
+#### Download data
+
+Here we will download the files using the Clowder API, but note that if you have access to the filesystem on Globus, you can directly access the data in the `sites/ua-mac/Level_1/EnvironmentLogger` folder. 
+
+```{r met-setup2}
+knitr::opts_chunk$set(eval = FALSE)
+api_url <- "https://terraref.org/clowder/api"
+output_dir <- file.path(tempdir(), "downloads")
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+```
+
+```{r query-clowder}
+# Get Spaces from Clowder - without authentication, result will be Sample Data
+spaces <- fromJSON(paste0(api_url, '/spaces'))
+print(spaces %>% select(id, name))
+```
+
+```{r list-of-datasets, eval = FALSE}
+
+# Get list of (at most 20) Datasets within that Space from Clowder
+datasets <- fromJSON(paste0(api_url, '/spaces/', spaces$id, '/datasets'))
+print(datasets %>% select(id, name))
+```
+
+```{r list-of-files, eval = FALSE}
+# Get list of Files within any EnvironmentLogger datasets and filter .nc files
+files <- fromJSON(paste0(api_url, '/datasets/', datasets$id[grepl("EnvironmentLogger", datasets$name)], '/files'))
+ncfiles <- files[grepl('environmentlogger.nc', files$filename), ]
+print(ncfiles %>% select(id, filename))
+```
+
+#### Download netCDF 1/s data from Clowder
+
+
+```{r nc-download, echo=FALSE, eval = FALSE}
+sources <- paste0(api_url, '/files/', ncfiles$id)
+outputs <- paste0(output_dir, ncfiles$filename)
+
+for (i in 1:length(sources)) {
+  print(paste0("Downloading ", sources[i], " to ", outputs[i]))
+  f <- CFILE(outputs[i], mode = "wb")
+  curlPerform(url = sources[i], writedata = f@ref)
+  RCurl::close(f)
+}
+```
+
+#### Using the netCDF 1/s data
+
+One use case getting the solar spectrum associated with a particular hyperspectral image.
+
+```{r, eval = FALSE}
+time <- vector()
+vals <- vector()
+
+for (i in 1:length(outputs)) {
+  print(paste0("Scanning ", outputs[i]))
+  ncfile <- nc_open(outputs[i])
+  curr_time <- list()
+
+  metdata <- list()
+  for(var in c(names(ncfile$dim), names(ncfile$var))){
+    metdata[[var]] <- ncvar_get(ncfile, var)
+  }
+  lapply(metdata, dim)
+  
+  days <- ncvar_get(ncfile, varid = "time")
+  curr_time <- as.numeric(ymd("1970-01-01") + seconds(days * 24 * 60 * 60))
+  
+  time <- c(time, curr_time)
+  PAR <- c(vals, metdata$`par_sensor/Sensor_Photosynthetically_Active_Radiation`)
+}
+
+#ggplot() + 
+#  geom_line(aes(time, PAR)) + theme_bw()
+
+print(ncfile)
+```
+
+
+<!--chapter:end:01-meteorological-data.Rmd-->
+
+# Using the PEcAn atmospheric data utilities
+
+Explain what these are
+
+github.com/pecanproject/pecan
+
+insert slide from talks ... 
+
+## Dependencies
+
+```{r install-pecan-dependencies, message=FALSE, eval = FALSE}
+
+devtools::install_github("pecanproject/pecan",  
+                         subdir = 'base/utils', ref = 'develop', dependencies = FALSE)
+devtools::install_github("pecanproject/pecan",  
+                         subdir = 'base/db')
+devtools::install_github("rforge/reddyproc",
+                         subdir = "pkg/REddyProc")
+devtools::install_github("pecanproject/pecan",  
+                         subdir = 'modules/data.atmosphere',
+                         ref = 'develop')
+
+source("https://raw.githubusercontent.com/PecanProject/pecan/develop/models/biocro/R/met2model.BIOCRO.R")
+```
+
+
+## PEcAn Met Workflow 
+
+```{r write-clowder, eval = FALSE}
+writeLines("
+<pecan>
+  <clowder>
+    <hostname>terraref.org</hostname>
+    <user>user@illinois.edu</user>
+    <password>ask</password>
+  </clowder>
+</pecan>", 
+con =  "~/.pecan.clowder.xml")
+```
+
+![](pecan.clowder.xml.png)
+
+```{r pecan-met-workflow, message=FALSE, warning=FALSE, eval = FALSE}
+library("PEcAn.data.atmosphere")
+library("dplyr")
+
+## download raw data
+ne <- download.Geostreams(
+  outfolder="data",
+  sitename="EnvironmentLogger sensor_weather_station",
+  start_date="2016-02-28",
+  end_date="2016-04-01",
+  overwrite = TRUE)
+
+## convert to standard
+ne_cf <- met2CF.Geostreams(
+  in.path = "data/", 
+  in.prefix = ne$dbfile.name, 
+  outfolder = "data/cf",
+  start_date = "2016-03-01", # note date shift to avoid TZ issues
+  end_date = "2016-04-01",
+  overwrite = TRUE)
+
+## convert to model specific input
+met2model.BIOCRO(
+  overwrite = TRUE,
+  in.path = "data/cf", 
+  in.prefix = ne_cf$dbfile.name, 
+  outfolder = "data/biocromet",
+  lat = 40,
+  lon = -88,
+  start_date = "2016-03-01", 
+  end_date = "2016-03-30")
+
+met <- readr::read_csv('data/biocromet/Clowder.UIUC Energy Farm - NE.2016-02-28.2016-04-01.2016.csv')
+```
+
+<!--chapter:end:01.2-pecan-met-utilities.Rmd-->
+
+---
+title: "Accessing Sensor Metadata"
+subtitle: "Response Curves and other Metadata"
+author: "David LeBauer, Craig Willis"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r sensor-metadata-setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(jsonlite)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+
+
+```
+
+# Introduction
+
+This tutorial will demonstrate how to access sensor metadata from within R. All of the sensor metadata is public, and can be queried via the API using the url `https://terraref.org/clowder/api/datasets/<id>/metadata.jsonld`.
+
+For further information about sensor metadata see the [Sensor Data Standards](/sensor-data-standards.md) section.
+
+## Avaialble Sensor metadata
+
+
+### Example: RSR curves for PAR, PSII and NDVI
+
+* par: https://terraref.org/clowder/api/datasets/5873a8ce4f0cad7d8131ad86/metadata.jsonld
+* pri: https://terraref.org/clowder/api/datasets/5873a9174f0cad7d8131b09a/metadata.jsonld
+* ndvi: https://terraref.org/clowder/api/datasets/5873a8f64f0cad7d8131af54/metadata.jsonld
+
+
+### PAR sensor metadata
+
+```{r}
+
+par_metadata <- jsonlite::fromJSON("https://terraref.org/clowder/api/datasets/5873a8ce4f0cad7d8131ad86/metadata.jsonld")
+print(par_metadata$content)
+knitr::kable(par_metadata$content$rsr)
+
+```
+#### PAR sensor RSR curve 
+
+```{r par-rsr-curve}
+par_rsr <- data.frame(wavelength = unlist(par_metadata$content$rsr$wavelength),
+                      response = unlist(par_metadata$content$rsr$response))
+
+                      
+ggplot(data = par_rsr, aes(x = wavelength, y = response), alpha = 0.4) +
+  geom_line() +
+  ylab('relative response')
+```
+
+### Skye NDVI meta-data
+
+```{r}
+
+ndvi_metadata <- jsonlite::fromJSON("https://terraref.org/clowder/api/datasets/5873a8f64f0cad7d8131af54/metadata.jsonld")
+knitr::kable(t(ndvi_metadata$content[-21]), col.names = '')
+
+```
+#### NDVI sensor RSR curve 
+
+```{r rsr-curve}
+ndvi_up_rsr <- cbind(direction = 'up',
+                     bind_rows(lapply(ndvi_metadata$content$rsr$up, unlist)))
+ndvi_down_rsr <- cbind(direction = 'down', 
+                    bind_rows(lapply(ndvi_metadata$content$rsr$down, unlist)))
+ndvi_rsr <- rbind(ndvi_up_rsr, ndvi_down_rsr) 
+ggplot(data = ndvi_rsr, aes(x = wavelength, linetype = direction), alpha = 0.4) +
+  geom_line(aes(y = ch1), color = 'green') + 
+  geom_line(aes(y = ch4), color = 'red') +
+  ylab('relative response')
+```
+
+
+<!--chapter:end:02-sensor-metadata.Rmd-->
+
+---
+title: "Laser Scanner Point Clouds"
+author: "David LeBauer"
+date: "`r Sys.Date()`"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = TRUE)
+library(rLiDAR) 
+library(ggplot2)
+library(dplyr)
+library(rgl)
+theme_set(theme_bw())
+```
+
+
+Based on documentation for the `readLiDAR` package
+
+```{r import-las}
+# Importing LAS file:
+
+lasfile <- "~/terraref/documentation/tutorials/data/51458297-0d25-416a-91a5-a2f0ae1a1083__Top-heading-east_0.las"
+
+LAS <- readLAS(lasfile) %>% 
+  as_data_frame %>% 
+  mutate(Z = (Z - min(Z)))
+
+```
+
+```{r downsample-las}
+LAS_sample <- LAS %>% 
+  filter(Z>200) %>% 
+  sample_frac(size = 0.01)
+```
+
+```{r lidar-cluster}
+xyz <- LAS_sample[,1:3]
+# Getting LiDAR clusters
+set.seed(1)
+clLAS <- kmeans(xyz, 32)
+```
+
+```{r lidar-visualization}
+# Set the points id
+id <- as.factor(clLAS$cluster)
+
+xyzid <- cbind(xyz, id)
+
+library(rgl)
+open3d()
+volumeList <- chullLiDAR3D(xyzid = xyzid, plotit = TRUE, col = 'forestgreen', alpha = 0.6)
+
+plot3d(xyzid[,1:3], add=TRUE)
+
+summary(volumeList) # summary
+
+xyid <- xyzid[,c("X", "Y", "id")]
+chullTrees <- chullLiDAR2D(xyid = xyid)
+
+ # Plotting the LiDAR convex hull
+library(sp)
+plot.new()
+plot(SpatialPoints(xyid[,1:2]),cex=0.5,col=xyid[,3])
+plot(chullTrees$chullPolygon, border = "green")
+# Get the ground-projected area of LiDAR convex hull
+
+chullList <- chullTrees$chullPolygon
+summary(chullList) # summary
+
+ggplot(data = LAS_sample ) + 
+  geom_histogram(aes(Z), bins = 300) + coord_flip()
+
+ggplot(data = LAS_sample) + 
+  geom_hex(aes(X, Y), bins = 50)
+
+
+```
+
+<!--chapter:end:03-laser-scanner-3D.Rmd-->
+
+# Command Line Hyperspectral Workflow
+
+```{r}
+knitr::include_url("https://docs.google.com/document/d/1QWBUHsRql_c_q15WoFrUGRMGk0gZQ-y85y6tpd9pdNM/pub")
+```
+
+<!--chapter:end:05-command-line-hyperspectral-workflow.Rmd-->
+
+# Generating file lists by plot
+
+## Pre-requisites: 
+
+* if you have not already done so, you will need to 1) sign up for the [beta user program](https://terraref.org/beta) and 2)
+sign up and be approved for access to the the [sensor data portal](https://terraref.org/clowder) in order to get
+the API key that will be used in this tutorial. 
+
+The terrautils python package has a new `products` module that aids in connecting
+plot boundaries stored within betydb with the file-based data products available
+from Globus.
+
+* if are using Rstudio and want to run the Python code chunks, the R package "reticulate" is required
+* use `pip3 install terrautils` to install the terrautils Python library
+
+## Getting started
+
+After installing terrautils, you should be able to import the `products` module.
+```{python eval = FALSE}
+from terrautils.products import get_sensor_list, unique_sensor_names
+from terrautils.products import get_file_listing, extract_file_paths
+```
+
+The `get_sensor_list` and `get_file_listing` functions both require the *connection*,
+*url*, and *key* parameters. The *connection* can be 'None'. The *url* (called host in the
+code) should be something like `https://terraref.org/clowder/`.
+The *key* is a unique access key for the Clowder API.
+
+## Getting the sensor list
+
+The first thing to get is the sensor name. This can be retrieved using the
+`get_sensor_list` function. This function returns the full record which may
+be useful in some cases but primarily includes sensor names that include
+a plot id number. The utility function `unique_sensor_names` accepts the
+sensor list and provides a list of names suitable for use in the 
+`get_file_listing` function.
+
+To use this tutorial you will need to sign up for Clowder, have your 
+account approved, and then get an API key from the [Clowder web interface](https://terraref.org/clowder).
+
+```{python eval = FALSE}
+url = 'https://terraref.org/clowder/'
+key = 'ENTER YOUR KEY HERE'
+```
+
+```{python eval = FALSE}
+sensors = get_sensor_list(None, url, key)
+names = unique_sensor_names(sensors)
+print(names)
+```
+
+
+Names will now contain a list of sensor names available in the Clowder
+geostreams API. The list of returned sensor names could be something like the 
+following:
+
+* flirIrCamera Datasets
+* IR Surface Temperature
+* RGB GeoTIFFs Datasets
+* stereoTop Datasets
+* scanner3DTop Datasets
+* Thermal IR GeoTIFFs Datasets
+* ...
+
+## Getting a list of files
+
+The geostreams API can be used to get a list of datasets that overlap a
+specific plot boundary and, optionally, limited by a time range. Iterating 
+over the datasets allows the paths to all the files to be extracted.
+
+```{python eval = FALSE}
+sensor = 'Thermal IR GeoTIFFs Datasets'
+sitename = 'MAC Field Scanner Season 1 Field Plot 101 W'
+key = 'INSERT YOUR KEY HERE'
+datasets = get_file_listing(None, url, key, sensor, sitename)
+files = extract_file_paths(datasets)
+```
+
+Datasets can be further filtered using the *since* and *until* parameters
+of `get_file_listing` with a date string.
+
+```{python eval=FALSE}
+dataset = get_file_listing(None, url, key, sensor, sitename, 
+        since='2016-06-01', until='2016-06-10')
+```
+
+
+## Querying the API
+
+<!-- 
+TODO: move this to a separate tutorial page focused on using curl
+-->
+
+The source files behind the data are available for downloading through the API. By executing a series
+of requests against the API it's possible to determine the files of interest and then download them.
+
+Each of the API URL's have the same beginning (https://terraref.org/clowder/api), 
+followed by the data needed for a specific request. As we step through the process you will be able
+to see how then end of the URL changes depending upon the request.
+
+Below is what the API looks like as a URL. Try pasting it into your browser.
+
+[https://terraref.org/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W](https://terraref.org/clowder/api/geostreams/sensors?sensor_name=MAC Field Scanner Season 1 Field Plot 101 W)
+
+This will return data for the requested plot including its id. This id (or identifier) can then be used for 
+additional queries against the API.
+
+In the examples below we will be using **curl** on the command line to make our API calls. Since the
+API is accessed through URLs, it's possible to use the URLs in software programs or with a programming language
+to retrieve its data. 
+
+### A Word of Caution
+
+We are no longer using the python terrautils package, which is a python library that provides helper functions that simplify interactions with the Clowder API. One of the ways it makes the interface easier is by using function names that make sense in the scope of the project. The API and the Clowder database have different names and _this is confusing_ since the same names are used for different parts of the database.
+
+The names and meanings of variables in this section don't necessarily match the ones in the section 
+above and it may be easy to get them confused. The API queries the database directly and thereby reflects 
+the database structure. This is the main reason for the naming differences between the API and the terraref
+client.
+
+For example, the Clowder API's use of the term *SENSOR_NAME* is equivalent to *site_name* above.
+
+### Finding plot ID
+
+We can query the API to find the identifier associated with the name of a plot. For this example
+we use the variable name of SENSOR_DATA to indicate the name of the plot.
+
+``` {sh eval=FALSE}
+SENSOR_NAME="MAC Field Scanner Season 1 Field Plot 101 W"
+curl -o plot.json -X GET "https://terraref.org/clowder/api/geostreams/sensors?sensor_name=${SENSOR_NAME}"
+```
+
+This creates a file named *plot.json* containing the JSON object returned by the API. The JSON object has an 
+'id' parameter. This ID parameter can be used to specify the correct data stream.
+
+### Finding stream ID within a plot
+
+Using the sensor ID returned in the JSON from the previous call and the id of a sensor returned previously to get
+the stream id. The names of streams are are formatted as "<Sensor Group> Datasets (<Sensor ID>)".
+
+``` {sh eval=FALSE}
+SENSOR_ID=3355
+STREAM_NAME="Thermal IR GeoTIFFs Datasets (${SENSOR_ID})"
+curl -o stream.json -X GET "https://terraref.org/clowder/api/geostreams/streams?stream_name=${STREAM_NAME}"
+```
+
+A file named *stream.json* will be created containing the returned JSON object. This JSON object has an 'id' parameter that
+contains the stream ID. You can use this ID parameter to get the datasets, and then datapoints, of interest.
+
+### Listing Clowder dataset IDs for that plot & sensor stream
+
+We now have a stream ID that we can use to list our datasets. The datasets in turn contain files of interest.
+
+``` {sh eval=FALSE}
+STREAM_ID=11586
+curl -o datasets.json -X GET "https://terraref.org/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}"
+```
+
+After the call succeeds, a file named *datasets.json* is created containing the returned JSON object. As part of the
+JSON object there are one or more `properties` fields containing *source_dataset* parameters.
+
+```{javascript eval=FALSE}
+properties: {
+    dataset_name: "Thermal IR GeoTIFFs - 2016-05-09__12-07-57-990",
+    source_dataset: "https://terraref.org/clowder/datasets/59fc9e7d4f0c3383c73d2905"
+},
+```
+
+The URL of each **source_dataset** can be used to view the dataset in Clowder.
+
+The datasets can also be filtered by date. The following filters out datasets that are outside of the range of January 2, 2017 through June 20, 2017.
+
+``` {sh eval=FALSE}
+curl -o datasets.json -X GET "https://terraref.org/clowder/api/geostreams/datapoints?stream_id=${STREAM_ID}&since=2017-01-02&until=2017-06-10"
+```
+
+### Getting file paths from dataset
+
+Now that we know what the dataset URLs are, we can use the URLs to query the API for file IDs in addition to their names and paths.
+
+Note the the URL has changed from our previous examples now that we're using the URLs returned by the previous call.
+
+``` {sh eval=FALSE}
+SOURCE_DATASET="https://terraref.org/clowder/datasets/59fc9e7d4f0c3383c73d2905"
+curl -o files.json -X GET "${SOURCE_DATASET}/files"
+```
+
+As before, we will have a file containing the returned JSON, named *files.json* in this case. The returned JSON consists of a list 
+of the files in the dataset with their IDs, and other data if available:
+
+``` {javascript eval=FALSE}
+[
+    {
+        size: "346069",
+        date-created: "Fri Nov 03 11:51:13 CDT 2017",
+        id: "59fc9e814f0c3383c73d2962",
+        filepath: "/home/clowder/sites/ua-mac/Level_1/ir_geotiff/2016-05-09/2016-05-09__12-07-57-990/ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.png",
+        contentType: "image/png",
+        filename: "ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.png"
+    },
+    {
+        size: "1231298",
+        date-created: "Fri Nov 03 11:51:16 CDT 2017",
+        id: "59fc9e844f0c3383c73d2980",
+        filepath: "/home/clowder/sites/ua-mac/Level_1/ir_geotiff/2016-05-09/2016-05-09__12-07-57-990/ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif",
+        contentType: "image/tiff",
+        filename: "ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif"
+    }
+]
+```
+
+### Retrieving the files
+
+Given that a large number of files may be contained in a dataset, it may be desirable to automate the process of pulling down files
+to the local system.
+
+For each file to be retrieved, the unique file ID is needed on the URL.
+
+``` {sh eval=FALSE}
+FILE_NAME="ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif"
+FILE_ID=59fc9e844f0c3383c73d2980
+curl -o "${FILE_NAME}" -X GET "https://terraref.org/clowder/api/files/${FILE_ID}"
+```
+
+This call will cause the server to return the contents of the file identified in the URL. This file is then stored locally in *ir_geotiff_L1_ua-mac_2016-05-09__12-07-57-990.tif*.
+
+
+
+<!--chapter:end:06-list-datasets-by-plot.Rmd-->
+
+
+## Hyperspectral Data
+
+### Calibration Targets
+
+These were collected on April 15 2017 every ~15 minutes
+
+
+```{r get-vnir-calibration, eval=FALSE}
+library(ncdf4)
+library(dplyr)
+
+hsi_calibration_dir <- '/data/terraref/sites/ua-mac/Level_1/hyperspectral/2017-04-15'
+hsi_calibration_files <- dir(hsi_calibration_dir, 
+                             recursive = TRUE,
+                             full.names = TRUE)
+
+fileinfo <- bind_rows(lapply(hsi_calibration_files, file.info)) %>%
+  mutate(size_gb = size/1073741824)
+
+calibration_nc <- nc_open(hsi_calibration_files[200])
+a <- calibration_nc$var$rfl_img
+
+
+#calibration_nc$dim$x$len 1600
+#calibration_nc$dim$y$len
+x_length <- round(calibration_nc$dim$x$len / 10)
+y_length <- round(calibration_nc$dim$y$len * 3/4)
+
+xstart <- ceiling(calibration_nc$dim$x$len / 2) - floor(x_length / 2) + 1
+
+ystart <- ceiling(calibration_nc$dim$y$len / 2) - floor(y_length / 2) + 1
+
+rfl <- ncvar_get(calibration_nc, 'rfl_img', 
+          #start = c(1, xstart, ystart), 
+          #count = c(955, x_length, y_length)
+          start = c(2, 2, 2),
+          count = c(1320, 10, 954)
+          )
+x <- ncvar_get(calibration_nc, 'x', start = 100, count = 160)
+y <- ncvar_get(calibration_nc, 'y', start = 100, count = 1324)
+lambda <- calibration_nc$dim$wavelength$vals
+for(i in 1 + 0:10*95){
+  image(x = x, y = y, z = rfl[i,,],
+        xlab = 'x (m)', ylab = 'y (m)',
+        col = rainbow(n=100),
+        main = paste('wavelength', 
+                      udunits2::ud.convert(lambda[i],'m','nm')))
+} 
+
+```
+
+<!--chapter:end:08-hyperspectral-calibration.Rmd-->
+
+---
+title: "Solar Radiance"
+author: "David LeBauer"
+date: "March 9, 2018"
+output: html_document
+---
+
+
+# VNIR Radiometer Data
+
+An Ocean Optics STS Spectrometer measures downwelling solar spectral radiance every 5s on top of the Gantry.
+
+Lets look at the output from this sensor over the course of the day (and then we will see how to access the data):
+
+```{r one-downwelling-spectra}
+library(tidyverse)
+library(ggridges)
+load('data/spectra.RData')
+
+s <- spectra_long %>% 
+  mutate(hour = hour, 
+         radiance = radiance - min(radiance)) %>% 
+  arrange(hour, wavelength) 
+  # subset for faster exploration: %>% slice(1:(24*64)*16) 
+
+ggplot(data = s, aes(x = wavelength, y = hour, group = hour, 
+                                height = radiance )) +
+  geom_density_ridges(stat = 'identity', scale = 6, size = 0.25, alpha = 0.7, color = 'white') +
+  theme_ridges(grid = FALSE, center_axis_labels = TRUE) +
+  scale_y_continuous(trans = 'reverse') +
+  ggtitle("Downwelling Spectral Radiance", 
+          subtitle = "hourly spectra from April 15, 2017")
+
+# Fun Challenge: implement wavelength --> color mapping
+#scale_color_gradientn(
+#    colors = c('white', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange', 'red', #'black'), 
+#    values = c(300, 420, 570, 530, 580, 620, 700, 800))
+
+```
+
+## Query from Environmental logger netCDF files
+
+There are 20 observations of 1024 individual wavelengths_per minute_ = `r 20 * 60 * 24 * 1024` data points per day. We convert these data to CF standards and store them in netCDF file formats.
+
+These are used in the hyperspectral workflow. 
+
+Let's take a look at one of these files:
+
+```{r netcdf-metadata}
+library(tidyverse)
+library(ncdf4)
+library(udunits2)
+library(lubridate)
+if(!require(tidync)){
+  devtools::install_github('hypertidy/ncmeta')
+  devtools::install_github('hypertidy/tidync')
+} 
+
+library(ncmeta)
+library(tidync)
+
+envlog_file <- "/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/2017-08-21/envlog_netcdf_L1_ua-mac_2017-08-21.nc"
+envlog.nc <- nc_open(envlog_file, readunlim = TRUE)
+
+time <- envlog.nc$dim$time$vals
+wvl <- envlog.nc$dim$wvl_lgr$vals
+
+metadata <- envlog.nc$var %>% bind_cols()
+
+#flx_dwn <- ncvar_get(envlog.nc, ')
+
+#if(!require(ncdf4.helpers)) install.packages("ncdf4.helpers")
+#ts <- ncdf4.helpers::nc.get.time.series(envlog.nc)
+s <- tidync::tidync(envlog_file)
+  
+  
+nc_metadata <- ncmeta::nc_meta(envlog_file)
+
+nc_metadata$variable %>% 
+  select(name, longname, units, ndims) %>% 
+  filter(!grepl('raw', name)) %>% 
+  knitr::kable()
+```
+
+
+
+Now lets query the Downwelling Spectral Irradiance  (flx_spc_dwn) from this file:
+
+```{r}
+
+library(tidync)
+flx_spc_dwn <- ncvar_get(envlog.nc, 'flx_spc_dwn', )
+time <- ncvar_get(envlog.nc, 'time')
+dim(flx_spc_dwn)
+
+if(!require(rasterVis)) install.packages("rasterVis")
+
+library(rasterVis)
+gplot(flx_spc_dwn) + 
+  geom_tile(aes(fill = value))
+  
+```
+
+
+```{r}
+time = flx_spc_dwn$  radiance = as.vector(flx_spc_dwn)
+get_spectra <- function(date, site = 'ua-mac'){
+  
+  
+  envlog_file <- file.path("/data/terraref/sites", site, "Level_1/envlog_netcdf", date, 
+                           paste0("envlog_netcdf_L1_", site, "_", date, ".nc"))
+  envlog.nc <- nc_open(envlog_file, readunlim = FALSE)
+  timepoints <- ud.convert(4*1:5, 'h', '5s')
+  
+  flx_spc_dwn <- ncvar_get(envlog.nc, 'flx_spc_dwn')[,timepoints]
+  datetime <- ymd("1970-01-01", tz ="America/Phoenix") + 
+    seconds(ud.convert(ncvar_get(envlog.nc, 'time'), 'day', 's'))
+  datetime[timepoints]
+  
+  z <- as.data.frame(flx_spc_dwn)
+  colnames(z) <- datetime[timepoints]
+  
+  wvl <- ncvar_get(envlog.nc, 'wvl_lgr')
+  wvl.idx <- sapply(c(34:81*10), 
+                    function(x) which.min(abs(x-wvl)))
+  zz <- z[wvl.idx,]
+  rownames(zz) <- round(wvl[wvl.idx])
+  return(t(zz))
+  write(zz, file = paste0('tmp/',date, '.csv'))
+}
+  
+
+dates <- seq(ymd('2017-04-15'), ymd('2017-11-12'), by = '10 days')
+all_spectra <- lapply(as.character(dates), get_spectra)
+spectra.df <- lapply(all_spectra, as.data.frame)
+zzz <- do.call(rbind, unname(spectra.df))
+write.csv(zzz, '~/tmp/spectra.csv')
+return(list(spc = spc, wvl = wvl, date = ymd(strftime(datetime, '%Y%m%d')), datetime = datetime))
+
+
+
+for(date in c('2016-06-21', '2016-09-21', '2016-12-21', '2017-03-21', '2017-05-21')){
+  
+  directory <- file.path("/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/", date)
+  files <- dir(directory, full.names = TRUE)  
+  spectra_list <- lapply(files, function(x){
+    metnc <- nc_open(x)
+    spc <- ncvar_get(metnc, 'flx_spc_dwn')
+    datetime <- ymd("1970-01-01") + 
+      seconds(ud.convert(ncvar_get(metnc, 'time'), 'day', 's'))
+    wvl <- ncvar_get(metnc, 'wvl_lgr')
+    time <- hour(datetime) + 
+      minute(datetime)/60 + 
+      second(datetime)/3600
+    return(list(spc = spc, wvl = wvl, date = ymd(strftime(datetime, '%Y%m%d')), datetime = datetime))
+    
+  })
+  
+  spectra_df <- do.call('cbind',(lapply(spectra_list, '[[', 'spc') ))
+  dim(spectra_df)
+  
+  time <- do.call('c',lapply(spectra_list,'[[','datetime'))
+  wavelengths <- spectra_list[[1]]$wvl
+  save(spectra_df, time, wavelengths, file = file.path('data', paste0("spectra",date,".Rdata")))
+  idx <- 1+0:700*24
+  i <- 1:length(hr)[!is.na(hr)]
+  library(lubridate)
+  hr <- hour(time) + minute(time)/60 + second(time)/3600
+  png(filename = paste0('data/spectra',date,'.png'))
+  image(x = wavelengths, y = as.numeric(hr[idx]), spectra_df[,idx],
+        ylab = 'hour of day', 
+        xlab = 'wavelength (nm)',
+        col = cm.colors(n=100),zlim = c(-1,2.1),
+        main = paste0('diurnal solar spectral radiation\n',date))
+  dev.off()
+  
+}  
+library(lubridate)
+library(data.table)
+library(udunits2)
+
+time <- ncvar_get(metnc, 'time')
+
+wavelengths <- ncvar_get(metnc, 'wvl_lgr')
+
+f_down_spectrum <- ncvar_get(metnc, 'flx_spc_dwn')
+
+library(ggplot2)
+
+ggplot() + 
+  geom_point(aes(wavelengths, f_down_spectrum[,1])) +
+  geom_line(aes(wavelengths, f_down_spectrum[,1]))
+
+f_down_means <- rowMeans(f_down_spectrum)
+
+ggplot() + 
+  geom_point(aes(wavelengths, f_down_means)) +
+  geom_line(aes(wavelengths, f_down_means))
+
+print(metnc)
+
+```
+
+### Your turn:
+
+Can you see the effect of the August 21, 2017 solar eclipse on the diurnal spectral radiance?
+
+## Raw sensor data
+
+Here we can found the original data written by the sensor. Unlike above, these are in text files and are not in a standard format like the CF format above.
+
+```{r raw-met, cache=TRUE}
+metfile <- "/data/terraref/sites/ua-mac/raw_data/EnvironmentLogger/2017-05-31/2017-05-31_12-19-38_environmentlogger.json"
+met <- jsonlite::fromJSON(metfile)
+writeLines(jsonlite::toJSON(met), con = file('foo.json'))
+
+timestamp <- lubridate::ymd_hms(met$environment_sensor_readings$timestamp)
+
+wavelengths <- met$environment_sensor_readings$spectrometer$wavelength[[1]]
+
+spectra <- do.call('rbind', met$environment_sensor_readings$spectrometer$spectrum)
+
+library(dplyr)
+spectra <- do.call('rbind', met$environment_sensor_readings$spectrometer$spectrum)
+
+#colnames(spectra) <- wavelengths
+#rownames(spectra) <- met$environment_sensor_readings$timestamp
+image(x = timestamp, y = wavelengths, z = spectra)
+```
+
+
+```{r}
+library(dplyr)
+library(readr)
+date = '2017-04-15'
+load_loggerdata <- function(date){
+  path <- file.path("/data/terraref/sites/ua-mac/raw_data/EnvironmentLogger", date)
+  files <- dir(path, full.names = TRUE)
+  loggerdata <- lapply(files, jsonlite::fromJSON) 
+  timestamp <- combine(sapply(loggerdata, function(x){
+    t <- x$environment_sensor_readings$timestamp
+    lubridate::ymd_hms(t)
+  }))
+  return(list(data = loggerdata, timestamp = timestamp))
+}
+
+extract_downwelling_irradiance <- function(logdata){
+
+  wavelengths <- logdata$data[[1]]$environment_sensor_readings$spectrometer$wavelength[[1]]
+  
+  spectra <- do.call('rbind', lapply(logdata$data, function(x){
+    do.call('rbind', x$environment_sensor_readings$spectrometer$spectrum)
+    }
+  ))
+  # image(x = timestamp, y = wavelengths, z = spectra)
+  return(list(spectra = spectra, wavelengths = wavelengths, timestamp = logdata$timestamp))
+}
+
+extract_logger_met <- function(logdata){
+  
+  met <- do.call('rbind', lapply(logdata$data, function(x){
+    tmp_met <- x$environment_sensor_readings
+    data.frame(par = tmp_met$`sensor par`$value,
+               co2 = tmp_met$`sensor co2`$value,
+               sundir = tmp_met$weather_station$sunDirection$value,
+               pressure = tmp_met$weather_station$airPressure$value,
+               brightness = tmp_met$weather_station$brightness$value,
+               rh = tmp_met$weather_station$relHumidity$value,
+               temp = tmp_met$weather_station$temperature$value,
+               wind_dir = tmp_met$weather_station$windDirection$value,
+               wind_speed = tmp_met$weather_station$windVelocity$value)
+    
+  })) 
+  return(met)
+}
+
+env_log_data <- load_loggerdata(date = '2017-04-15')
+env_log_spectra <- extract_downwelling_irradiance(env_log_data)
+env_log_met <- extract_logger_met(env_log_data)
+
+```
+
+#### Plots
+
+```{r}
+library(lubridate)
+library(dplyr)
+library(tidyr)
+time <- env_log_data$timestamp
+
+hourly_index <- 1+0:23*720
+
+time_hr <- time[hourly_index]
+hourly_spectra <- env_log_spectra$spectra[hourly_index,]
+wavelengths <- env_log_spectra$wavelengths
+
+colnames(hourly_spectra) <- wavelengths
+
+image(x = time_hr, y = wavelengths, z = hourly_spectra, 
+      xlab = 'local time', ylab = 'wavelength (nm)')
+```
+
+```{r spectra-ggplot}
+
+spectra_df <- data.frame(hour = 1:24, hourly_spectra)
+
+spectra_long <- spectra_df %>% 
+  gather(key = wavelength, value = radiance, -hour) %>% 
+  mutate(wavelength = as.numeric(gsub("X", "", wavelength))) 
+
+colnames(spectra_long)
+
+library(ggplot2)
+ggplot(data = spectra_long, aes(x = wavelength, y = radiance)) +
+  geom_line(size = 0.1) +
+  ggthemes::theme_tufte() +
+  facet_wrap(~hour, ncol = 6) +
+  ggtitle(paste('spectra on', date))
+
+```
+
+<!--chapter:end:09-vnir-radiometer.Rmd-->
+

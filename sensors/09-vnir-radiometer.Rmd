@@ -42,9 +42,11 @@ ggplot(data = s, aes(x = wavelength, y = hour, group = hour,
 
 There are 20 observations of 1024 individual wavelengths_per minute_ = `r 20 * 60 * 24 * 1024` data points per day. We convert these data to CF standards and store them in netCDF file formats.
 
+The data are described in the TERRA REF documentation under the environmental data section of the [data products chapter](https://docs.terraref.org/user-manual/data-products/environmental-conditions) 
 These are used in the hyperspectral workflow. 
 
 Let's take a look at one of these files:
+
 
 ```{r netcdf-metadata}
 library(tidyverse)
@@ -59,14 +61,16 @@ if(!require(tidync)){
 library(ncmeta)
 library(tidync)
 
-envlog_file <- "/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/2017-08-21/envlog_netcdf_L1_ua-mac_2017-08-21.nc"
+envlog_file <- "~/Globus/envlog_netcdf/2017-08-20/2017-08-20_03-11-57_environmentlogger.nc"
+#envlog_file <- "~/Globus/envlog_netcdf/2017-08-20/envlog_netcdf_L1_ua-mac_2017-08-20.nc"
+#envlog_file <- "/data/terraref/sites/ua-mac/Level_1/envlog_netcdf/2017-08-21/envlog_netcdf_L1_ua-mac_2017-08-21.nc"
 envlog.nc <- nc_open(envlog_file, readunlim = TRUE)
 
 time <- envlog.nc$dim$time$vals
 wvl <- envlog.nc$dim$wvl_lgr$vals
 
-metadata <- envlog.nc$var %>% bind_cols()
-
+#metadata <- as.data.frame(envlog.nc$var)
+metadata <- jsonlite::fromJSON('~/dev/data-paper/metadata/envlog_netcdf_metadata.json',  flatten = TRUE)
 #flx_dwn <- ncvar_get(envlog.nc, ')
 
 #if(!require(ncdf4.helpers)) install.packages("ncdf4.helpers")
@@ -74,11 +78,19 @@ metadata <- envlog.nc$var %>% bind_cols()
 s <- tidync::tidync(envlog_file)
   
   
-nc_metadata <- ncmeta::nc_meta(envlog_file)
+#ncmetadata <- ncmeta::nc_meta(envlog.nc)
 
+variables <- names(envlog.nc$var)
+
+x <- data.frame(variable = character(length = length(envlog.nc$var)))
+x$variable <- envlog.nc$var
+for(v in variables){
+  
+
+}
 nc_metadata$variable %>% 
-  select(name, longname, units, ndims) %>% 
-  filter(!grepl('raw', name)) %>% 
+  select(name, units, ndims) %>% 
+#  filter(!grepl('raw', name)) %>% 
   knitr::kable()
 ```
 
