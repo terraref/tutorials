@@ -1,0 +1,271 @@
+---
+title: "NAPPN 2021 TERRA REF workshop notes"
+author: "Kristina Riemer"
+output: github_document
+urlcolor: blue
+---
+
+# Workshop details
+
+- Title: Using TERRA REF high throughput, sensor-collected plant data with R
+- Date: Tuesday February 16, 2021
+- Time: 8:30am - 11:00am CST
+
+## Agenda
+
+
+
+### Download/install
+
+- R locally and Dryad data downloaded OR Binder
+- Sign up for Globus account on globus.org and download Globus connect (following automated setup steps)
+
+
+```{r, eval=FALSE}
+local_path <- "videos/nappn_2021/dryad_data.zip"
+download.file(url = "https://datadryad.org/stash/downloads/file_stream/624637", destfile = local_path)
+unzip(local_path)
+```
+
+## Data overview
+
+TERRA REF is a project funded by the Advanced Research Projects Agency for Energy (ARPA-E). The objective is to advance the science and technology of high throughput field phenotyping, which is the automated measurement of plants. TERRA REF has deployed an exceptionally large robot capable of collecting data from a range of sensors at 1 mm spatial resolution every other day. You can learn more about the project from the website, terraref.org. The suite of sensors include visible light cameras, hyperspectral cameras, a laser 3d scanner, and environmental data. In addition there are weather stations and high resolution genome sequences for hundreds of varieties of Sorghum being monitored. 
+
+These tutorials are to make these data accessible and usable. I will provide an overview of how to use computational tools to get these data, and combine, plot, and analyze them.
+
+We have written online tutorials [here](https://terraref.github.io/tutorials/). These walkthroughs and videos complement those materials, which are growing and improving continually. 
+
+### Traitvis webapp and experimental design
+
+Field is passed over by large robot called a gantry. Lot of equipment in hanging box to collect many types of data. 
+
+Gantry goes systematically over entire field once a day. Some sensors take data every day, like 9,000 images from RGB camera. Others more intermittently, like hyperspectral images, because of data space limits. 
+
+Sensors include: 
+
+* camera that takes pairs of red-green-blue images (**Stereo RGB**)
+* thermal infrared images (**FLIR**)
+* images at a bunch of wavelengths to get hyperspectral data (**VNIR/SWIR**)
+* laser that collects points on plant surfaces to create 3D image (**3D Laser**)
+* measures plant fluorescence (**PS II Fluor**)
+* handful of others, including environmental data such as temperature and light 
+
+See example data for some of these. 
+
+Collecting data since 2015, and are up to 8 seasons worth in that time. Originally for sorghum, but now open to other crop species and organizations that want to use system.
+
+Field is split up into plots. Referenced using range by column system, can see by hovering over map. 
+
+Can choose data within season with slider bar. Set to July 25, or 2018-07-25. Takes a moment to pull data for that date. 
+
+Currently shows canopy cover value for each plot. See for single plot "Range 20 Column 1". Zoom in on lower left hand part. Hover over that and see a canopy cover value of ~18%. 
+
+These data are summarized from camera data, can see that by unselecting "Heat Map" button on left. These are downscaled versions of infrared data. Main image data are infrared and RGB. 
+
+### Dryad data
+
+Explore Dryad data
+
+Focus on subset of data here. Start w/ README
+
+
+## Sensor data
+
+### Metadata
+
+Plots of sensor data available in Dryad README, with underlying data in metadata/sensor_products.csv
+
+Metadata about sensors in sensors folders. sensors/season_6_catalog/rgb_geotiff_plots. json format, so not all that readable, but path key has examples of paths to these data on Globus
+
+First json: file_catalog_season6_rgb_geotiff_plots_2018-04-16.json
+First path: season-6/sites/ua-mac/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6 Range 44 Column 7/rgb_geotiff_L1_ua-mac_2018-04-16__10-17-18-788_left.tif
+
+### Download from Globus
+
+[out of date instructions](https://docs.terraref.org/user-manual/how-to-access-data/)
+
+After following automated setup for Globus download, should have a local endpoint in Endpoints on left side menu
+Optional possible step: Create personal endpoint by opening up Globus Connect, go to Preferences, to Access, click + button, select local folder (maybe Desktop for now), select "Writable" tab
+
+Add Terra Ref endpoint. Log into Globus account at globus.org. Click endpoints button in left side menu. Search for #Terraref in Search bar, click to start a transfer. 
+
+Go back to metadata json and use path to navigate to tif at /ua-mac/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6 Range 44 Column 7/. Transfer to local Globus endpoint in same root folder as Dryad data by submitting transfer. Can see job by clicking link in green pop up box. 
+
+### Plot
+
+```{r}
+library(raster)
+single_RGB <- raster("videos/nappn_2021/rgb_geotiff_L1_ua-mac_2018-04-16__10-17-18-788_left.tif")
+plot(single_RGB)
+```
+
+TODO: add clipping? 
+
+## Trait data
+
+Other available data and tools in Dryad download, including code and instructions for how to generate the data here from the database Bety, high resolution field scanner weather data, and metadata for sensor data and genomics data. 
+
+### Read in data
+
+Row per date, location, cultivar, and trait
+
+```{r}
+canopy_cover <- read.csv("videos/nappn_2021/dryad_data/traits/season_6_traits/season_6_canopy_cover_sensor.csv")
+
+library(dplyr)
+canopy_cover <- canopy_cover %>% 
+  mutate(date = as.Date(date))
+
+```
+
+### Plot data
+
+Plot data as time series
+
+```{r}
+library(ggplot2)
+ggplot(data = canopy_cover, aes(x = date, y = mean)) +
+  geom_point()
+ggplot(data = canopy_cover, aes(x = date, y = mean, color = plot)) +
+  geom_point()
+
+cultivar <- "PI656026"
+canopy_cover_cultivar <- canopy_cover %>% 
+  filter(genotype == cultivar)
+ggplot(data = canopy_cover_cultivar, aes(x = date, y = mean, color = plot)) +
+  geom_point()
+ggplot(data = canopy_cover_cultivar, aes(x = date, y = mean)) +
+  geom_point() +
+  facet_wrap(~plot)
+```
+
+
+## Weather data
+
+### Read in data
+
+`metadata/weather/azmet`
+
+```{r}
+range(canopy_cover$date)
+weather <- read.csv("videos/nappn_2021/dryad_data/metadata/weather/azmet/azmet_2018_hourly.csv")
+```
+
+Create date column, summarize by day, pull out temp column using metadata
+
+```{r}
+library(tidyr)
+temp_2018_daily <- weather %>% 
+  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
+  select(date, X4.4) %>% 
+  rename(temperature = X4.4) %>% 
+  group_by(date) %>% 
+  summarize(mean_temp = mean(temperature))
+```
+
+### Plot data
+
+```{r}
+ggplot(temp_2018_daily, aes(x = date, y = mean_temp)) +
+  geom_point()
+```
+
+### Calculate GDD
+
+We’ll calculate a metric from temperature called growing degree days. Basically a simple measure of how much heat plants have been exposed to over time during the year.
+
+Go back a few steps to get hourly temperature values. The value actually needed for GDD is the mean of lowest and highest temps, so add that calculation in as a new column.
+```{r}
+temp_for_gdd <- weather %>% 
+  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
+  select(date, X4.4) %>% 
+  rename(temperature = X4.4) %>% 
+  group_by(date) %>% 
+  summarize(min_temp = min(temperature), 
+            max_temp = max(temperature), 
+            avg_temp = (max_temp + min_temp) / 2)
+```
+
+GDD is measure of the accumulation of heat over time that a plant is exposed to, but only above a chosen base temperature. The amount of heat a plant is exposed to affects timing and ability to grow, produce flowers, ect.
+
+Set a base temp as 10, then combine with average temp to get GDD.
+
+Use an ifelse to set that up. If the mean temp is above the base temp, then take mean temp and subtract base temp of 10 to indicate degrees of heat they’re exposed to that day. Anything below base temp gets no degrees.
+
+```{r}
+base_temp <- 10
+gdd <- temp_for_gdd %>% 
+  mutate(gdd = ifelse(avg_temp > base_temp, avg_temp - base_temp, 0))
+```
+
+This is amount of heat each day they’re exposed to. We want to know total amount they’ve been exposed to over the year. Use built-in cumsum to add each day’s degrees onto total.
+
+```{r}
+gdd <- temp_for_gdd %>% 
+  mutate(gdd = ifelse(avg_temp > base_temp, avg_temp - base_temp, 0), 
+         gdd_cum = cumsum(gdd)) %>% 
+  select(date, gdd_cum)
+```
+
+```{r}
+ggplot(gdd, aes(x = date, y = gdd_cum)) +
+  geom_line()
+```
+
+### Combine and model trait and weather data
+
+```{r}
+cover_gdd <- left_join(canopy_cover_cultivar, gdd, by = "date") %>% 
+  select(date, mean, gdd_cum)
+```
+
+Before modeling any data, should look at it. With more heat, cover increases quite quickly before asymptoting.
+
+```{r}
+ggplot(cover_gdd, aes(x = gdd_cum, y = mean)) +
+  geom_point()
+```
+
+Seems like logistic growth model would be a good fit to these data. Wrote a function to model these data. Copy and paste function and point out parts.
+
+```{r}
+model_logistic_growth <- function(data){
+  #parameter estimates
+  c <- 90
+  a <- 0.1
+  y <- cover_gdd$mean[3]
+  g <- cover_gdd$gdd_cum[3]
+  b <- ((log((c/y) - 1)) - a)/g
+  #model
+  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)), 
+                             start = list(c = c, a = a, b = b),
+                             data = data)
+  #model coefficients
+  single_c <- coef(model)[1]
+  single_a <- coef(model)[2]
+  single_b <- coef(model)[3]
+  #canopy value predictions
+  mean_predict = single_c / (1 + exp(single_a + single_b * data$gdd_cum))
+  return(mean_predict)
+}
+```
+
+Run the logistic model on the dataframe to get out predicted values of canopy cover for all GDD values. Add this to dataframe.
+
+```{r}
+cover_predictions <- model_logistic_growth(cover_gdd)
+cover_gdd$predictions <- cover_predictions
+```
+
+Plot the data like before, and plot model as line using predicted values to compare. Looks like a good fit.
+
+```{r}
+ggplot(cover_gdd) +
+  geom_point(aes(x = gdd_cum, y = mean)) +
+  geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
+  labs(x = "Cumulative growing degree days", y = "Canopy Height")
+```
+
+### Wrapup
+
+- Notes available on GitHub
