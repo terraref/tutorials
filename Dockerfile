@@ -1,4 +1,4 @@
-FROM rocker/rstudio:latest
+FROM rocker/binder:4.0.3
 
 RUN apt-get update \
     && apt-get install -y \
@@ -22,3 +22,5 @@ CMD Rscript -e 'bookdown::render_book("index.Rmd")' \
     && cd docs \
     && echo 'Starting a web server on http://localhost:3000/ to preview the documentation...' \
     && python -m SimpleHTTPServer 3000
+    
+# CMD wget -O trait_data.zip https://datadryad.org/stash/downloads/file_stream/624637
