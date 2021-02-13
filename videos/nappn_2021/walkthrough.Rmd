@@ -47,7 +47,7 @@ unzip(local_path)
 
 ## Data overview
 
-The purpose of this walkthrough is to provide an introduction to the data available through the TERRA REF project, and give everyone a chance to actually get and use some of the data in a hands on way. 
+The purpose of this walkthrough is to provide an introduction the TERRA REF public domain high throughput phenomics datasets (LeBauer et al 2020), and to give learners a chance to access and explore a representative cross section of these data. 
 
 In addition to this workshop, we have online tutorials for using these data at [https://terraref.github.io/tutorials/](https://terraref.github.io/tutorials/). There are also materials from previous walkthrough workshops at [https://github.com/terraref/tutorials/tree/master/videos](https://github.com/terraref/tutorials/tree/master/videos). We are striving to make these data as accessible and usable as possible. 
 
@@ -330,3 +330,11 @@ ggplot(cover_gdd) +
 ### Wrapup
 
 - Notes available on GitHub
+
+### References
+
+TERRA REF Seasons 4 and 6 public domain data:
+
+Citation: LeBauer, David et al. (2020), Data From: TERRA-REF, An open reference data set from high resolution genomics, phenomics, and imaging sensors, Dryad, Dataset, https://doi.org/10.5061/dryad.4b8gtht99
+
+[README](https://dryad-assetstore-merritt-west.s3.us-west-2.amazonaws.com/ark%3A/13030/m54v1sgd%7C5%7Cproducer/README_terraref_dryad.html)
