@@ -72,7 +72,7 @@ Collecting data since 2015, and are up to 8 seasons worth in that time. Original
 
 ### Traitvis webapp
 
-The easiest way to start to visualize and understand the TERRA REF data is through our webapp. Go to [https://traitvis.workbench.terraref.org/](https://traitvis.workbench.terraref.org/), which takes a minute to load. Displays plots of various data across collection time.
+The easiest way to start to visualize and understand the TERRA REF data is through the Traitvis shiny app website. Go to [terraref.org/traitvis/](https://terraref.org/traitvis/); this takes a minute to load because there is so much data, and _may freeze if everyone does it at once_! It displays time plots of trait data as well as maps and thumbnails of field scans.
 
 As example, we’ll look at data from Season 6, which we looked at last week, by going to “MAC Season 6” tab.
 
