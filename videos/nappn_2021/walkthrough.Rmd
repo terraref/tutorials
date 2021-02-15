@@ -50,7 +50,7 @@ AZ time:
     - RStudio at [https://rstudio.com/products/rstudio/download/](https://rstudio.com/products/rstudio/download/)
     - R packages: raster, dplyr, ggplot2
 4. Download Dryad data
-    - Download manually at [https://datadryad.org/stash/dataset/doi:10.5061/dryad.4b8gtht99](https://datadryad.org/stash/dataset/doi:10.5061/dryad.4b8gtht99) by clicking blue "Download dataset" button OR
+    - Download manually at [https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4b8gtht99/download](https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4b8gtht99/download) OR
     - Download with R using code below
 
 ```{r, eval=FALSE}
