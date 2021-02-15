@@ -13,7 +13,21 @@ Date: Tuesday February 16, 2021
 
 Time: 8:30am - 11:00am CST
 
-## Agenda
+## Agenda - Kristina
+
+EST: 
+
+- 9:30 - 10:00: Installation time/troubleshooting
+- 9:30 - 10:00: Overview of TERRA REF experiment
+- 10:00 - 10:30: Downloading sensor data from Globus
+- 10:30 - 10:35: break
+- 10:35 - 11:00: Using sensor data from Globus
+- 11:00 - 11:25: Using trait data with R
+- 11:25 - 11:30: break
+- 11:30 - 11:50: Using weather data with R, combining trait & weather data
+- 11:50 - 12:00: TERRA REF data review, wrap-up
+
+AZ time: 
 
 - 7:30 - 8:00: Installation time/troubleshooting
 - 7:30 - 8:00: Overview of TERRA REF experiment
@@ -25,7 +39,7 @@ Time: 8:30am - 11:00am CST
 - 9:30 - 9:50: Using weather data with R, combining trait & weather data
 - 9:50 - 10:00: TERRA REF data review, wrap-up
 
-### Download/install
+### Download/install - Kristina
 
 1. Sign up for Globus account on [https://www.globus.org/](https://www.globus.org/)
 2. Download Globus Connect Personal
@@ -41,11 +55,12 @@ Time: 8:30am - 11:00am CST
 
 ```{r, eval=FALSE}
 local_path <- "dryad_data.zip"
-download.file(url = "https://datadryad.org/stash/downloads/file_stream/624637", destfile = local_path)
+dryad_url <- ""
+download.file(url = dryad_url, destfile = local_path)
 unzip(local_path)
 ```
 
-## Data overview
+## Data overview - David
 
 The purpose of this walkthrough is to provide an introduction the TERRA REF public domain high throughput phenomics datasets (LeBauer et al 2020), and to give learners a chance to access and explore a representative cross section of these data. 
 
@@ -53,7 +68,7 @@ In addition to this workshop, we have online tutorials for using these data at [
 
 TERRA REF is a project funded by the Advanced Research Projects Agency for Energy (ARPA-E). The objective is to advance the science and technology of high throughput field phenotyping, which is the automated measurement of plant traits. The TERRA REF field scanner is the world’s largest agricultural robot and is capable of collecting data from a range of sensors at 1 mm spatial resolution. You can learn more about the project from the website, [terraref.org](https://terraref.org) and the documentation, [docs.terraref.org](https://docs.terraref.org). The suite of sensors include visible light cameras, hyperspectral cameras, a laser 3d scanner, and environmental data. These are provided alongside a suite of traits collected by hand as well as derived from sensors. Along with these data are high resolution genome sequences for hundreds of varieties of Sorghum being monitored as well as soil, weather, and other environmental data.
 
-### Experimental design
+### Experimental design - David
 
 (Show picture of site) Field site is in Arizona. Field is passed over by large robot called a gantry. Lot of equipment in hanging box to collect many types of data. 
 
@@ -70,7 +85,7 @@ Sensors include:
 
 Collecting data since 2015, and are up to 8 seasons worth in that time. Originally for sorghum, but now open to other crop species and organizations that want to use system.
 
-### Traitvis webapp
+### Traitvis webapp - David
 
 The easiest way to start to visualize and understand the TERRA REF data is through the Traitvis shiny app website. Go to [terraref.org/traitvis/](https://terraref.org/traitvis/); this takes a minute to load because there is so much data, and _may freeze if everyone does it at once_! It displays time plots of trait data as well as maps and thumbnails of field scans.
 
@@ -88,7 +103,7 @@ Currently shows canopy cover value for each plot. See for single plot "Range 20 
 
 These data are summarized from camera data, can see that by unselecting "Heat Map" button on left. These are downscaled versions of infrared data. Main image data are infrared and RGB. 
 
-### Dryad data
+### Dryad data - Kristina
 
 There is a lot of data available from TERRA REF. One of the easier entry points to using the data are on the data repository Dryad. This contains documentation about data, derived trait data, weather data, and information about the sensor and genomic data. This is currently only for two seasons of data. 
 
@@ -104,15 +119,15 @@ Let's look at what's in Dryad download by navigating in file system to folder wi
 
 **Sensors folder** Lastly is the sensor folder, which has some machine readable metadata about the sensor data, which we'll explore as a jumping off point to actually downloading and looking at some data. 
 
-## Sensor data
+## Sensor data - Kristina
 
-### Metadata
+### Metadata - Kristina
 
 Navigate into `sensors/season_6_catalog`. Can see folders for each of the types of sensor data. In `rgb_geotiff_plots`, there are a bunch of json files. These are formatted nicely for computers to understand, but aren't always easy to read ourselves. 
 
 Open up first file `file_catalog_season6_rgb_geotiff_plots_2018-04-16.json`. Lots of info available, but we'll use data after first instance of `path`. This is a file path, help us locate this file on Globus. Path is `season-6/sites/ua-mac/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6 Range 44 Column 7/rgb_geotiff_L1_ua-mac_2018-04-16__10-17-18-788_left.tif`. 
 
-### Download from Globus
+### Download from Globus - Kristina
 
 [out of date instructions](https://docs.terraref.org/user-manual/how-to-access-data/)
 
@@ -128,7 +143,7 @@ Transfer that RGB image from TERRA REF endpoint to our endpoint. Click on File M
 
 In right hand file system, navigate to `/ua-mac/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6 Range 44 Column 7/`. Can specify local path too. Transfer to local Globus endpoint in same root folder as Dryad data by submitting transfer. Can see job by clicking "View details" link in green pop up box. Show file locally. 
 
-### Plot
+### Plot - Kristina
 
 R has a pretty good set of tools for working with spatial data. One of these is `raster` package, which is good for gridded data like this RGB image. 
 
@@ -142,11 +157,11 @@ TODO: add clipping?
 
 There's a lot of other sensor data that was collected and can be accessed in a similar way. 
 
-## Trait data
+## Trait data - Kristina
 
 Other available data and tools in Dryad download, including code and instructions for how to generate the data here from the database Bety, high resolution field scanner weather data, and metadata for sensor data and genomics data. 
 
-### Read in data
+### Read in data - Kristina
 
 Go back to trait data in Dryad download. The way each csv is structured is there is a row per date, location, cultivar, and trait. We'll look at canopy cover, which is derived from RGB images, for that. Walk through columns, noting that `mean` is the actual value. 
 
@@ -163,7 +178,7 @@ canopy_cover <- canopy_cover %>%
   mutate(date = as.Date(date))
 ```
 
-### Plot data
+### Plot data - Kristina
 
 Plot data as time series. 
 
@@ -189,9 +204,9 @@ ggplot(data = canopy_cover_cultivar, aes(x = date, y = mean)) +
   facet_wrap(~plot)
 ```
 
-## Weather data
+## Weather data - Kristina
 
-### Read in data
+### Read in data - Kristina
 
 Weather data in Dryad download for the field site and the two years that the two seasons were collected. Navigate to `metadata/weather/`, we'll be using the `azmet` data. There are csv files for 2017 and 2018, and daily and hourly data. Want to get data for the right year to correspond to canopy cover data, cause we'll combine them later. 
 
@@ -218,16 +233,16 @@ temp_2018_daily <- weather %>%
   summarize(mean_temp = mean(temperature))
 ```
 
-### Plot data
+### Plot data - Kristina
 
 ```{r}
 ggplot(temp_2018_daily, aes(x = date, y = mean_temp)) +
   geom_point()
 ```
 
-## Calculations and modelling
+## Calculations and modelling - Kristina
 
-### Calculate GDD
+### Calculate GDD - Kristina
 
 We’ll calculate a metric from temperature called growing degree days. Basically a simple measure of how much heat plants have been exposed to over time during the year. Affects a lot of plant physiological processes like flowering. 
 
@@ -271,7 +286,7 @@ ggplot(gdd, aes(x = date, y = gdd_cum)) +
   geom_line()
 ```
 
-### Combine and model trait and weather data
+### Combine and model trait and weather data - Kristina
 
 We're going to put these gdd calculations with canopy cover for one cultivar and model the relationship between them. 
 
@@ -327,7 +342,7 @@ ggplot(cover_gdd) +
   labs(x = "Cumulative growing degree days", y = "Canopy Height")
 ```
 
-### Wrapup
+### Wrapup - David
 
 - Notes available on GitHub
 
