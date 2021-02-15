@@ -65,7 +65,7 @@ Sensors include:
 * thermal infrared images (**FLIR**)
 * hyperspectral images of over 1000 wavelengths at 2/3 (VNIR) or 12 (SWIR) nm spectral resolution (**VNIR/SWIR**)
 * laser that produces a depth map image that is converted to 3D point clouds (**3D Laser**)
-* measures plant fluorescence (**PS II Fluor**)
+* time series of 100 images capturing plant fluorescence response (**PS II Fluor**)
 * handful of others, including environmental data such as temperature and light
 
 Collecting data since 2015, and are up to 8 seasons worth in that time. Originally for sorghum, but now open to other crop species and organizations that want to use system.
