@@ -63,7 +63,7 @@ Sensors include:
 
 * camera that takes stereo pairs of red-green-blue images (**Stereo RGB**)
 * thermal infrared images (**FLIR**)
-* images at a bunch of wavelengths to get hyperspectral data (**VNIR/SWIR**)
+* hyperspectral images of over 1000 wavelengths at 2/3 (VNIR) or 12 (SWIR) nm spectral resolution (**VNIR/SWIR**)
 * laser that collects points on plant surfaces to create 3D image (**3D Laser**)
 * measures plant fluorescence (**PS II Fluor**)
 * handful of others, including environmental data such as temperature and light
