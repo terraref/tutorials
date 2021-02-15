@@ -61,7 +61,7 @@ Gantry goes systematically over entire field once a day. Some sensors take data 
 
 Sensors include: 
 
-* camera that takes pairs of red-green-blue images (**Stereo RGB**)
+* camera that takes stereo pairs of red-green-blue images (**Stereo RGB**)
 * thermal infrared images (**FLIR**)
 * images at a bunch of wavelengths to get hyperspectral data (**VNIR/SWIR**)
 * laser that collects points on plant surfaces to create 3D image (**3D Laser**)
