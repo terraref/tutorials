@@ -49,7 +49,8 @@ AZ time:
     - R at [https://www.r-project.org/](https://www.r-project.org/)
     - RStudio at [https://rstudio.com/products/rstudio/download/](https://rstudio.com/products/rstudio/download/)
     - R packages: raster, dplyr, ggplot2
-4. Download Dryad data
+4. Download data from Dryad:
+    - full package is 723 MB; this could take an hour on a slow (2Mbps) internet connection
     - Download manually at [https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4b8gtht99/download](https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4b8gtht99/download) OR
     - Download with R using code below
 
