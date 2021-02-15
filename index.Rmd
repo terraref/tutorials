@@ -86,11 +86,22 @@ To sign up, you will need to 1) fill out the TERRA REF Beta user questionnaire (
 
 ## Ways of Accessing Data
 
+### Public Domain Data (Seasons 4 and 6) 
+
+Data in the public domain can be found in two places. 
+
+1. About 1GB of data including all trait data, weather, experimental metadata, sensor documentation and lists of all of the sensor data are on Dryad at https://doi.org/10.5061/dryad.4b8gtht99. Learn more in the [README](https://datadryad.org/stash/downloads/file_stream/624638) on Dryad.
+2. Sensor and Genomic data (approximately 1/2 PB) are available via Globus on the [`ncsa#terra-public`](https://app.globus.org/file-manager?origin_id=e8feaff4-96cd-11ea-bf90-0e6cccbb0103&origin_path=%2F) collection. 
+
+Citation: LeBauer, David et al. (2020), Data From: TERRA-REF, An open reference data set from high resolution genomics, phenomics, and imaging sensors, Dryad, Dataset, https://doi.org/10.5061/dryad.4b8gtht99
+
+### Other data portals (public domain and beyond) 
+
 * Web Interfaces
-    + [Clowder](https://docs.terraref.org/user-manual/how-to-access-data/using-clowder-sensor-and-genoomics-data) (sensor and genomic data)
-    + [Globus](https://docs.terraref.org/user-manual/how-to-access-data/using-globus-sensor-and-genomics-data) (sensor and genomic data)
-    + [BETYdb](https://docs.terraref.org/user-manual/how-to-access-data/using-betydb-trait-data-experimental-metadata) (trait data and experimental metadata)
-    + [CoGe](https://docs.terraref.org/user-manual/how-to-access-data/using-coge-genomics) (genomic data)
+    + [Clowder](https://docs.terraref.org/user-manual/how-to-access-data#clowder-sensor-data-and-metadata-browser) (sensor and genomic data)
+    + [Globus](https://docs.terraref.org/user-manual/how-to-access-data#globus-browse-and-transfer-files) (sensor and genomic data)
+    + [BETYdb](https://docs.terraref.org/user-manual/how-to-access-data#betydb-trait-data-and-agronomic-metadata) (trait data and experimental metadata)
+    + [CoGe](https://docs.terraref.org/user-manual/how-to-access-data#coge-genomics-data) (genomics data)
 * Files
 * Programming APIs
     + [BETYdb API](https://pecan.gitbook.io/betydb-data-access/api-for-url-based-queries)
