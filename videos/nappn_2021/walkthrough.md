@@ -49,17 +49,19 @@ AZ time:
       - R at <https://www.r-project.org/>
       - RStudio at <https://rstudio.com/products/rstudio/download/>
       - R packages: raster, dplyr, ggplot2
-4.  Download Dryad data
+4.  Download data from Dryad:
+      - full package is 723 MB; this could take an hour on a slow
+        (2Mbps) internet connection
       - Download manually at
-        <https://datadryad.org/stash/dataset/doi:10.5061/dryad.4b8gtht99>
-        by clicking blue “Download dataset” button OR
+        <https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4b8gtht99/download>
+        OR
       - Download with R using code below
 
 <!-- end list -->
 
 ``` r
 local_path <- "dryad_data.zip"
-dryad_url <- ""
+dryad_url <- "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4b8gtht99/download"
 download.file(url = dryad_url, destfile = local_path)
 unzip(local_path)
 ```
@@ -255,7 +257,7 @@ library(raster)
     ## Warning: package 'sp' was built under R version 3.6.2
 
 ``` r
-single_RGB <- raster("rgb_geotiff_L1_ua-mac_2018-04-16__10-17-18-788_left.tif")
+single_RGB <- raster("rgb_geotiff_L1_ua-mac_2018-04-16__10-17-18-788_left.tif 06-09-33-030.tif")
 plot(single_RGB)
 ```
 
@@ -341,13 +343,6 @@ ggplot(data = canopy_cover, aes(x = date, y = mean)) +
 
 ![](walkthrough_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-``` r
-ggplot(data = canopy_cover, aes(x = date, y = mean, color = plot)) +
-  geom_point()
-```
-
-![](walkthrough_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
-
 That’s a lot of data, so look at just one cultivar. Get this from the
 traitvis cultivar menu.
 
@@ -361,14 +356,6 @@ ggplot(data = canopy_cover_cultivar, aes(x = date, y = mean, color = plot)) +
 ```
 
 ![](walkthrough_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
-
-``` r
-ggplot(data = canopy_cover_cultivar, aes(x = date, y = mean)) +
-  geom_point() +
-  facet_wrap(~plot)
-```
-
-![](walkthrough_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
 
 ## Weather data - Kristina
 
@@ -530,8 +517,7 @@ Run the logistic model on the dataframe to get out predicted values of
 canopy cover for all GDD values. Add this to dataframe.
 
 ``` r
-cover_predictions <- model_logistic_growth(cover_gdd)
-cover_gdd$predictions <- cover_predictions
+cover_gdd$predictions <- model_logistic_growth(cover_gdd)
 ```
 
 Plot the data like before, and plot model as line using predicted values

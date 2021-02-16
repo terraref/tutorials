@@ -150,7 +150,7 @@ R has a pretty good set of tools for working with spatial data. One of these is 
 
 ```{r}
 library(raster)
-single_RGB <- raster("rgb_geotiff_L1_ua-mac_2018-04-16__10-17-18-788_left.tif")
+single_RGB <- raster("rgb_geotiff_L1_ua-mac_2018-04-16__10-17-18-788_left.tif 06-09-33-030.tif")
 plot(single_RGB)
 ```
 
@@ -187,8 +187,6 @@ Plot data as time series.
 library(ggplot2)
 ggplot(data = canopy_cover, aes(x = date, y = mean)) +
   geom_point()
-ggplot(data = canopy_cover, aes(x = date, y = mean, color = plot)) +
-  geom_point()
 ```
 
 That's a lot of data, so look at just one cultivar. Get this from the traitvis cultivar menu. 
@@ -200,9 +198,6 @@ canopy_cover_cultivar <- canopy_cover %>%
 
 ggplot(data = canopy_cover_cultivar, aes(x = date, y = mean, color = plot)) +
   geom_point()
-ggplot(data = canopy_cover_cultivar, aes(x = date, y = mean)) +
-  geom_point() +
-  facet_wrap(~plot)
 ```
 
 ## Weather data - Kristina
@@ -330,8 +325,7 @@ model_logistic_growth <- function(data){
 Run the logistic model on the dataframe to get out predicted values of canopy cover for all GDD values. Add this to dataframe.
 
 ```{r}
-cover_predictions <- model_logistic_growth(cover_gdd)
-cover_gdd$predictions <- cover_predictions
+cover_gdd$predictions <- model_logistic_growth(cover_gdd)
 ```
 
 Plot the data like before, and plot model as line using predicted values to compare. Looks like a good fit.
