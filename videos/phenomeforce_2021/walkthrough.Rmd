@@ -164,7 +164,7 @@ Other available data and tools in Dryad download, including code and instruction
 Go back to trait data in Dryad download. The way each csv is structured is there is a row per date, location, cultivar, and trait. We'll look at canopy cover, which is derived from RGB images, for that. Walk through columns, noting that `mean` is the actual value. 
 
 ```{r}
-canopy_cover <- read.csv("dryad_data/traits/season_6_traits/season_6_canopy_cover_sensor.csv")
+canopy_cover <- read.csv("dryad_data/traits/season_4_traits/season_4_canopy_cover_sensor.csv")
 str(canopy_cover)
 ```
 
@@ -210,7 +210,7 @@ range(canopy_cover$date)
 So 2018 data, and we'll use hourly because we'll need sub-daily values later. 
 
 ```{r}
-weather <- read.csv("dryad_data/metadata/weather/azmet/azmet_2018_hourly.csv")
+weather <- read.csv("dryad_data/metadata/weather/azmet/azmet_2017_hourly.csv")
 ```
 
 There are no column names. These are in README in `azmet` folder. In "HOURLY FILES" section. 
@@ -218,10 +218,10 @@ There are no column names. These are in README in `azmet` folder. In "HOURLY FIL
 Calculate date from year and day of year, to go with date in canopy cover. Then calculate mean temperature. Pull out just date and temperature column. Use dplyr tools to get mean daily temp. 
 
 ```{r}
-temp_2018_daily <- weather %>% 
-  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
-  select(date, X4.4) %>% 
-  rename(temperature = X4.4) %>% 
+temp_2017_daily <- weather %>% 
+  mutate(date = as.Date(X1, origin = "2016-12-31")) %>% 
+  select(date, X13.3) %>% 
+  rename(temperature = X13.3) %>% 
   group_by(date) %>% 
   summarize(mean_temp = mean(temperature))
 ```
@@ -229,7 +229,7 @@ temp_2018_daily <- weather %>%
 ### Plot data - Kristina
 
 ```{r}
-ggplot(temp_2018_daily, aes(x = date, y = mean_temp)) +
+ggplot(temp_2017_daily, aes(x = date, y = mean_temp)) +
   geom_point()
 ```
 
@@ -242,9 +242,9 @@ We’ll calculate a metric from temperature called growing degree days. Basicall
 Go back a few steps to get hourly temperature values. The value actually needed for GDD is the mean of lowest and highest temps, so add that calculation in as a new column.
 ```{r}
 temp_for_gdd <- weather %>% 
-  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
-  select(date, X4.4) %>% 
-  rename(temperature = X4.4) %>% 
+  mutate(date = as.Date(X1, origin = "2016-12-31")) %>% 
+  select(date, X13.3) %>% 
+  rename(temperature = X13.3) %>% 
   group_by(date) %>% 
   summarize(min_temp = min(temperature), 
             max_temp = max(temperature), 
@@ -298,40 +298,40 @@ ggplot(cover_gdd, aes(x = gdd_cum, y = mean)) +
 Seems like logistic growth model would be a good fit to these data. Wrote a function to model these data. Copy and paste function and point out parts.
 
 ```{r}
-model_logistic_growth <- function(data){
-  #parameter estimates
-  c <- 90
-  a <- 0.1
-  y <- cover_gdd$mean[3]
-  g <- cover_gdd$gdd_cum[3]
-  b <- ((log((c/y) - 1)) - a)/g
-  #model
-  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)), 
-                             start = list(c = c, a = a, b = b),
-                             data = data)
-  #model coefficients
-  single_c <- coef(model)[1]
-  single_a <- coef(model)[2]
-  single_b <- coef(model)[3]
-  #canopy value predictions
-  mean_predict = single_c / (1 + exp(single_a + single_b * data$gdd_cum))
-  return(mean_predict)
-}
+# model_logistic_growth <- function(data){
+#   #parameter estimates
+#   c <- 90
+#   a <- 0.1
+#   y <- cover_gdd$mean[3]
+#   g <- cover_gdd$gdd_cum[3]
+#   b <- ((log((c/y) - 1)) - a)/g
+#   #model
+#   model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)), 
+#                              start = list(c = c, a = a, b = b),
+#                              data = data)
+#   #model coefficients
+#   single_c <- coef(model)[1]
+#   single_a <- coef(model)[2]
+#   single_b <- coef(model)[3]
+#   #canopy value predictions
+#   mean_predict = single_c / (1 + exp(single_a + single_b * data$gdd_cum))
+#   return(mean_predict)
+# }
 ```
 
 Run the logistic model on the dataframe to get out predicted values of canopy cover for all GDD values. Add this to dataframe.
 
 ```{r}
-cover_gdd$predictions <- model_logistic_growth(cover_gdd)
+# cover_gdd$predictions <- model_logistic_growth(cover_gdd)
 ```
 
 Plot the data like before, and plot model as line using predicted values to compare. Looks like a good fit.
 
 ```{r}
-ggplot(cover_gdd) +
-  geom_point(aes(x = gdd_cum, y = mean)) +
-  geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
-  labs(x = "Cumulative growing degree days", y = "Canopy Height")
+# ggplot(cover_gdd) +
+#   geom_point(aes(x = gdd_cum, y = mean)) +
+#   geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
+#   labs(x = "Cumulative growing degree days", y = "Canopy Height")
 ```
 
 ### Wrapup - David
