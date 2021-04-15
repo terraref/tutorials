@@ -288,50 +288,57 @@ cover_gdd <- left_join(canopy_cover_cultivar, gdd, by = "date") %>%
   select(date, mean, gdd_cum)
 ```
 
+We're going to only model data up until the peak canopy height. 
+
+```{r}
+cover_gdd_model <- cover_gdd %>% 
+  filter(date <= as.Date("2017-07-01"))
+```
+
 Before modeling any data, should look at it. With more heat, cover increases quite quickly before asymptoting.
 
 ```{r}
-ggplot(cover_gdd, aes(x = gdd_cum, y = mean)) +
+ggplot(cover_gdd_model, aes(x = gdd_cum, y = mean)) +
   geom_point()
 ```
 
 Seems like logistic growth model would be a good fit to these data. Wrote a function to model these data. Copy and paste function and point out parts.
 
 ```{r}
-# model_logistic_growth <- function(data){
-#   #parameter estimates
-#   c <- 90
-#   a <- 0.1
-#   y <- cover_gdd$mean[3]
-#   g <- cover_gdd$gdd_cum[3]
-#   b <- ((log((c/y) - 1)) - a)/g
-#   #model
-#   model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)), 
-#                              start = list(c = c, a = a, b = b),
-#                              data = data)
-#   #model coefficients
-#   single_c <- coef(model)[1]
-#   single_a <- coef(model)[2]
-#   single_b <- coef(model)[3]
-#   #canopy value predictions
-#   mean_predict = single_c / (1 + exp(single_a + single_b * data$gdd_cum))
-#   return(mean_predict)
-# }
+model_logistic_growth <- function(data){
+  #parameter estimates
+  c <- 80
+  a <- 0.1
+  y <- cover_gdd_model %>% filter(date == "2017-06-28") %>% slice(2) %>% select(mean) %>% as.numeric()
+  g <- cover_gdd_model %>% filter(date == "2017-06-28") %>% slice(2) %>% select(gdd_cum) %>% as.numeric()
+  b <- ((log((c/y) - 1)) - a)/g
+  #model
+  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)),
+                             start = list(c = c, a = a, b = b),
+                             data = data)
+  #model coefficients
+  single_c <- coef(model)[1]
+  single_a <- coef(model)[2]
+  single_b <- coef(model)[3]
+  #canopy value predictions
+  mean_predict = single_c / (1 + exp(single_a + single_b * data$gdd_cum))
+  return(mean_predict)
+}
 ```
 
 Run the logistic model on the dataframe to get out predicted values of canopy cover for all GDD values. Add this to dataframe.
 
 ```{r}
-# cover_gdd$predictions <- model_logistic_growth(cover_gdd)
+cover_gdd_model$predictions <- model_logistic_growth(cover_gdd_model)
 ```
 
 Plot the data like before, and plot model as line using predicted values to compare. Looks like a good fit.
 
 ```{r}
-# ggplot(cover_gdd) +
-#   geom_point(aes(x = gdd_cum, y = mean)) +
-#   geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
-#   labs(x = "Cumulative growing degree days", y = "Canopy Height")
+ggplot(cover_gdd_model) +
+  geom_point(aes(x = gdd_cum, y = mean)) +
+  geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
+  labs(x = "Cumulative growing degree days", y = "Canopy Height")
 ```
 
 ### Wrapup - David
