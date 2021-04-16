@@ -135,11 +135,11 @@ Go to globus.org and sign into account. Go to Endpoints in left hand side menu a
 
 (Optional possible step: Create personal endpoint by opening up Globus Connect, go to Preferences, to Access, click + button, select local folder (maybe Desktop for now), select "Writable" tab)
 
-We'll need to add the TERRA REF endpoint. In "Search all endpoints" bar in upper right, type in #Terraref. Add endpoint that pops up by clicking on it. 
+We'll need to add the TERRA REF endpoint. In "Search all endpoints" bar in upper right, type in ncsa#terra-public. Add endpoint that pops up by clicking on it. 
 
 Transfer that RGB image from TERRA REF endpoint to our endpoint. Click on File Manager. In left side "Collection" bar, select personal endpoint. In right side "Collection" bar, select TERRA REF endpoint. 
 
-In right hand file system, navigate to `/ua-mac/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6 Range 44 Column 7/`. Can specify local path too. Transfer to local Globus endpoint in same root folder as Dryad data by submitting transfer. Can see job by clicking "View details" link in green pop up box. Show file locally. 
+In right hand file system, navigate to `/season-6/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6 Range 44 Column 7/`. Can specify local path too. Transfer to local Globus endpoint in same root folder as Dryad data by submitting transfer by clicking blue Start button on right hand side. Can see job by clicking "View details" link in green pop up box. Show file locally. 
 
 ### Plot - Kristina
 
@@ -164,7 +164,7 @@ Other available data and tools in Dryad download, including code and instruction
 Go back to trait data in Dryad download. The way each csv is structured is there is a row per date, location, cultivar, and trait. We'll look at canopy cover, which is derived from RGB images, for that. Walk through columns, noting that `mean` is the actual value. 
 
 ```{r}
-canopy_cover <- read.csv("dryad_data/traits/season_6_traits/season_6_canopy_cover_sensor.csv")
+canopy_cover <- read.csv("dryad_data/traits/season_4_traits/season_4_canopy_cover_sensor.csv")
 str(canopy_cover)
 ```
 
@@ -207,10 +207,10 @@ Weather data in Dryad download for the field site and the two years that the two
 range(canopy_cover$date)
 ```
 
-So 2018 data, and we'll use hourly because we'll need sub-daily values later. 
+So 2017 data, and we'll use hourly because we'll need sub-daily values later. 
 
 ```{r}
-weather <- read.csv("dryad_data/metadata/weather/azmet/azmet_2018_hourly.csv")
+weather <- read.csv("dryad_data/metadata/weather/azmet/azmet_2017_hourly.csv")
 ```
 
 There are no column names. These are in README in `azmet` folder. In "HOURLY FILES" section. 
@@ -218,10 +218,10 @@ There are no column names. These are in README in `azmet` folder. In "HOURLY FIL
 Calculate date from year and day of year, to go with date in canopy cover. Then calculate mean temperature. Pull out just date and temperature column. Use dplyr tools to get mean daily temp. 
 
 ```{r}
-temp_2018_daily <- weather %>% 
-  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
-  select(date, X4.4) %>% 
-  rename(temperature = X4.4) %>% 
+temp_2017_daily <- weather %>% 
+  mutate(date = as.Date(X1, origin = "2016-12-31")) %>% 
+  select(date, X13.3) %>% 
+  rename(temperature = X13.3) %>% 
   group_by(date) %>% 
   summarize(mean_temp = mean(temperature))
 ```
@@ -229,7 +229,7 @@ temp_2018_daily <- weather %>%
 ### Plot data - Kristina
 
 ```{r}
-ggplot(temp_2018_daily, aes(x = date, y = mean_temp)) +
+ggplot(temp_2017_daily, aes(x = date, y = mean_temp)) +
   geom_point()
 ```
 
@@ -242,9 +242,9 @@ We’ll calculate a metric from temperature called growing degree days. Basicall
 Go back a few steps to get hourly temperature values. The value actually needed for GDD is the mean of lowest and highest temps, so add that calculation in as a new column.
 ```{r}
 temp_for_gdd <- weather %>% 
-  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
-  select(date, X4.4) %>% 
-  rename(temperature = X4.4) %>% 
+  mutate(date = as.Date(X1, origin = "2016-12-31")) %>% 
+  select(date, X13.3) %>% 
+  rename(temperature = X13.3) %>% 
   group_by(date) %>% 
   summarize(min_temp = min(temperature), 
             max_temp = max(temperature), 
@@ -288,10 +288,17 @@ cover_gdd <- left_join(canopy_cover_cultivar, gdd, by = "date") %>%
   select(date, mean, gdd_cum)
 ```
 
+We're going to only model data up until the peak canopy height. 
+
+```{r}
+cover_gdd_model <- cover_gdd %>% 
+  filter(date <= as.Date("2017-07-01"))
+```
+
 Before modeling any data, should look at it. With more heat, cover increases quite quickly before asymptoting.
 
 ```{r}
-ggplot(cover_gdd, aes(x = gdd_cum, y = mean)) +
+ggplot(cover_gdd_model, aes(x = gdd_cum, y = mean)) +
   geom_point()
 ```
 
@@ -300,13 +307,13 @@ Seems like logistic growth model would be a good fit to these data. Wrote a func
 ```{r}
 model_logistic_growth <- function(data){
   #parameter estimates
-  c <- 90
+  c <- 80
   a <- 0.1
-  y <- cover_gdd$mean[3]
-  g <- cover_gdd$gdd_cum[3]
+  y <- cover_gdd_model %>% filter(date == "2017-06-28") %>% slice(2) %>% select(mean) %>% as.numeric()
+  g <- cover_gdd_model %>% filter(date == "2017-06-28") %>% slice(2) %>% select(gdd_cum) %>% as.numeric()
   b <- ((log((c/y) - 1)) - a)/g
   #model
-  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)), 
+  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)),
                              start = list(c = c, a = a, b = b),
                              data = data)
   #model coefficients
@@ -322,13 +329,13 @@ model_logistic_growth <- function(data){
 Run the logistic model on the dataframe to get out predicted values of canopy cover for all GDD values. Add this to dataframe.
 
 ```{r}
-cover_gdd$predictions <- model_logistic_growth(cover_gdd)
+cover_gdd_model$predictions <- model_logistic_growth(cover_gdd_model)
 ```
 
 Plot the data like before, and plot model as line using predicted values to compare. Looks like a good fit.
 
 ```{r}
-ggplot(cover_gdd) +
+ggplot(cover_gdd_model) +
   geom_point(aes(x = gdd_cum, y = mean)) +
   geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
   labs(x = "Cumulative growing degree days", y = "Canopy Height")

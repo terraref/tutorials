@@ -221,7 +221,7 @@ Connect, go to Preferences, to Access, click + button, select local
 folder (maybe Desktop for now), select “Writable” tab)
 
 We’ll need to add the TERRA REF endpoint. In “Search all endpoints” bar
-in upper right, type in \#Terraref. Add endpoint that pops up by
+in upper right, type in ncsa\#terra-public. Add endpoint that pops up by
 clicking on it.
 
 Transfer that RGB image from TERRA REF endpoint to our endpoint. Click
@@ -229,11 +229,11 @@ on File Manager. In left side “Collection” bar, select personal
 endpoint. In right side “Collection” bar, select TERRA REF endpoint.
 
 In right hand file system, navigate to
-`/ua-mac/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6
-Range 44 Column 7/`. Can specify local path too. Transfer to local
-Globus endpoint in same root folder as Dryad data by submitting
-transfer. Can see job by clicking “View details” link in green pop up
-box. Show file locally.
+`/season-6/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner
+Season 6 Range 44 Column 7/`. Can specify local path too. Transfer to
+local Globus endpoint in same root folder as Dryad data by submitting
+transfer by clicking blue Start button on right hand side. Can see job
+by clicking “View details” link in green pop up box. Show file locally.
 
 ### Plot - Kristina
 
@@ -279,22 +279,22 @@ columns, noting that `mean` is the actual
 value.
 
 ``` r
-canopy_cover <- read.csv("dryad_data/traits/season_6_traits/season_6_canopy_cover_sensor.csv")
+canopy_cover <- read.csv("dryad_data/traits/season_4_traits/season_4_canopy_cover_sensor.csv")
 str(canopy_cover)
 ```
 
-    ## 'data.frame':    110637 obs. of  12 variables:
-    ##  $ plot          : Factor w/ 780 levels "MAC Field Scanner Season 6 Range 10 Column 1",..: 328 327 316 323 330 671 579 669 22 21 ...
+    ## 'data.frame':    54710 obs. of  12 variables:
+    ##  $ plot          : Factor w/ 778 levels "MAC Field Scanner Season 4 Range 10 Column 1",..: 70 70 70 70 70 70 70 70 70 70 ...
     ##  $ scientificname: Factor w/ 1 level "Sorghum bicolor": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ genotype      : Factor w/ 326 levels "PI144134","PI145619",..: 326 326 326 326 93 247 120 185 216 242 ...
-    ##  $ treatment     : Factor w/ 1 level "MAC Season 6: Sorghum": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ date          : Factor w/ 86 levels "2018-04-16","2018-04-28",..: 81 81 81 81 81 81 81 81 81 81 ...
+    ##  $ genotype      : Factor w/ 351 levels "Big_Kahuna","PI144134",..: 209 209 209 209 209 209 209 209 209 209 ...
+    ##  $ treatment     : Factor w/ 2 levels "MAC Season 4: BAP water-deficit stress Aug 1-14",..: 2 2 2 2 2 2 2 2 2 2 ...
+    ##  $ date          : Factor w/ 101 levels "2017-04-27","2017-04-28",..: 1 3 4 5 7 8 9 11 12 13 ...
     ##  $ trait         : Factor w/ 1 level "canopy_cover": 1 1 1 1 1 1 1 1 1 1 ...
     ##  $ method        : Factor w/ 1 level "Green Canopy Cover Estimation from Field Scanner RGB images": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ mean          : num  70 72.2 71.3 71.7 46.9 ...
+    ##  $ mean          : num  0.000225 0.0866 0.309 2.53 0.366 1.64 1.57 5.75 8.7 7.71 ...
     ##  $ checked       : int  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ author        : Factor w/ 1 level "Zongyang, Li": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ season        : Factor w/ 1 level "Season 6": 1 1 1 1 1 1 1 1 1 1 ...
+    ##  $ season        : Factor w/ 1 level "Season 4": 1 1 1 1 1 1 1 1 1 1 ...
     ##  $ method_type   : Factor w/ 1 level "sensor": 1 1 1 1 1 1 1 1 1 1 ...
 
 Note that date is a factor. We’ll need it to be in date format for
@@ -371,13 +371,13 @@ to canopy cover data, cause we’ll combine them later.
 range(canopy_cover$date)
 ```
 
-    ## [1] "2018-04-16" "2018-07-28"
+    ## [1] "2017-04-27" "2017-08-31"
 
-So 2018 data, and we’ll use hourly because we’ll need sub-daily values
+So 2017 data, and we’ll use hourly because we’ll need sub-daily values
 later.
 
 ``` r
-weather <- read.csv("dryad_data/metadata/weather/azmet/azmet_2018_hourly.csv")
+weather <- read.csv("dryad_data/metadata/weather/azmet/azmet_2017_hourly.csv")
 ```
 
 There are no column names. These are in README in `azmet` folder. In
@@ -388,10 +388,10 @@ cover. Then calculate mean temperature. Pull out just date and
 temperature column. Use dplyr tools to get mean daily temp.
 
 ``` r
-temp_2018_daily <- weather %>% 
-  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
-  select(date, X4.4) %>% 
-  rename(temperature = X4.4) %>% 
+temp_2017_daily <- weather %>% 
+  mutate(date = as.Date(X1, origin = "2016-12-31")) %>% 
+  select(date, X13.3) %>% 
+  rename(temperature = X13.3) %>% 
   group_by(date) %>% 
   summarize(mean_temp = mean(temperature))
 ```
@@ -399,7 +399,7 @@ temp_2018_daily <- weather %>%
 ### Plot data - Kristina
 
 ``` r
-ggplot(temp_2018_daily, aes(x = date, y = mean_temp)) +
+ggplot(temp_2017_daily, aes(x = date, y = mean_temp)) +
   geom_point()
 ```
 
@@ -420,9 +420,9 @@ calculation in as a new column.
 
 ``` r
 temp_for_gdd <- weather %>% 
-  mutate(date = as.Date(X1, origin = "2017-12-31")) %>% 
-  select(date, X4.4) %>% 
-  rename(temperature = X4.4) %>% 
+  mutate(date = as.Date(X1, origin = "2016-12-31")) %>% 
+  select(date, X13.3) %>% 
+  rename(temperature = X13.3) %>% 
   group_by(date) %>% 
   summarize(min_temp = min(temperature), 
             max_temp = max(temperature), 
@@ -477,15 +477,22 @@ cover_gdd <- left_join(canopy_cover_cultivar, gdd, by = "date") %>%
   select(date, mean, gdd_cum)
 ```
 
+We’re going to only model data up until the peak canopy height.
+
+``` r
+cover_gdd_model <- cover_gdd %>% 
+  filter(date <= as.Date("2017-07-01"))
+```
+
 Before modeling any data, should look at it. With more heat, cover
 increases quite quickly before asymptoting.
 
 ``` r
-ggplot(cover_gdd, aes(x = gdd_cum, y = mean)) +
+ggplot(cover_gdd_model, aes(x = gdd_cum, y = mean)) +
   geom_point()
 ```
 
-![](walkthrough_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](walkthrough_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Seems like logistic growth model would be a good fit to these data.
 Wrote a function to model these data. Copy and paste function and point
@@ -494,13 +501,13 @@ out parts.
 ``` r
 model_logistic_growth <- function(data){
   #parameter estimates
-  c <- 90
+  c <- 80
   a <- 0.1
-  y <- cover_gdd$mean[3]
-  g <- cover_gdd$gdd_cum[3]
+  y <- cover_gdd_model %>% filter(date == "2017-06-28") %>% slice(2) %>% select(mean) %>% as.numeric()
+  g <- cover_gdd_model %>% filter(date == "2017-06-28") %>% slice(2) %>% select(gdd_cum) %>% as.numeric()
   b <- ((log((c/y) - 1)) - a)/g
   #model
-  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)), 
+  model <- nls(mean ~ c / (1 + exp(a + b * gdd_cum)),
                              start = list(c = c, a = a, b = b),
                              data = data)
   #model coefficients
@@ -517,20 +524,20 @@ Run the logistic model on the dataframe to get out predicted values of
 canopy cover for all GDD values. Add this to dataframe.
 
 ``` r
-cover_gdd$predictions <- model_logistic_growth(cover_gdd)
+cover_gdd_model$predictions <- model_logistic_growth(cover_gdd_model)
 ```
 
 Plot the data like before, and plot model as line using predicted values
 to compare. Looks like a good fit.
 
 ``` r
-ggplot(cover_gdd) +
+ggplot(cover_gdd_model) +
   geom_point(aes(x = gdd_cum, y = mean)) +
   geom_line(aes(x = gdd_cum, y = predictions), color = "orange") +
   labs(x = "Cumulative growing degree days", y = "Canopy Height")
 ```
 
-![](walkthrough_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](walkthrough_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ### Wrapup - David
 
