@@ -221,7 +221,7 @@ Connect, go to Preferences, to Access, click + button, select local
 folder (maybe Desktop for now), select “Writable” tab)
 
 We’ll need to add the TERRA REF endpoint. In “Search all endpoints” bar
-in upper right, type in \#Terraref. Add endpoint that pops up by
+in upper right, type in ncsa\#terra-public. Add endpoint that pops up by
 clicking on it.
 
 Transfer that RGB image from TERRA REF endpoint to our endpoint. Click
@@ -229,11 +229,11 @@ on File Manager. In left side “Collection” bar, select personal
 endpoint. In right side “Collection” bar, select TERRA REF endpoint.
 
 In right hand file system, navigate to
-`/ua-mac/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner Season 6
-Range 44 Column 7/`. Can specify local path too. Transfer to local
-Globus endpoint in same root folder as Dryad data by submitting
-transfer. Can see job by clicking “View details” link in green pop up
-box. Show file locally.
+`/season-6/Level_1_Plots/rgb_geotiff/2018-04-16/MAC Field Scanner
+Season 6 Range 44 Column 7/`. Can specify local path too. Transfer to
+local Globus endpoint in same root folder as Dryad data by submitting
+transfer by clicking blue Start button on right hand side. Can see job
+by clicking “View details” link in green pop up box. Show file locally.
 
 ### Plot - Kristina
 
@@ -373,7 +373,7 @@ range(canopy_cover$date)
 
     ## [1] "2017-04-27" "2017-08-31"
 
-So 2018 data, and we’ll use hourly because we’ll need sub-daily values
+So 2017 data, and we’ll use hourly because we’ll need sub-daily values
 later.
 
 ``` r
